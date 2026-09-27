@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-arabic), sans-serif;
+  background-color: #f6f7f5;
+  color: #16241d;
+}
+
+.container-x {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.section {
+  padding-top: 2.75rem;
+  padding-bottom: 2.75rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+
+.card {
+  @apply bg-white rounded-xl2 shadow-sm;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 30px -12px rgba(22, 36, 29, 0.15);
+}
+
+/* Marquee animation — must be defined here, not just in tailwind.config.js */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+
+.marquee-wrap:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.btn-primary {
+  @apply bg-brand text-white px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200;
+}
+
+.btn-primary:hover {
+  @apply bg-brand-dark;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -6px rgba(28, 59, 46, 0.5);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  @apply border border-brand/30 text-ink px-6 py-3 rounded-xl font-bold text-sm bg-white transition-all duration-200;
+}
+
+.btn-outline:hover {
+  @apply bg-brand-soft border-brand/50;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -6px rgba(28, 59, 46, 0.15);
+}
+
+.btn-outline:active {
+  transform: translateY(0);
+}
+
+.btn-white {
+  @apply bg-white text-ink px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200;
+}
+
+.btn-white:hover {
+  @apply bg-white/90;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -6px rgba(255, 255, 255, 0.25);
+}
+
+.btn-white:active {
+  transform: translateY(0);
+}
+
+.btn-cta {
+  @apply bg-brand-light text-white px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200;
+}
+
+.btn-cta:hover {
+  @apply bg-brand;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -6px rgba(28, 59, 46, 0.4);
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+}
+
+/* Rakkas heading style */
+.heading-decorative {
+  font-family: var(--font-arabic-heading);
+  line-height: 1.4;
+}
