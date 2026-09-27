@@ -1,9 +1,14 @@
 // components/SecurityServices.jsx
+import { SquiggleUnderline } from "./SquiggleUnderline";
+
 export default function SecurityServices({ title, subtitle, items }) {
   return (
     <section className="container-x section">
       <div className="mb-12 max-w-xl">
-        <h2 className="text-3xl font-black text-ink mb-4">{title}</h2>
+        <div className="inline-block mb-4">
+          <h2 className="text-3xl font-black text-ink">{title}</h2>
+          <SquiggleUnderline />
+        </div>
         <p className="text-ink/60">{subtitle}</p>
       </div>
 

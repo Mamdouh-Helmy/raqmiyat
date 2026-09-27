@@ -1,5 +1,6 @@
 // components/SurveillanceGrid.jsx
 import Image from "next/image";
+import { SquiggleUnderline } from "./SquiggleUnderline";
 
 const feeds = [
   { label: "المدخل الرئيسي", status: "نشط" },
@@ -8,14 +9,17 @@ const feeds = [
   { label: "المخازن", status: "نشط" },
 ];
 
-export default function SurveillanceGrid({ image }) {
+export default function SurveillanceGrid({ images }) {
   return (
     <section className="container-x section">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-10 items-center">
         <div>
-          <h2 className="text-3xl font-black text-ink mb-4">
-            مراقبة حية، على مدار الساعة
-          </h2>
+          <div className="inline-block mb-4">
+            <h2 className="text-3xl font-black text-ink">
+              مراقبة حية، على مدار الساعة
+            </h2>
+            <SquiggleUnderline />
+          </div>
           <p className="text-ink/60 leading-relaxed mb-6 max-w-md">
             نراقب منشآتك بكاميرات عالية الدقة وتحليل ذكي للأحداث، مع فريق
             بشري يتابع كل تنبيه لحظة بلحظة.
@@ -37,14 +41,14 @@ export default function SurveillanceGrid({ image }) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {[0, 1, 2, 3].map((i) => (
+          {feeds.map((f, i) => (
             <div
-              key={i}
+              key={f.label}
               className="relative rounded-xl overflow-hidden aspect-video"
             >
               <Image
-                src={image}
-                alt="كاميرا مراقبة"
+                src={images[i]}
+                alt={f.label}
                 fill
                 className="object-cover"
               />

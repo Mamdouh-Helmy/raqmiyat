@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
-import PageHero from "@/components/PageHero";
-import FeatureGrid from "@/components/FeatureGrid";
+import SecurityIntro from "@/components/SecurityIntro";
+import SurveillanceGrid from "@/components/SurveillanceGrid";
+import SecurityServices from "@/components/SecurityServices";
 import ProcessSteps from "@/components/ProcessSteps";
 import Testimonial from "@/components/Testimonial";
 import CTASection from "@/components/CTASection";
@@ -57,12 +58,20 @@ export default function SecurityPage() {
   return (
     <main className="bg-paper">
       <Navbar />
-      <PageHero
+      <SecurityIntro
         title="أمن بياناتك مسؤوليتنا الأولى"
         subtitle="أنظمة حماية سيبرانية متقدمة تضمن سلامة أصولك الرقمية على مدار الساعة بمعايير عالمية."
-        screenshot="/screenshots/security-hero.jpg"
+        image="/security/intro.png"
       />
-      <FeatureGrid
+      <SurveillanceGrid
+        images={[
+          "/security/cam-entrance.png",
+          "/security/cam-parking.png",
+          "/security/cam-lobby.png",
+          "/security/cam-warehouse.png",
+        ]}
+      />
+      <SecurityServices
         title="خدمات الأمن السيبراني"
         subtitle="حماية متكاملة تغطي كل طبقات بنيتك التقنية، من الأنظمة إلى الأفراد."
         items={items}
