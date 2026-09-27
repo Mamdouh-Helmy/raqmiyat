@@ -1,56 +1,58 @@
 import Navbar from "@/components/Navbar";
 import SecurityIntro from "@/components/SecurityIntro";
-import SurveillanceGrid from "@/components/SurveillanceGrid";
+import SiteMonitoring from "@/components/SiteMonitoring";
+import SurveillanceFeatures from "@/components/SurveillanceFeatures";
+import BeforeAfterCompare from "@/components/BeforeAfterCompare";
 import SecurityServices from "@/components/SecurityServices";
 import ProcessSteps from "@/components/ProcessSteps";
 import Testimonial from "@/components/Testimonial";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import {
-  ShieldAlert,
-  Eye,
-  FileCheck2,
-  Siren,
-  Lock,
-  Users,
+  Video,
+  BellRing,
+  Smartphone,
+  CloudUpload,
+  Wrench,
+  HeadphonesIcon,
 } from "lucide-react";
 
 export const metadata = {
-  title: "أنظمة الأمان | رقميات",
+  title: "أنظمة كاميرات المراقبة | رقميات",
   description:
-    "حماية شاملة لبياناتك وأنظمتك من التهديدات الرقمية بمعايير أمنية عالمية.",
+    "تركيب وصيانة أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي لحماية منشآتك على مدار الساعة.",
 };
 
 const items = [
   {
-    icon: ShieldAlert,
-    title: "اختبار الاختراق",
-    text: "فحص استباقي لأنظمتك وتطبيقاتك لاكتشاف الثغرات قبل استغلالها.",
+    icon: Video,
+    title: "توريد وتركيب الكاميرات",
+    text: "اختيار وتركيب كاميرات عالية الدقة (4K) تناسب طبيعة موقعك الداخلي والخارجي.",
   },
   {
-    icon: Eye,
-    title: "المراقبة الأمنية المستمرة (SOC)",
-    text: "رصد وتحليل التهديدات على مدار الساعة عبر مركز عمليات أمنية متكامل.",
+    icon: BellRing,
+    title: "التنبيهات الذكية",
+    text: "إشعارات فورية على هاتفك عند رصد حركة أو شخص غير معتاد في الموقع.",
   },
   {
-    icon: FileCheck2,
-    title: "الامتثال والحوكمة",
-    text: "مواءمة أنظمتك مع المعايير السعودية والعالمية مثل NCA وISO 27001.",
+    icon: Smartphone,
+    title: "المتابعة عبر الجوال",
+    text: "تطبيق مخصص يتيح لك مشاهدة كل الكاميرات مباشرة من أي مكان وفي أي وقت.",
   },
   {
-    icon: Siren,
-    title: "الاستجابة للحوادث",
-    text: "فريق جاهز للتحرك الفوري عند وقوع أي اختراق لاحتواء الضرر بسرعة.",
+    icon: CloudUpload,
+    title: "التخزين السحابي",
+    text: "نسخ احتياطي تلقائي للتسجيلات على السحابة، بحفظ آمن لأي مدة تحتاجها.",
   },
   {
-    icon: Lock,
-    title: "حماية وتشفير البيانات",
-    text: "تطبيق أعلى بروتوكولات التشفير لحماية بياناتك أثناء التخزين والنقل.",
+    icon: Wrench,
+    title: "الصيانة الدورية",
+    text: "فحص وصيانة منتظمة لضمان عمل كل كاميرا بأعلى كفاءة طوال الوقت.",
   },
   {
-    icon: Users,
-    title: "التوعية الأمنية للموظفين",
-    text: "برامج تدريبية لرفع وعي فريقك وتقليل مخاطر الهندسة الاجتماعية.",
+    icon: HeadphonesIcon,
+    title: "دعم فني على مدار الساعة",
+    text: "فريق جاهز للرد على أي عطل أو استفسار فور حدوثه، ليل نهار.",
   },
 ];
 
@@ -59,21 +61,27 @@ export default function SecurityPage() {
     <main className="bg-paper">
       <Navbar />
       <SecurityIntro
-        title="أمن بياناتك مسؤوليتنا الأولى"
-        subtitle="أنظمة حماية سيبرانية متقدمة تضمن سلامة أصولك الرقمية على مدار الساعة بمعايير عالمية."
+        title="عين ساهرة على منشأتك، ٢٤ ساعة"
+        subtitle="أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي، تركيب احترافي ومتابعة مستمرة تضمن أمان موقعك."
         image="/security/intro.png"
       />
-      <SurveillanceGrid
+      <SiteMonitoring
         images={[
           "/security/cam-entrance.png",
           "/security/cam-parking.png",
           "/security/cam-lobby.png",
           "/security/cam-warehouse.png",
         ]}
+        locations={["المدخل الرئيسي", "موقف السيارات", "الردهة", "المخازن"]}
+      />
+      <SurveillanceFeatures />
+      <BeforeAfterCompare
+        beforeImage="/security/compare-before.png"
+        afterImage="/security/compare-after.png"
       />
       <SecurityServices
-        title="خدمات الأمن السيبراني"
-        subtitle="حماية متكاملة تغطي كل طبقات بنيتك التقنية، من الأنظمة إلى الأفراد."
+        title="خدماتنا في أنظمة المراقبة"
+        subtitle="من التركيب إلى الصيانة، نغطي كل احتياجاتك في حماية موقعك بالكاميرات."
         items={items}
       />
       <ProcessSteps />

@@ -51,7 +51,7 @@ export default function Testimonial() {
           key={active}
           className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 md:gap-8 items-center animate-fadeIn"
         >
-          <div className="w-20 h-20 md:w-40 md:h-40 rounded-xl2 overflow-hidden bg-brand-dark flex items-center justify-center shrink-0 order-1 md:order-2">
+          <div className="w-20 h-20 md:w-36 md:h-36 rounded-xl2 overflow-hidden bg-brand-dark flex items-center justify-center shrink-0 order-1 md:order-2">
             <span className="text-white text-lg md:text-3xl font-black">
               {t.initials}
             </span>
