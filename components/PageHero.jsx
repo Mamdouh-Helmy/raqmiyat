@@ -1,25 +1,44 @@
-import Link from "next/link";
+// components/PageHero.jsx
+import Image from "next/image";
+import { SquiggleUnderline } from "./SquiggleUnderline";
+import { ArrowLeft } from "lucide-react";
 
-export default function PageHero({ eyebrow, title, subtitle, gradient }) {
+export default function PageHero({ title, subtitle, screenshot }) {
   return (
-    <section className="container-x pt-6 pb-10 md:pt-10 md:pb-14">
-      <div className="text-sm text-ink/40 mb-6 flex items-center gap-2">
-        <Link href="/" className="hover:text-brand transition-colors">
-          الرئيسية
-        </Link>
-        <span>/</span>
-        <span className="text-ink/60">{eyebrow}</span>
-      </div>
-      <div
-        className={`relative rounded-xl2 overflow-hidden px-8 py-16 md:px-16 md:py-20 text-white ${gradient}`}
-      >
-        <span className="inline-block bg-white/10 text-xs font-bold px-4 py-2 rounded-full mb-6">
-          {eyebrow}
-        </span>
-        <h1 className="text-3xl md:text-5xl font-black mb-5 max-w-2xl leading-tight">
-          {title}
-        </h1>
-        <p className="text-white/70 max-w-xl leading-relaxed">{subtitle}</p>
+    <section className="container-x pt-10 pb-6 md:pt-14 md:pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center">
+        <div>
+          <div className="inline-block mb-5">
+            <h1 className="text-3xl md:text-[2.75rem] font-black leading-snug text-ink">
+              {title}
+            </h1>
+            <SquiggleUnderline />
+          </div>
+
+          <p className="text-ink/60 leading-relaxed text-base md:text-lg max-w-lg mb-8">
+            {subtitle}
+          </p>
+
+          <div className="flex gap-3">
+            <button className="btn-primary">اطلب استشارة</button>
+            <button className="inline-flex items-center gap-2 text-ink font-bold text-sm hover:text-brand transition-colors">
+              شاهد أعمالنا
+              <ArrowLeft size={16} />
+            </button>
+          </div>
+        </div>
+
+        {screenshot && (
+          <div className="relative rounded-xl2 overflow-hidden min-h-[280px] md:min-h-[380px]">
+            <Image
+              src={screenshot}
+              alt={title}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
       </div>
     </section>
   );

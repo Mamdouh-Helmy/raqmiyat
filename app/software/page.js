@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
+import TechStack from "@/components/TechStack";
 import FeatureGrid from "@/components/FeatureGrid";
 import ProcessSteps from "@/components/ProcessSteps";
 import Testimonial from "@/components/Testimonial";
@@ -53,6 +54,13 @@ const items = [
   },
 ];
 
+const heroStats = [
+  { value: "+150", label: "مشروع منجز" },
+  { value: "24/7", label: "دعم فني مستمر" },
+  { value: "+80", label: "عميل راضٍ" },
+  { value: "6+", label: "سنوات خبرة" },
+];
+
 export default function SoftwarePage() {
   return (
     <main className="bg-paper">
@@ -62,7 +70,10 @@ export default function SoftwarePage() {
         title="نبني برمجيات تنمو مع أعمالك"
         subtitle="من الفكرة إلى الإطلاق، نصمم وننفّذ حلولاً برمجية مخصصة بدقة هندسية وتجربة مستخدم استثنائية."
         gradient="bg-gradient-to-br from-brand-dark via-brand to-emerald-700"
+        stats={heroStats}
+        screenshot="/screenshots/software-hero.png"
       />
+      <TechStack />
       <FeatureGrid
         title="خدماتنا البرمجية"
         subtitle="مجموعة متكاملة من الحلول التقنية المصممة خصيصاً لاحتياجات عملك."
