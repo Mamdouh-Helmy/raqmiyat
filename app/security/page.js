@@ -58,10 +58,9 @@ export default function SecurityPage() {
     <main className="bg-paper">
       <Navbar />
       <PageHero
-        eyebrow="أنظمة الأمان"
         title="أمن بياناتك مسؤوليتنا الأولى"
         subtitle="أنظمة حماية سيبرانية متقدمة تضمن سلامة أصولك الرقمية على مدار الساعة بمعايير عالمية."
-        gradient="bg-gradient-to-br from-emerald-950 via-brand-dark to-brand"
+        screenshot="/screenshots/security-hero.jpg"
       />
       <FeatureGrid
         title="خدمات الأمن السيبراني"
