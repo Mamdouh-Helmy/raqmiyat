@@ -1,23 +1,34 @@
+// app/api/contact/route.js
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Contact from "@/models/Contact";
 import { validateContactForm } from "@/lib/validate";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
+import { sanitizeDetails, summarizeDetails } from "@/lib/leadDetails";
 
 const ALLOWED_SUBJECTS = [
   "استشارة مجانية",
   "التحدث مع خبير تقني",
   "فحص أمني",
+  "مناقشة مشروع",
   "عام",
 ];
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { name, email, phone, message, subject, company } = body || {};
+    console.log("contact body:", JSON.stringify(body));
+    const { name, email, phone, message, subject, company, details: rawDetails } =
+      body || {};
+
+    const details = sanitizeDetails(rawDetails);
+
+    // لو الـ planner مبعتش ملاحظات حرّة، الرسالة بتتكوّن من التفاصيل نفسها
+    const finalMessage =
+      (typeof message === "string" && message.trim()) || summarizeDetails(details);
 
     // Server-side validation is the source of truth — never trust the client.
-    const errors = validateContactForm({ name, email, phone, message });
+    const errors = validateContactForm({ name, email, phone, message: finalMessage });
     if (Object.keys(errors).length > 0) {
       return NextResponse.json({ error: "بيانات غير صحيحة.", fields: errors }, { status: 400 });
     }
@@ -30,8 +41,9 @@ export async function POST(req) {
       email: email.trim(),
       phone: phone?.trim() || undefined,
       company: company?.trim() || undefined,
-      message: message.trim(),
+      message: finalMessage,
       subject: safeSubject,
+      details,
     });
 
     return NextResponse.json({ success: true, id: contact._id }, { status: 201 });

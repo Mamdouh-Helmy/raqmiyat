@@ -1,8 +1,10 @@
 "use client";
 
+// app/admin/leads/page.jsx  (أو المسار اللي عندك للصفحة دي)
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone, RefreshCw, Inbox } from "lucide-react";
+import { Mail, Phone, RefreshCw, Inbox, Trash2 } from "lucide-react";
+import { summarizeDetails } from "@/lib/leadDetails";
 
 function initials(name) {
   if (!name) return "؟";
@@ -21,6 +23,9 @@ export default function AdminLeadsPage() {
   const router = useRouter();
   const [leads, setLeads] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | idle | error
+  const [confirmId, setConfirmId] = useState(null); // الطلب اللي مستني تأكيد الحذف
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteErrorId, setDeleteErrorId] = useState(null);
 
   async function fetchLeads() {
     setStatus("loading");
@@ -36,6 +41,26 @@ export default function AdminLeadsPage() {
       setStatus("idle");
     } catch {
       setStatus("error");
+    }
+  }
+
+  async function deleteLead(id) {
+    setDeletingId(id);
+    setDeleteErrorId(null);
+    try {
+      const res = await fetch(`/api/contact/${id}`, { method: "DELETE" });
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      // 404 معناها اتحذف قبل كده، فبنشيله من القائمة عادي
+      if (!res.ok && res.status !== 404) throw new Error();
+      setLeads((prev) => prev.filter((l) => l._id !== id));
+      setConfirmId(null);
+    } catch {
+      setDeleteErrorId(id);
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -93,37 +118,117 @@ export default function AdminLeadsPage() {
         </div>
       ) : (
         <div className="border border-ink/10 rounded-2xl divide-y divide-ink/5 bg-white overflow-hidden">
-          {leads.map((lead) => (
-            <div key={lead._id} className="p-6 flex flex-col md:flex-row md:items-start gap-4">
-              <div className="w-11 h-11 rounded-full bg-brand-soft text-brand font-black flex items-center justify-center shrink-0 text-sm">
-                {initials(lead.name)}
-              </div>
+          {leads.map((lead) => {
+            const hasDetails = lead.details?.length > 0;
+            // لو الرسالة اتكوّنت أوتوماتيك من التفاصيل، منعرضهاش مرتين
+            const showMessage =
+              lead.message && lead.message !== summarizeDetails(lead.details);
+            const confirming = confirmId === lead._id;
+            const deleting = deletingId === lead._id;
 
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="font-black text-ink">{lead.name}</span>
-                  <span className="text-[11px] font-bold text-brand bg-brand-soft px-2.5 py-1 rounded-full">
-                    {lead.subject}
-                  </span>
+            return (
+              <div key={lead._id} className="p-6 flex flex-col md:flex-row md:items-start gap-4">
+                <div className="w-11 h-11 rounded-full bg-brand-soft text-brand font-black flex items-center justify-center shrink-0 text-sm">
+                  {initials(lead.name)}
                 </div>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/45 mb-3">
-                  <span className="flex items-center gap-1.5">
-                    <Mail size={13} /> {lead.email}
-                  </span>
-                  {lead.phone && (
-                    <span className="flex items-center gap-1.5">
-                      <Phone size={13} /> {lead.phone}
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="font-black text-ink">{lead.name}</span>
+                    <span className="text-[11px] font-bold text-brand bg-brand-soft px-2.5 py-1 rounded-full">
+                      {lead.subject}
                     </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/45 mb-3">
+                    <span className="flex items-center gap-1.5">
+                      <Mail size={13} /> {lead.email}
+                    </span>
+                    {lead.phone && (
+                      <span className="flex items-center gap-1.5">
+                        <Phone size={13} /> {lead.phone}
+                      </span>
+                    )}
+                  </div>
+
+                  {showMessage && (
+                    <p className="text-sm text-ink/70 leading-relaxed whitespace-pre-line">
+                      {lead.message}
+                    </p>
+                  )}
+
+                  {hasDetails && (
+                    <div className={showMessage ? "mt-4" : ""}>
+                      <p className="text-xs font-black text-ink mb-2">تفاصيل المشروع</p>
+                      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3.5 rounded-xl border border-ink/10 bg-ink/[0.02] p-4">
+                        {lead.details.map((d, i) => (
+                          <div key={`${d.label}-${i}`}>
+                            <dt className="text-[11px] font-bold text-ink/40 mb-1">{d.label}</dt>
+                            <dd className="text-sm text-ink">
+                              {d.values.length > 1 ? (
+                                <span className="flex flex-wrap gap-1.5">
+                                  {d.values.map((v, j) => (
+                                    <span
+                                      key={`${v}-${j}`}
+                                      className="text-xs font-bold text-ink/70 bg-white border border-ink/10 px-2.5 py-1 rounded-full"
+                                    >
+                                      {v}
+                                    </span>
+                                  ))}
+                                </span>
+                              ) : (
+                                d.values[0]
+                              )}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
                   )}
                 </div>
-                <p className="text-sm text-ink/70 leading-relaxed">{lead.message}</p>
-              </div>
 
-              <p className="text-xs text-ink/30 shrink-0 md:pt-1">
-                {new Date(lead.createdAt).toLocaleString("ar-SA")}
-              </p>
-            </div>
-          ))}
+                <div className="shrink-0 flex flex-row md:flex-col items-center md:items-end justify-between gap-3 md:pt-1">
+                  <p className="text-xs text-ink/30">
+                    {new Date(lead.createdAt).toLocaleString("ar-SA")}
+                  </p>
+
+                  {confirming ? (
+                    <div className="flex flex-col items-end gap-1.5">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => deleteLead(lead._id)}
+                          disabled={deleting}
+                          className="text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 px-3.5 py-2 rounded-lg transition-colors"
+                        >
+                          {deleting ? "جارِ الحذف..." : "تأكيد الحذف"}
+                        </button>
+                        <button
+                          onClick={() => setConfirmId(null)}
+                          disabled={deleting}
+                          className="text-xs font-bold text-ink/50 hover:text-ink transition-colors"
+                        >
+                          إلغاء
+                        </button>
+                      </div>
+                      {deleteErrorId === lead._id && (
+                        <p className="text-[11px] text-red-600">تعذر الحذف، حاول مرة أخرى.</p>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setDeleteErrorId(null);
+                        setConfirmId(lead._id);
+                      }}
+                      aria-label={`حذف طلب ${lead.name}`}
+                      className="p-2 rounded-lg text-ink/30 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

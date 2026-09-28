@@ -1,5 +1,6 @@
 import { El_Messiri, Rakkas } from "next/font/google";
 import "./globals.css";
+import { ContactModalProvider } from "@/components/ContactModalProvider";
 
 const elMessiri = El_Messiri({
   subsets: ["arabic"],
@@ -60,7 +61,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${elMessiri.variable} ${rakkas.variable} font-arabic antialiased`}
       >
-        {children}
+        <ContactModalProvider>{children}</ContactModalProvider>
       </body>
     </html>
   );

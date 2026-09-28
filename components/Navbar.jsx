@@ -4,10 +4,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useContactModal } from "./ContactModalProvider";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const { openContactModal } = useContactModal();
+
+  function handleRequestClick() {
+    document
+      .getElementById("cta-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    openContactModal("استشارة مجانية");
+  }
+
+  function handleMobileRequestClick() {
+    setIsOpen(false);
+    handleRequestClick();
+  }
 
   return (
     <header className="container-x pt-6 relative z-50">
@@ -79,12 +93,13 @@ export default function Navbar() {
         </ul>
 
         {/* Desktop CTA */}
-        <Link
-          href="/#contact"
+        <button
+          type="button"
+          onClick={handleRequestClick}
           className="hidden md:block btn-primary !py-2.5 !px-5 text-xs"
         >
           اطلب استشارة
-        </Link>
+        </button>
 
         {/* Mobile Toggle Button */}
         <button
@@ -170,13 +185,13 @@ export default function Navbar() {
           </Link>
 
           {/* CTA */}
-          <Link
-            href="/#contact"
-            onClick={() => setIsOpen(false)}
+          <button
+            type="button"
+            onClick={handleMobileRequestClick}
             className="btn-primary mt-2 !w-full !py-3 text-center block"
           >
             اطلب استشارة
-          </Link>
+          </button>
         </div>
       </div>
     </header>

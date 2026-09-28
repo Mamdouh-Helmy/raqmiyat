@@ -1,8 +1,19 @@
-// components/SecurityIntro.jsx
+"use client";
+
 import Image from "next/image";
 import { SquiggleUnderline } from "./SquiggleUnderline";
+import { useContactModal } from "./ContactModalProvider";
 
 export default function SecurityIntro({ title, subtitle, image }) {
+  const { openContactModal } = useContactModal();
+
+  function handleRequestClick() {
+    document
+      .getElementById("cta-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    openContactModal("استشارة مجانية");
+  }
+
   return (
     <section className="container-x pt-10 pb-6 md:pt-14 md:pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-10 lg:gap-16 items-center">
@@ -16,7 +27,12 @@ export default function SecurityIntro({ title, subtitle, image }) {
           <p className="text-ink/60 leading-relaxed text-base md:text-lg max-w-md mb-8">
             {subtitle}
           </p>
-          <button className="btn-primary">اطلب استشارة</button>
+          <button
+            onClick={handleRequestClick}
+            className="btn-primary"
+          >
+            اطلب استشارة
+          </button>
         </div>
 
         <div className="relative rounded-xl2 overflow-hidden min-h-[280px] md:min-h-[420px]">

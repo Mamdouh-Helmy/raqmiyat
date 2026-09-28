@@ -1,9 +1,19 @@
-// components/PageHero.jsx
+"use client";
+
 import Image from "next/image";
 import { SquiggleUnderline } from "./SquiggleUnderline";
-import { ArrowLeft } from "lucide-react";
+import { useContactModal } from "./ContactModalProvider";
 
 export default function PageHero({ title, subtitle, screenshot }) {
+  const { openContactModal } = useContactModal();
+
+  function handleRequestClick() {
+    document
+      .getElementById("cta-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    openContactModal("استشارة مجانية");
+  }
+
   return (
     <section className="container-x pt-10 pb-6 md:pt-14 md:pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center">
@@ -20,10 +30,12 @@ export default function PageHero({ title, subtitle, screenshot }) {
           </p>
 
           <div className="flex gap-3">
-            <button className="btn-primary">اطلب استشارة</button>
-            <button className="inline-flex items-center gap-2 text-ink font-bold text-sm hover:text-brand transition-colors">
-              شاهد أعمالنا
-              <ArrowLeft size={16} />
+            <button
+              type="button"
+              onClick={handleRequestClick}
+              className="btn-primary"
+            >
+              اطلب استشارة
             </button>
           </div>
         </div>
