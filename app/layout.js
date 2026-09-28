@@ -16,7 +16,7 @@ const rakkas = Rakkas({
   display: "swap",
 });
 
-const SITE_URL = "https://raqmiyat.vercel.app"; // غيّر ده لدومين موقعك الحقيقي بعد ما ينشر
+const SITE_URL = "https://www.rqmyat.sa";
 
 const title = "رقميات | مستقبل البرمجيات برؤية سعودية";
 const description =
@@ -26,8 +26,11 @@ export const metadata = {
   metadataBase: new URL(SITE_URL),
   title,
   description,
+  alternates: {
+    canonical: "/",
+  },
   icons: {
-    icon: "/logo.png",
+    icon: [{ url: "/logo.png", type: "image/png" }],
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
@@ -48,7 +51,7 @@ export const metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title,
     description,
     images: ["/logo.png"],
