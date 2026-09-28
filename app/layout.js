@@ -16,7 +16,7 @@ const rakkas = Rakkas({
   display: "swap",
 });
 
-const SITE_URL = "https://raqmiyat.com"; // غيّر ده لدومين موقعك الحقيقي بعد ما ينشر
+const SITE_URL = "https://raqmiyat.vercel.app"; // غيّر ده لدومين موقعك الحقيقي بعد ما ينشر
 
 const title = "رقميات | مستقبل البرمجيات برؤية سعودية";
 const description =
