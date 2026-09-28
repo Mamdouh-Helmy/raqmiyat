@@ -3,24 +3,29 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useContactModal } from "@/components/ContactModalProvider";
 
+// action: "contact" يفتح بوب التواصل بالـ subject المحدد، "scroll" ينزل لقسم في الصفحة
 const slides = [
   {
-    title: "الابتكار الرقمي بلا حدود",
-    text: "نطوع الذكاء الاصطناعي لخدمة أعمالك وخلق فرص نمو جديدة ومستدامة في السوق السعودي المتطور.",
-    cta: "استكشف حلولنا",
+    title: "أنظمة مراقبة وحماية متكاملة",
+    text: "نصمم ونركّب كاميرات المراقبة وأنظمة التحكم في الدخول، مع متابعة مركزية وعن بُعد من الجوال على مدار الساعة.",
+    cta: "اطلب معاينة",
+    action: { type: "contact", subject: "فحص أمني" },
     image: "/carousel/ai.png",
   },
   {
-    title: "شراكة تقنية تدوم",
-    text: "فريق من الخبراء يرافقك من التخطيط حتى الإطلاق، بمعايير جودة وأمان عالمية.",
-    cta: "تعرف على فريقنا",
+    title: "برمجيات وأنظمة تُبنى لأعمالك",
+    text: "مواقع وتطبيقات وأنظمة ERP وLMS مخصصة لاحتياج منشأتك، من التحليل حتى التشغيل والدعم.",
+    cta: "ناقش مشروعك",
+    action: { type: "contact", subject: "مناقشة مشروع" },
     image: "/carousel/team.png",
   },
   {
-    title: "حلول مصممة لرؤية 2030",
-    text: "نواكب أهداف التحول الرقمي في المملكة بحلول برمجية سيادية وآمنة.",
-    cta: "اقرأ المزيد",
+    title: "شريك تقني من الفكرة للتشغيل",
+    text: "فريق يرافقك في كل مرحلة بمعايير جودة وأمان عالية، وعقود دعم وصيانة تضمن استمرارية عملك.",
+    cta: "احجز استشارة مجانية",
+    action: { type: "contact", subject: "استشارة مجانية" },
     image: "/carousel/vision2030.png",
   },
 ];
@@ -41,6 +46,7 @@ function SquiggleUnderline() {
 }
 
 export default function InnovationCarousel() {
+  const { openContactModal } = useContactModal();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef(null);
@@ -56,6 +62,12 @@ export default function InnovationCarousel() {
   const slide = slides[active];
   const go = (i) => setActive((i + slides.length) % slides.length);
 
+  function handleCta() {
+    if (slide.action.type === "contact") {
+      openContactModal(slide.action.subject);
+    }
+  }
+
   return (
     <section className="container-x section">
       <div
@@ -64,19 +76,20 @@ export default function InnovationCarousel() {
         onMouseLeave={() => setPaused(false)}
       >
         <div className="card p-10 flex flex-col justify-center min-h-[300px] relative overflow-hidden">
+          {/* في الـ RTL: اليمين = السابق، الشمال = التالي */}
           <button
             onClick={() => go(active - 1)}
             aria-label="السابق"
-            className="absolute top-6 left-6 w-9 h-9 rounded-full border border-ink/10 flex items-center justify-center hover:bg-brand-soft transition-colors"
+            className="absolute top-6 right-6 w-9 h-9 rounded-full border border-ink/10 flex items-center justify-center hover:bg-brand-soft transition-colors"
           >
-            <ChevronLeft size={16} />
+            <ChevronRight size={16} />
           </button>
           <button
             onClick={() => go(active + 1)}
             aria-label="التالي"
-            className="absolute top-6 right-6 w-9 h-9 rounded-full border border-ink/10 flex items-center justify-center hover:bg-brand-soft transition-colors"
+            className="absolute top-6 left-6 w-9 h-9 rounded-full border border-ink/10 flex items-center justify-center hover:bg-brand-soft transition-colors"
           >
-            <ChevronRight size={16} />
+            <ChevronLeft size={16} />
           </button>
 
           <div key={active} className="animate-fadeIn">
@@ -90,7 +103,9 @@ export default function InnovationCarousel() {
           </div>
 
           <div className="flex items-center justify-between">
-            <button className="btn-cta">{slide.cta}</button>
+            <button type="button" onClick={handleCta} className="btn-cta">
+              {slide.cta}
+            </button>
             <div className="flex gap-2">
               {slides.map((_, i) => (
                 <button

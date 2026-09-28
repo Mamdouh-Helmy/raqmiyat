@@ -6,6 +6,10 @@ html {
   scroll-behavior: smooth;
 }
 
+#contact {
+  scroll-margin-top: 90px; /* عدّل الرقم حسب ارتفاع الـ Navbar */
+}
+
 body {
   font-family: var(--font-arabic), sans-serif;
   background-color: #f6f7f5;
@@ -121,3 +125,13 @@ body {
   font-family: var(--font-arabic-heading);
   line-height: 1.4;
 }
+
+/* يخفي شريط التمرير ويسيب التمرير شغال */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge القديم */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+

@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import AboutModal from "@/components/AboutModal";
 
 function SquiggleUnderline() {
   return (
@@ -16,6 +20,8 @@ function SquiggleUnderline() {
 }
 
 export default function Hero() {
+  const [aboutOpen, setAboutOpen] = useState(false);
+
   return (
     <section className="container-x section">
       <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-6">
@@ -49,11 +55,20 @@ export default function Hero() {
           <div className="w-10 h-1 rounded-full bg-brand/30" />
 
           <div className="flex gap-3 mt-auto">
-            <button className="btn-primary">ابدأ الآن</button>
-            <button className="btn-outline">تعرف علينا</button>
+            <a
+              href="#contact"
+              className="btn-primary inline-flex items-center justify-center"
+            >
+              ابدأ الآن
+            </a>
+            <button className="btn-outline" onClick={() => setAboutOpen(true)}>
+              تعرف علينا
+            </button>
           </div>
         </div>
       </div>
+
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </section>
   );
 }

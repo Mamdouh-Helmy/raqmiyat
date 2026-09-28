@@ -21,12 +21,13 @@ export function useContactModal() {
 function modalTitle(subject) {
   if (subject === "استشارة مجانية") return "احجز استشارتك المجانية";
   if (subject === "مناقشة مشروع") return "ناقش مشروعك معنا";
+  if (subject === "فحص أمني") return "اطلب معاينة واستشارة";
   return "تحدث مع أحد خبرائنا";
 }
 
 export function ContactModalProvider({ children }) {
   const [mounted, setMounted] = useState(false);
-  const [modal, setModal] = useState(null); // null | "استشارة مجانية" | "مناقشة مشروع" | ...
+  const [modal, setModal] = useState(null); // null | "استشارة مجانية" | "مناقشة مشروع" | "فحص أمني" | ...
   const [details, setDetails] = useState([]); // اختيارات الزائر من الـ planner: [{ label, value }]
   const [status, setStatus] = useState("idle");
   const [form, setForm] = useState(emptyForm);
@@ -114,25 +115,26 @@ export function ContactModalProvider({ children }) {
         onClick={close}
       />
 
-      <div className="relative bg-white rounded-xl2 w-full max-w-md p-8 shadow-2xl animate-fadeIn max-h-[90vh] overflow-y-auto">
+      {/* no-scrollbar: التمرير شغال بس الشريط مخفي */}
+      <div className="no-scrollbar relative bg-white rounded-xl2 w-full max-w-2xl p-8 md:p-12 shadow-2xl animate-fadeIn max-h-[92vh] overflow-y-auto">
         <button
           type="button"
           onClick={close}
           aria-label="إغلاق"
-          className="absolute top-5 left-5 w-9 h-9 rounded-full flex items-center justify-center text-ink/40 hover:text-ink hover:bg-brand-soft transition-colors"
+          className="absolute top-5 left-5 w-10 h-10 rounded-full flex items-center justify-center text-ink/40 hover:text-ink hover:bg-brand-soft transition-colors"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
         {status === "success" ? (
-          <div className="text-center py-6">
-            <div className="w-16 h-16 rounded-full bg-brand-soft text-brand flex items-center justify-center mx-auto mb-5 text-2xl">
+          <div className="text-center py-10">
+            <div className="w-20 h-20 rounded-full bg-brand-soft text-brand flex items-center justify-center mx-auto mb-6 text-3xl">
               ✓
             </div>
-            <h3 className="text-xl font-black text-ink mb-2">
+            <h3 className="text-2xl font-black text-ink mb-2">
               تم إرسال طلبك بنجاح
             </h3>
-            <p className="text-ink/60 text-sm mb-6">
+            <p className="text-ink/60 mb-8">
               سيتواصل معك فريقنا في أقرب وقت ممكن.
             </p>
             <button type="button" onClick={close} className="btn-primary">
@@ -144,16 +146,16 @@ export function ContactModalProvider({ children }) {
             <span className="inline-block bg-brand-soft text-brand text-xs font-bold px-4 py-2 rounded-full mb-4">
               {modal}
             </span>
-            <h3 className="text-2xl font-black text-ink mb-2">
+            <h3 className="text-3xl font-black text-ink mb-2">
               {modalTitle(modal)}
             </h3>
-            <p className="text-ink/50 text-sm mb-6">
+            <p className="text-ink/50 mb-8">
               املأ بياناتك وسنعاود التواصل معك خلال 24 ساعة.
             </p>
 
             {/* اللي اختاره الزائر في الـ planner، بيتعرض له وبيتبعت معاه */}
             {details.length > 0 && (
-              <dl className="mb-5 space-y-2.5 rounded-xl border border-ink/10 bg-paper p-4">
+              <dl className="mb-6 space-y-3 rounded-xl border border-ink/10 bg-paper p-5">
                 {details.map((d) => (
                   <div
                     key={d.label}
@@ -170,32 +172,34 @@ export function ContactModalProvider({ children }) {
               </dl>
             )}
 
-            <form onSubmit={handleSubmit} noValidate className="space-y-3">
-              <div>
-                <input
-                  placeholder="الاسم الكامل"
-                  value={form.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                  onBlur={() => blurField("name")}
-                  className={inputClass(touched.name && errors.name)}
-                />
-                {touched.name && errors.name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                )}
-              </div>
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    placeholder="الاسم الكامل"
+                    value={form.name}
+                    onChange={(e) => updateField("name", e.target.value)}
+                    onBlur={() => blurField("name")}
+                    className={inputClass(touched.name && errors.name)}
+                  />
+                  {touched.name && errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                  )}
+                </div>
 
-              <div>
-                <input
-                  type="email"
-                  placeholder="البريد الإلكتروني"
-                  value={form.email}
-                  onChange={(e) => updateField("email", e.target.value)}
-                  onBlur={() => blurField("email")}
-                  className={inputClass(touched.email && errors.email)}
-                />
-                {touched.email && errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                )}
+                <div>
+                  <input
+                    type="email"
+                    placeholder="البريد الإلكتروني"
+                    value={form.email}
+                    onChange={(e) => updateField("email", e.target.value)}
+                    onBlur={() => blurField("email")}
+                    className={inputClass(touched.email && errors.email)}
+                  />
+                  {touched.email && errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -213,8 +217,8 @@ export function ContactModalProvider({ children }) {
 
               <div>
                 <textarea
-                  placeholder="أخبرنا عن مشروعك باختصار"
-                  rows={3}
+                  placeholder="أخبرنا عن احتياجك باختصار"
+                  rows={5}
                   value={form.message}
                   onChange={(e) => updateField("message", e.target.value)}
                   onBlur={() => blurField("message")}

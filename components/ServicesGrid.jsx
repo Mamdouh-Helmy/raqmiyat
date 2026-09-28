@@ -21,8 +21,8 @@ export default function ServicesGrid() {
           <div>
             <h3 className="text-2xl font-black text-ink mb-3">الحلول البرمجية</h3>
             <p className="text-ink/60 leading-relaxed mb-5">
-              تطوير تطبيقات ويب وموبايل مخصصة تلبي احتياجات عملك بدقة وكفاءة
-              عالية، مع ضمان تجربة مستخدم استثنائية.
+              نطوّر مواقع الويب وتطبيقات الجوال وأنظمة ERP وLMS مخصصة لاحتياج
+              منشأتك، من تحليل المتطلبات حتى التشغيل والدعم الفني المستمر.
             </p>
             <span className="inline-flex items-center gap-2 text-brand font-bold text-sm">
               اكتشف الخدمة
@@ -39,10 +39,10 @@ export default function ServicesGrid() {
             <ShieldCheck size={26} />
           </div>
           <div>
-            <h3 className="text-2xl font-black mb-3">الأمن السيبراني</h3>
+            <h3 className="text-2xl font-black mb-3">أنظمة المراقبة والحماية</h3>
             <p className="text-white/60 leading-relaxed mb-5">
-              حماية شاملة لبياناتك وأنظمتك من التهديدات الرقمية المتطورة
-              بمعايير أمنية عالمية.
+              تصميم وتركيب وصيانة كاميرات المراقبة وأنظمة التحكم في الدخول،
+              مع متابعة مركزية وعن بُعد على مدار الساعة.
             </p>
             <span className="inline-flex items-center gap-2 text-white font-bold text-sm">
               اكتشف الخدمة
