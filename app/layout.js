@@ -42,8 +42,8 @@ export const metadata = {
     images: [
       {
         url: "/logo.png",
-        width: 1254,
-        height: 1254,
+        width: 512,
+        height: 512,
         alt: "شعار رقميات",
       },
     ],
