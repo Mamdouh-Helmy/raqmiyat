@@ -24,24 +24,30 @@ export default function Hero() {
 
   return (
     <section className="container-x section">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        <div className="lg:col-span-6">
-          <div className="inline-block">
-            <h1 className="font-arabic text-5xl md:text-7xl font-black leading-[1.25] text-ink">
-              مستقبل البرمجيات
-              <br />
-              برؤية سعودية
-            </h1>
-            <SquiggleUnderline />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-6">
+        <div className="card p-8 flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            <div className="inline-block self-start">
+              <h1 className="font-arabic text-3xl lg:text-4xl font-black leading-snug text-ink">
+                مستقبل البرمجيات
+                <br />
+                برؤية سعودية
+              </h1>
+              <SquiggleUnderline />
+            </div>
+            <p className="text-ink/60 leading-relaxed text-sm lg:text-base">
+              نقدم حلولاً برمجية متطورة وخدمات أمنية متكاملة لدعم التحول
+              الرقمي في المملكة.
+            </p>
           </div>
 
-          <p className="text-ink/60 leading-relaxed lg:text-lg mt-8 max-w-md">
-            نقدم حلولاً برمجية متطورة وخدمات أمنية متكاملة لدعم التحول الرقمي في
-            المملكة.
-          </p>
+          <div className="w-10 h-1 rounded-full bg-brand/30" />
 
-          <div className="flex flex-wrap gap-3 mt-8">
-            <a href="#contact" className="btn-primary inline-flex items-center justify-center">
+          <div className="flex gap-3 mt-auto">
+            <a
+              href="#contact"
+              className="btn-primary inline-flex items-center justify-center"
+            >
               ابدأ الآن
             </a>
             <button className="btn-outline" onClick={() => setAboutOpen(true)}>
@@ -49,18 +55,15 @@ export default function Hero() {
             </button>
           </div>
         </div>
-
-        <div className="lg:col-span-6">
-          <div className="relative w-full max-w-[640px] mx-auto aspect-[680/640] bg-brand-dark rounded-xl overflow-hidden">
-            <Image
-              src="/hero.png"
-              alt="أفق الرياض"
-              fill
-              sizes="(min-width: 1024px) 640px, 100vw"
-              className="object-cover"
-              priority
-            />
-          </div>
+        <div className="relative rounded-xl2 overflow-hidden min-h-[420px]">
+          <Image
+            src="/hero.png"
+            alt="أفق الرياض"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/70 via-brand-dark/20 to-transparent" />
         </div>
       </div>
 
