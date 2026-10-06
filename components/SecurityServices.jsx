@@ -23,6 +23,8 @@ const ICONS = {
   headphones: HeadphonesIcon,
 };
 
+const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+
 export default function SecurityServices({ title, subtitle, items }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
 
@@ -49,31 +51,40 @@ export default function SecurityServices({ title, subtitle, items }) {
         <p className="text-ink/60 max-w-lg mx-auto">{subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 border-t border-ink/15">
         {items.map((item, i) => {
           const Icon = ICONS[item.icon] || Video;
           const { title: t, text } = item;
           return (
-            <div
+            <button
               key={t}
-              className="group flex gap-4 p-6 rounded-xl2 bg-white border border-ink/5 transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg hover:border-brand/20"
+              type="button"
+              onClick={() => setSelectedIndex(i)}
+              className="group flex items-start gap-5 border-b border-ink/15 px-4 py-8 text-right outline-none transition-colors duration-300 hover:bg-brand-dark focus-visible:bg-brand-dark md:odd:border-l md:px-8"
             >
-              <div className="w-11 h-11 rounded-lg bg-brand-soft text-brand flex items-center justify-center shrink-0 transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
-                <Icon size={20} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-black text-ink mb-1.5">{t}</h3>
-                <p className="text-ink/60 text-sm leading-relaxed mb-2">{text}</p>
-                <button
-                  type="button"
-                  onClick={() => setSelectedIndex(i)}
-                  className="inline-flex items-center gap-1 text-brand font-bold text-xs hover:gap-2 transition-all duration-200"
-                >
-                  اعرف أكتر
-                  <ArrowLeft size={13} />
-                </button>
-              </div>
-            </div>
+              <span className="flex w-12 shrink-0 flex-col items-start gap-4">
+                <span className="font-heading text-sm leading-none text-sand-deep transition-colors duration-300 group-hover:text-sand group-focus-visible:text-sand">
+                  {toAr(String(i + 1).padStart(2, "0"))}
+                </span>
+                <Icon
+                  size={26}
+                  className="text-brand transition-colors duration-300 group-hover:text-sand group-focus-visible:text-sand"
+                />
+              </span>
+
+              <span className="flex-1">
+                <span className="block text-xl font-black text-ink mb-2 transition-colors duration-300 group-hover:text-white group-focus-visible:text-white">
+                  {t}
+                </span>
+                <span className="block text-sm leading-relaxed text-ink/60 transition-colors duration-300 group-hover:text-white/65 group-focus-visible:text-white/65">
+                  {text}
+                </span>
+              </span>
+
+              <span className="grid size-10 shrink-0 place-items-center rounded-full border border-ink/15 text-ink/50 transition-all duration-300 group-hover:-translate-x-1 group-hover:border-sand group-hover:bg-sand group-hover:text-brand-dark group-focus-visible:border-sand group-focus-visible:bg-sand group-focus-visible:text-brand-dark">
+                <ArrowLeft size={16} />
+              </span>
+            </button>
           );
         })}
       </div>

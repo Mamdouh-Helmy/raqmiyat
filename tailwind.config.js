@@ -13,6 +13,11 @@ module.exports = {
           light: "#3f6650",
           soft: "#eef2ee",
         },
+        // اللون الدافئ الوحيد: للتفاصيل الصغيرة بس
+        sand: {
+          DEFAULT: "#c9a66b",
+          deep: "#8a6a2f", // للنص (تباين أعلى على الخلفية الفاتحة)
+        },
         ink: "#16241d",
         paper: "#f6f7f5",
       },
@@ -29,10 +34,15 @@ module.exports = {
           "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        progress: {
+          "0%": { transform: "scaleX(0)" },
+          "100%": { transform: "scaleX(1)" },
+        },
       },
       animation: {
         marquee: "marquee 22s linear infinite",
         fadeIn: "fadeIn 0.5s ease-out",
+        progress: "progress 7s linear forwards",
       },
       borderRadius: {
         xl2: "1.5rem",

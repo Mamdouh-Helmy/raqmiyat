@@ -5,62 +5,94 @@ import { useState } from "react";
 import Image from "next/image";
 import { SquiggleUnderline } from "./SquiggleUnderline";
 
+const pad = (n) => String(n + 1).padStart(2, "0");
+
 export default function SiteMonitoring({ images, locations }) {
   const [active, setActive] = useState(0);
 
   return (
     <section className="container-x section">
-      <div className="inline-block mb-10">
-        <h2 className="text-3xl font-black text-ink">تغطية كاملة لكل موقع</h2>
-        <SquiggleUnderline />
+      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between mb-10">
+        <div className="inline-block self-start">
+          <h2 className="text-3xl font-black text-ink">تغطية كاملة لكل موقع</h2>
+          <SquiggleUnderline />
+        </div>
+        <p className="text-ink/60 leading-relaxed max-w-sm">
+          عدسات مثبّتة في كل نقطة حساسة من منشأتك، تنقل الصورة بدقة عالية
+          لحظة بلحظة.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-8 lg:gap-14 items-start">
-        <div>
-          <p className="text-ink/60 leading-relaxed mb-8 max-w-xs">
-            عدسات مثبّتة في كل نقطة حساسة من منشأتك، تنقل الصورة بدقة عالية
-            لحظة بلحظة.
-          </p>
+      {/* الشاشة الرئيسية */}
+      <div className="relative aspect-[16/10] md:aspect-[16/8] overflow-hidden rounded-xl2 bg-brand-dark">
+        <Image
+          key={images[active]}
+          src={images[active]}
+          alt={locations[active]}
+          fill
+          sizes="(min-width: 1024px) 1100px, 100vw"
+          className="object-cover animate-fadeIn"
+        />
 
-          <div className="flex flex-col">
-            {locations.map((loc, i) => (
-              <button
-                key={loc}
-                onClick={() => setActive(i)}
-                className={`flex items-center justify-between text-right py-4 border-b transition-colors ${
-                  active === i
-                    ? "border-brand"
-                    : "border-ink/10 hover:border-ink/30"
+        <div className="absolute top-4 right-4 flex items-center gap-3 rounded-full bg-black/55 px-4 py-2 text-xs font-bold text-white backdrop-blur">
+          <span dir="ltr" className="font-mono tracking-wider">
+            CAM {pad(active)}
+          </span>
+          <span className="h-3 w-px bg-white/30" />
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 animate-pulse rounded-full bg-red-500" />
+            مباشر
+          </span>
+        </div>
+
+        <div className="absolute bottom-4 right-4 rounded-xl bg-black/55 px-4 py-2 text-sm font-black text-white backdrop-blur">
+          {locations[active]}
+        </div>
+      </div>
+
+      {/* مصغّرات الكاميرات */}
+      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {locations.map((loc, i) => {
+          const isActive = i === active;
+          return (
+            <button
+              key={loc}
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => setActive(i)}
+              className="group text-right outline-none"
+            >
+              <span
+                className={`relative block aspect-[16/10] overflow-hidden rounded-xl transition-all duration-300 ${
+                  isActive
+                    ? "ring-2 ring-sand ring-offset-2 ring-offset-paper"
+                    : "opacity-60 group-hover:opacity-100 group-focus-visible:ring-2 group-focus-visible:ring-sand"
                 }`}
               >
+                <Image
+                  src={images[i]}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 25vw, 50vw"
+                  className="object-cover"
+                />
                 <span
-                  className={`font-black transition-colors ${
-                    active === i ? "text-brand" : "text-ink/50"
-                  }`}
+                  dir="ltr"
+                  className="absolute top-2 right-2 rounded bg-black/55 px-1.5 py-0.5 font-mono text-[10px] text-white"
                 >
-                  {loc}
+                  {pad(i)}
                 </span>
-                <span
-                  className={`text-xs font-mono transition-colors ${
-                    active === i ? "text-brand" : "text-ink/25"
-                  }`}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative rounded-xl2 overflow-hidden aspect-[16/10]">
-          <Image
-            key={images[active]}
-            src={images[active]}
-            alt={locations[active]}
-            fill
-            className="object-cover"
-          />
-        </div>
+              </span>
+              <span
+                className={`mt-2 block text-sm font-black transition-colors ${
+                  isActive ? "text-ink" : "text-ink/45"
+                }`}
+              >
+                {loc}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

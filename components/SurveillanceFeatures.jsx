@@ -1,9 +1,11 @@
 // components/SurveillanceFeatures.jsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { SquiggleUnderline } from "./SquiggleUnderline";
+
+const DURATION = 6000;
 
 const slides = [
   {
@@ -32,20 +34,13 @@ const slides = [
   },
 ];
 
+const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+
 export default function SurveillanceFeatures() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
-  const timerRef = useRef(null);
 
-  useEffect(() => {
-    if (paused) return;
-    timerRef.current = setInterval(() => {
-      setActive((i) => (i + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timerRef.current);
-  }, [paused]);
-
-  const s = slides[active];
+  const next = () => setActive((i) => (i + 1) % slides.length);
 
   return (
     <section className="container-x section">
@@ -55,36 +50,83 @@ export default function SurveillanceFeatures() {
       </div>
 
       <div
-        className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-8 items-stretch"
+        className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-8 lg:gap-14 items-stretch"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <div className="flex flex-col justify-between">
-          <div key={active} className="animate-fadeIn">
-            <span className="inline-block bg-brand-soft text-brand text-xs font-bold px-3 py-1.5 rounded-full mb-5">
-              {s.tag}
-            </span>
-            <h3 className="text-2xl md:text-3xl font-black text-ink mb-4 leading-snug">
-              {s.title}
-            </h3>
-            <p className="text-ink/60 leading-relaxed max-w-md">{s.text}</p>
-          </div>
+        {/* القايمة */}
+        <ol className="border-t border-ink/15">
+          {slides.map((s, i) => {
+            const isActive = i === active;
+            return (
+              <li key={s.title} className="border-b border-ink/15">
+                <button
+                  type="button"
+                  aria-current={isActive}
+                  onClick={() => setActive(i)}
+                  className="relative w-full text-right py-6 pr-0 flex gap-5 outline-none focus-visible:bg-brand-soft"
+                >
+                  <span
+                    className={`font-heading text-3xl leading-none w-10 shrink-0 transition-colors duration-300 ${
+                      isActive ? "text-sand-deep" : "text-ink/20"
+                    }`}
+                  >
+                    {toAr(i + 1)}
+                  </span>
 
-          <div className="flex gap-2 mt-10">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActive(i)}
-                aria-label={`ميزة ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === active ? "w-8 bg-brand" : "w-1.5 bg-ink/15"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+                  <span className="flex-1">
+                    <span className="flex items-baseline justify-between gap-4">
+                      <span
+                        className={`text-lg md:text-xl font-black transition-colors duration-300 ${
+                          isActive ? "text-ink" : "text-ink/45"
+                        }`}
+                      >
+                        {s.title}
+                      </span>
+                      <span
+                        dir="ltr"
+                        className={`text-xs font-bold transition-opacity duration-300 ${
+                          isActive ? "text-sand-deep opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        {s.tag}
+                      </span>
+                    </span>
 
-        <div className="relative rounded-xl2 overflow-hidden min-h-[320px] lg:min-h-[400px]">
+                    <span
+                      className={`grid transition-[grid-template-rows] duration-500 ease-out ${
+                        isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                      }`}
+                    >
+                      <span className="overflow-hidden">
+                        <span className="block pt-3 text-ink/60 text-[15px] leading-relaxed max-w-md">
+                          {s.text}
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+
+                  {/* شريط التقدم: لما يخلص بينقل للميزة اللي بعدها */}
+                  {isActive && (
+                    <span
+                      key={active}
+                      aria-hidden="true"
+                      onAnimationEnd={next}
+                      className="absolute bottom-0 right-0 h-0.5 w-full origin-right bg-brand animate-progress"
+                      style={{
+                        animationDuration: `${DURATION}ms`,
+                        animationPlayState: paused ? "paused" : "running",
+                      }}
+                    />
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+
+        {/* الصور */}
+        <div className="relative min-h-[320px] lg:min-h-[440px] overflow-hidden rounded-xl2 bg-brand-dark">
           {slides.map((slide, i) => (
             <div
               key={slide.image}
@@ -96,11 +138,11 @@ export default function SurveillanceFeatures() {
                 src={slide.image}
                 alt={slide.title}
                 fill
+                sizes="(min-width: 1024px) 700px, 100vw"
                 className="object-cover"
               />
             </div>
           ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
       </div>
     </section>

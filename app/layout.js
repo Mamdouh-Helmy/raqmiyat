@@ -1,6 +1,8 @@
+//app/layout.js
 import { El_Messiri, Rakkas } from "next/font/google";
 import "./globals.css";
 import { ContactModalProvider } from "@/components/ContactModalProvider";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 const elMessiri = El_Messiri({
   subsets: ["arabic"],
@@ -16,15 +18,17 @@ const rakkas = Rakkas({
   display: "swap",
 });
 
-const SITE_URL = "https://www.rqmyat.sa";
-
 const title = "رقميات | مستقبل البرمجيات برؤية سعودية";
 const description =
   "نقدم حلولاً برمجية متطورة وخدمات أمنية متكاملة لدعم التحول الرقمي في المملكة.";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
-  title,
+  // الصفحات الداخلية بتكتب عنوانها بس، والـ template بيضيف اسم الموقع
+  title: {
+    default: title,
+    template: `%s | ${SITE_NAME}`,
+  },
   description,
   alternates: {
     canonical: "/",
@@ -38,7 +42,7 @@ export const metadata = {
     title,
     description,
     url: SITE_URL,
-    siteName: "رقميات",
+    siteName: SITE_NAME,
     images: [
       {
         url: "/logo.png",

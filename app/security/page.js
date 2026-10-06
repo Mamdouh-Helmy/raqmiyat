@@ -1,3 +1,4 @@
+//app/security/page.js
 import Navbar from "@/components/Navbar";
 import SecurityIntro from "@/components/SecurityIntro";
 import SiteMonitoring from "@/components/SiteMonitoring";
@@ -8,12 +9,31 @@ import ProcessSteps from "@/components/ProcessSteps";
 import Testimonial from "@/components/Testimonial";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = {
-  title: "أنظمة كاميرات المراقبة | رقميات",
+  title: "أنظمة كاميرات المراقبة",
   description:
     "تركيب وصيانة أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي لحماية منشآتك على مدار الساعة.",
+  keywords: [
+    "كاميرات مراقبة",
+    "تركيب كاميرات مراقبة في الرياض",
+    "أنظمة المراقبة والحماية",
+    "كاميرات رؤية ليلية",
+    "مراقبة عن بعد",
+  ],
+  alternates: { canonical: "/security" },
+  openGraph: {
+    type: "website",
+    locale: "ar_SA",
+    siteName: "رقميات",
+    title: "أنظمة كاميرات المراقبة | رقميات",
+    description:
+      "تركيب وصيانة أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي.",
+    url: `${SITE_URL}/security`,
+  },
 };
+
 
 // icon هنا اسم (string) مش كومبوننت — SecurityServices بيحوله للأيقونة الفعلية
 // الأرقام في stats تقديرية، عدّلها حسب مواصفاتكم الفعلية

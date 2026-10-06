@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.4",
     "framer-motion": "^13.4.4",

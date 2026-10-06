@@ -1,3 +1,4 @@
+//components/AboutModal.jsx
 "use client";
 
 import { useEffect } from "react";
@@ -99,7 +100,7 @@ export default function AboutModal({ open, onClose }) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <a href="#contact" onClick={onClose} className="btn-primary inline-flex items-center justify-center">
+            <a href="/#contact" onClick={onClose} className="btn-primary inline-flex items-center justify-center">
               تواصل معنا
             </a>
             <button onClick={onClose} className="btn-outline">

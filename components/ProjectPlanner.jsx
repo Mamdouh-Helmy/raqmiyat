@@ -58,6 +58,26 @@ const durations = {
   erp: { idea: "١٦ – ٢٦", spec: "١٢ – ٢٠", existing: "٨ – ١٦" },
 };
 
+// شبكة معيّنات السدو لكارت النتيجة
+const lattice =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z' fill='none' stroke='%23c9a66b' stroke-opacity='0.16'/%3E%3C/svg%3E\")";
+
+// عنوان فرعي بمعيّن صغير
+function StepLabel({ n, children }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <span className="relative grid place-items-center size-7 shrink-0">
+        <span className="absolute size-5 rotate-45 rounded-[3px] border border-[#c9a66b]/70 bg-white" />
+        <span className="relative font-heading text-[11px] leading-none text-brand-dark">
+          {n}
+        </span>
+      </span>
+      <p className="text-xs font-bold tracking-wide text-[#a98445]">{children}</p>
+      <span className="h-px flex-1 bg-gradient-to-l from-ink/10 to-transparent" />
+    </div>
+  );
+}
+
 export default function ProjectPlanner() {
   const { openContactModal } = useContactModal();
   const [typeIdx, setTypeIdx] = useState(0);
@@ -80,14 +100,21 @@ export default function ProjectPlanner() {
 
   return (
     <section className="container-x section">
-      <div className="text-center mb-12">
-        <div className="inline-block mb-4">
-          <h2 className="text-3xl font-black text-ink">
+      {/* العنوان */}
+      <div className="text-center mb-12 md:mb-16">
+        <div className="flex items-center justify-center gap-3 mb-6" aria-hidden="true">
+          <span className="h-px w-12 bg-gradient-to-r from-transparent to-[#c9a66b]" />
+          <span className="size-2 rotate-45 bg-[#c9a66b]" />
+          <span className="h-px w-12 bg-gradient-to-l from-transparent to-[#c9a66b]" />
+        </div>
+
+        <div className="inline-block mb-5">
+          <h2 className="text-3xl md:text-5xl font-black text-ink leading-[1.3]">
             كم يستغرق مشروعك تقريباً؟
           </h2>
           <SquiggleUnderline />
         </div>
-        <p className="text-ink/60 max-w-lg mx-auto">
+        <p className="text-ink/60 max-w-lg mx-auto leading-relaxed">
           اختر نوع المشروع ومرحلتك الحالية، وسنعطيك فكرة أولية عن المدة وعن
           أول خطوة معنا.
         </p>
@@ -95,35 +122,42 @@ export default function ProjectPlanner() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-8">
         {/* الاختيارات */}
-        <div className="space-y-8">
+        <div className="space-y-10">
           <div>
-            <p className="text-xs font-bold text-ink/45 mb-3">
-              ١ — ماذا تريد أن تبني؟
-            </p>
-            <div className="flex flex-wrap gap-2.5" role="group">
-              {types.map((t, i) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  aria-pressed={i === typeIdx}
-                  onClick={() => setTypeIdx(i)}
-                  className={`px-5 py-2.5 rounded-full border text-sm font-bold transition-colors ${
-                    i === typeIdx
-                      ? "bg-brand-dark text-white border-brand-dark"
-                      : "bg-white text-ink/70 border-ink/15 hover:border-brand/40"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
+            <StepLabel n="١">ماذا تريد أن تبني؟</StepLabel>
+            <div className="flex flex-wrap gap-2.5" role="group" aria-label="نوع المشروع">
+              {types.map((t, i) => {
+                const active = i === typeIdx;
+                return (
+                  <button
+                    key={t.key}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setTypeIdx(i)}
+                    className={`group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border text-sm font-bold outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-[#c9a66b]/60 ${
+                      active
+                        ? "bg-brand-dark text-white border-brand-dark shadow-md"
+                        : "bg-white text-ink/70 border-ink/15 hover:border-[#c9a66b] hover:text-ink"
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`size-2 rotate-45 transition-all duration-300 ${
+                        active
+                          ? "bg-[#c9a66b] scale-110"
+                          : "border border-[#c9a66b]/60 group-hover:bg-[#c9a66b]/40"
+                      }`}
+                    />
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-bold text-ink/45 mb-3">
-              ٢ — أين أنت الآن؟
-            </p>
-            <div className="space-y-2.5" role="radiogroup">
+            <StepLabel n="٢">أين أنت الآن؟</StepLabel>
+            <div className="space-y-3" role="radiogroup" aria-label="مرحلة المشروع">
               {stages.map((s, i) => {
                 const active = i === stageIdx;
                 return (
@@ -133,24 +167,42 @@ export default function ProjectPlanner() {
                     role="radio"
                     aria-checked={active}
                     onClick={() => setStageIdx(i)}
-                    className={`w-full text-right flex items-start gap-3.5 p-4 rounded-xl2 border transition-colors ${
+                    className={`group relative w-full overflow-hidden text-right flex items-start gap-4 p-4 md:p-5 rounded-xl2 border outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-[#c9a66b]/60 ${
                       active
-                        ? "bg-white border-brand shadow-sm"
-                        : "border-ink/10 hover:border-brand/30"
+                        ? "bg-white border-[#c9a66b]/60 shadow-md"
+                        : "border-ink/10 hover:border-[#c9a66b]/40 hover:bg-brand-dark/[0.025]"
                     }`}
                   >
+                    {/* خط ذهبي جانبي للاختيار الحالي */}
                     <span
-                      className={`mt-1 w-4 h-4 rounded-full border-2 shrink-0 transition-colors ${
-                        active
-                          ? "border-brand bg-brand shadow-[inset_0_0_0_3px_white]"
-                          : "border-ink/25"
+                      aria-hidden="true"
+                      className={`absolute right-0 top-0 h-full w-[3px] origin-top bg-[#c9a66b] transition-transform duration-500 ${
+                        active ? "scale-y-100" : "scale-y-0"
                       }`}
                     />
+
+                    {/* المعيّن بدل الدايرة */}
+                    <span className="relative grid place-items-center size-8 shrink-0 mt-0.5">
+                      <span
+                        className={`absolute size-5 rotate-45 rounded-[3px] border-2 transition-all duration-500 ${
+                          active
+                            ? "rotate-[135deg] border-brand-dark bg-brand-dark"
+                            : "border-[#c9a66b]/60 bg-white group-hover:rotate-[135deg]"
+                        }`}
+                      />
+                      <span
+                        aria-hidden="true"
+                        className={`relative size-1.5 rotate-45 bg-[#c9a66b] transition-opacity duration-300 ${
+                          active ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                    </span>
+
                     <span>
-                      <span className="block font-black text-ink text-sm">
+                      <span className="block font-black text-ink text-sm md:text-base">
                         {s.label}
                       </span>
-                      <span className="block text-ink/50 text-xs mt-0.5">
+                      <span className="block text-ink/50 text-xs mt-1">
                         {s.hint}
                       </span>
                     </span>
@@ -164,35 +216,72 @@ export default function ProjectPlanner() {
         {/* النتيجة */}
         <div
           key={`${type.key}-${stage.key}`}
-          className="rounded-xl2 bg-brand-dark text-white p-8 md:p-10 flex flex-col animate-fadeIn"
+          className="relative isolate overflow-hidden rounded-xl2 bg-brand-dark text-white p-8 md:p-10 flex flex-col animate-fadeIn"
         >
-          <p className="text-white/45 text-xs font-bold mb-3">
-            تقدير أولي للنسخة الأولى
-          </p>
+          {/* زخرفة السدو */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10"
+            style={{
+              backgroundImage: lattice,
+              backgroundSize: "56px 56px",
+              WebkitMaskImage: "linear-gradient(to bottom left, #000 0%, transparent 70%)",
+              maskImage: "linear-gradient(to bottom left, #000 0%, transparent 70%)",
+            }}
+          />
+          {/* توهّج ذهبي */}
+          <div
+            aria-hidden="true"
+            className="absolute -top-20 -right-20 -z-10 size-64 rounded-full bg-[#c9a66b]/15 blur-3xl"
+          />
+          {/* خط ذهبي علوي */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-[#c9a66b]/70 to-transparent"
+          />
 
-          <div className="flex items-baseline gap-3 mb-8">
-            <span className="font-heading text-6xl md:text-7xl leading-none">
+          <div className="flex items-center gap-3 mb-5">
+            <span className="size-2 rotate-45 bg-[#c9a66b]" aria-hidden="true" />
+            <p className="text-[#c9a66b] text-xs font-bold tracking-widest">
+              تقدير أولي للنسخة الأولى
+            </p>
+          </div>
+
+          <div className="flex items-baseline gap-3 mb-8" aria-live="polite">
+            <span className="font-heading text-6xl md:text-7xl leading-none bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
               {duration}
             </span>
             <span className="text-white/60">أسبوع</span>
           </div>
 
-          <dl className="space-y-5 border-t border-white/10 pt-6 mb-8">
-            <div>
-              <dt className="text-white/45 text-xs font-bold mb-1">
-                أول ما تراه
-              </dt>
-              <dd className="text-white/90 text-sm leading-relaxed">
-                {type.first}
-              </dd>
+          <dl className="space-y-6 border-t border-white/10 pt-6 mb-8">
+            <div className="flex gap-3">
+              <span
+                aria-hidden="true"
+                className="mt-1.5 size-1.5 rotate-45 shrink-0 bg-[#c9a66b]"
+              />
+              <div>
+                <dt className="text-[#c9a66b]/80 text-xs font-bold mb-1">
+                  أول ما تراه
+                </dt>
+                <dd className="text-white/90 text-sm leading-relaxed">
+                  {type.first}
+                </dd>
+              </div>
             </div>
-            <div>
-              <dt className="text-white/45 text-xs font-bold mb-1">
-                أول خطوة معنا
-              </dt>
-              <dd className="text-white/90 text-sm leading-relaxed">
-                {stage.step}
-              </dd>
+            <div className="flex gap-3">
+              <span
+                aria-hidden="true"
+                className="mt-1.5 size-1.5 rotate-45 shrink-0 bg-[#c9a66b]"
+              />
+              <div>
+                <dt className="text-[#c9a66b]/80 text-xs font-bold mb-1">
+                  أول خطوة معنا
+                </dt>
+                <dd className="text-white/90 text-sm leading-relaxed">
+                  {stage.step}
+                </dd>
+              </div>
             </div>
           </dl>
 
@@ -200,7 +289,7 @@ export default function ProjectPlanner() {
             <button
               type="button"
               onClick={handleDiscuss}
-              className="inline-flex items-center gap-2 bg-white text-ink px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/90 transition-colors"
+              className="group inline-flex items-center gap-2 bg-[#c9a66b] text-brand-dark px-6 py-3 rounded-xl font-bold text-sm outline-none transition-all duration-300 hover:bg-[#d6b57d] hover:gap-3 focus-visible:ring-2 focus-visible:ring-[#c9a66b] focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark"
             >
               ناقش هذا المشروع
               <ArrowLeft size={15} />

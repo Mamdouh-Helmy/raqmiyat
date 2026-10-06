@@ -1,3 +1,4 @@
+//app/software/page.js
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
 import TechStack from "@/components/TechStack";
@@ -18,11 +19,29 @@ import {
   BarChart3,
   Plug,
 } from "lucide-react";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = {
-  title: "الحلول البرمجية | رقميات",
+  title: "الحلول البرمجية",
   description:
     "نطور تطبيقات ويب وموبايل، متاجر إلكترونية، وأنظمة مؤسسية مخصصة بأحدث التقنيات.",
+  keywords: [
+    "تطوير برمجيات",
+    "شركة برمجة في الرياض",
+    "تطوير تطبيقات الجوال",
+    "أنظمة ERP",
+    "متاجر إلكترونية",
+  ],
+  alternates: { canonical: "/software" },
+  openGraph: {
+    type: "website",
+    locale: "ar_SA",
+    siteName: "رقميات",
+    title: "الحلول البرمجية | رقميات",
+    description:
+      "تطبيقات ويب وموبايل ومتاجر إلكترونية وأنظمة مؤسسية مخصصة.",
+    url: `${SITE_URL}/software`,
+  },
 };
 
 const items = [

@@ -1,11 +1,16 @@
+"use client";
+
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, Instagram, Linkedin, HelpCircle } from "lucide-react";
+import AboutModal from "@/components/AboutModal";
 
+// action: "about" يفتح مودال من نحن، وغير كده href عادي
 const quickLinks = [
-  { label: "من نحن", href: "/" },
-  { label: "أعمالنا", href: "/" },
-  { label: "المدونة التقنية", href: "/" },
+  { label: "من نحن", action: "about" },
+  { label: "أعمالنا", href: "/works" },
+  { label: "المدونة التقنية", href: "/blog" },
   { label: "تواصل معنا", href: "/#contact" },
 ];
 
@@ -23,6 +28,9 @@ const socials = [
 ];
 
 export default function Footer() {
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const closeAbout = useCallback(() => setAboutOpen(false), []);
+
   return (
     <footer className="pt-14 pb-8 bg-white">
       <div className="container-x grid grid-cols-1 md:grid-cols-4 gap-10 pb-6 text-sm">
@@ -57,11 +65,21 @@ export default function Footer() {
         <div>
           <h4 className="font-black text-ink mb-5">روابط سريعة</h4>
           <ul className="space-y-3 text-ink/60">
-            {quickLinks.map(({ label, href }) => (
+            {quickLinks.map(({ label, href, action }) => (
               <li key={label}>
-                <Link href={href} className="hover:text-brand transition-colors">
-                  {label}
-                </Link>
+                {action === "about" ? (
+                  <button
+                    type="button"
+                    onClick={() => setAboutOpen(true)}
+                    className="hover:text-brand transition-colors"
+                  >
+                    {label}
+                  </button>
+                ) : (
+                  <Link href={href} className="hover:text-brand transition-colors">
+                    {label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
@@ -121,6 +139,8 @@ export default function Footer() {
           </Link>
         </div>
       </div>
+
+      <AboutModal open={aboutOpen} onClose={closeAbout} />
     </footer>
   );
 }

@@ -1,47 +1,81 @@
-import { Building2, Landmark, Factory, Briefcase, ShieldCheck } from "lucide-react";
+import {
+  Aref_Ruqaa,
+  Reem_Kufi,
+  Lalezar,
+  Markazi_Text,
+  Rakkas,
+} from "next/font/google";
+import { SquiggleUnderline } from "./najdi-icons";
+
+// كل شريك بخط مختلف عشان يبانوا علامات تجارية حقيقية مش placeholders
+const ruqaa = Aref_Ruqaa({ subsets: ["arabic"], weight: ["700"] });
+const kufi = Reem_Kufi({ subsets: ["arabic"], weight: ["700"] });
+const lalezar = Lalezar({ subsets: ["arabic"], weight: ["400"] });
+const markazi = Markazi_Text({ subsets: ["arabic"], weight: ["700"] });
+const rakkas = Rakkas({ subsets: ["arabic"], weight: ["400"] });
 
 const partners = [
-  { name: "مؤسسة نجد", icon: Building2 },
-  { name: "وزارة التقنية", icon: Landmark },
-  { name: "صناعات مكة", icon: Factory },
-  { name: "أعمال الرياض", icon: Briefcase },
-  { name: "شركة جدة", icon: ShieldCheck },
+  { name: "مؤسسة نجد", cls: `${ruqaa.className} text-3xl` },
+  { name: "وزارة التقنية", cls: `${kufi.className} text-2xl tracking-wide` },
+  { name: "صناعات مكة", cls: `${lalezar.className} text-3xl` },
+  { name: "أعمال الرياض", cls: `${markazi.className} text-3xl` },
+  { name: "شركة جدة", cls: `${rakkas.className} text-2xl` },
 ];
 
-const repeatedPartners = [...partners, ...partners, ...partners];
+const stats = [
+  { n: "١٥٠", plus: true, label: "مشروع تم تسليمه" },
+  { n: "٤٥", plus: true, label: "جهة حكومية وخاصة" },
+  { n: "٩٩٫٩٪", plus: false, label: "جاهزية الأنظمة" },
+];
 
-function LogoRow() {
+// مجموعة واحدة مكررة مرتين عشان تملا عرض الشاشة
+function PartnerSet({ hidden = false }) {
   return (
-    <>
-      {repeatedPartners.map(({ name, icon: Icon }, i) => (
+    <div className="flex shrink-0" aria-hidden={hidden || undefined}>
+      {[...partners, ...partners].map((p, i) => (
         <div
-          key={`${name}-${i}`}
-          className="flex items-center gap-2 text-sm font-bold text-ink/50 shrink-0 px-8"
+          key={`${p.name}-${i}`}
+          className="h-28 px-12 md:px-16 flex items-center justify-center shrink-0 whitespace-nowrap border-l border-ink/15 text-ink/70"
         >
-          <Icon size={20} />
-          {name}
+          <span dir="rtl" className={p.cls}>{p.name}</span>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
 export default function TrustedBy() {
   return (
     <section className="container-x section">
-      <div className="card p-10 text-center overflow-hidden">
-        <p className="text-ink/50 mb-8">
-          نحوز على ثقة كبرى الجهات والشركات في المملكة
-        </p>
-        <div
-          dir="ltr"
-          className="marquee-wrap relative w-full overflow-hidden [mask-image:linear-gradient(to_left,transparent,black_10%,black_90%,transparent)]"
-        >
-          <div className="marquee-track">
-            <LogoRow />
-            <LogoRow />
-          </div>
+      <p className="text-ink/60 mb-6 text-sm">
+        نحوز على ثقة كبرى الجهات والشركات في المملكة
+      </p>
+
+      {/* شريط الشركاء: لوب مستمر، بيقف لما تقف عليه بالماوس */}
+      <div
+        dir="ltr"
+        className="overflow-hidden border-y border-ink/15 [mask-image:linear-gradient(to_left,transparent,black_8%,black_92%,transparent)]"
+      >
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] motion-reduce:animate-none">
+          <PartnerSet />
+          <PartnerSet hidden />
         </div>
+      </div>
+
+      <div className="my-14 opacity-30">
+        <SquiggleUnderline />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-6">
+        {stats.map((s) => (
+          <div key={s.label}>
+            <div className="font-black text-brand leading-none text-[88px] md:text-[132px] tracking-tight">
+              {s.plus && <span className="text-sand">+</span>}
+              {s.n}
+            </div>
+            <p className="mt-3 text-ink/60 pr-1">{s.label}</p>
+          </div>
+        ))}
       </div>
     </section>
   );

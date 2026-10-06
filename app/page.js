@@ -1,3 +1,4 @@
+//app/page.js
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SecurityBanner from "@/components/SecurityBanner";
