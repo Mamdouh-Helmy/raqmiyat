@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Link2, Linkedin, MessageCircle, Twitter } from "lucide-react";
+import {
+  Check,
+  LinkSimple,
+  LinkedinLogo,
+  WhatsappLogo,
+  XLogo,
+} from "@phosphor-icons/react/dist/ssr";
 
 const btn =
   "inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink/60 transition-colors hover:border-brand hover:bg-brand hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
@@ -32,7 +38,7 @@ export default function ShareBar({ url, title }) {
         aria-label="شارك عبر واتساب"
         className={btn}
       >
-        <MessageCircle size={16} />
+        <WhatsappLogo size={18} weight="fill" />
       </a>
       <a
         href={`https://twitter.com/intent/tweet?text=${text}&url=${link}`}
@@ -41,7 +47,7 @@ export default function ShareBar({ url, title }) {
         aria-label="شارك عبر X"
         className={btn}
       >
-        <Twitter size={16} />
+        <XLogo size={16} weight="fill" />
       </a>
       <a
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${link}`}
@@ -50,10 +56,10 @@ export default function ShareBar({ url, title }) {
         aria-label="شارك عبر لينكدإن"
         className={btn}
       >
-        <Linkedin size={16} />
+        <LinkedinLogo size={18} weight="fill" />
       </a>
       <button type="button" onClick={copy} aria-label="انسخ رابط المقال" className={btn}>
-        {copied ? <Check size={16} /> : <Link2 size={16} />}
+        {copied ? <Check size={16} weight="bold" /> : <LinkSimple size={16} weight="bold" />}
       </button>
       <span role="status" className="text-xs font-bold text-brand">
         {copied ? "تم نسخ الرابط" : ""}

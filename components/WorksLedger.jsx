@@ -1,27 +1,28 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  BarChart3,
-  Boxes,
+  CaretDown,
   Camera,
-  ChevronDown,
+  ChartBar,
+  Cube,
+  DeviceMobile,
   Globe,
-  Plug,
-  Smartphone,
-} from "lucide-react";
+  PlugsConnected,
+} from "@phosphor-icons/react/dist/ssr";
 import { SquiggleUnderline } from "@/components/SquiggleUnderline";
 import { useContactModal } from "@/components/ContactModalProvider";
 import { works, workTypes } from "@/lib/works";
 
 const TYPE_ICONS = {
   web: Globe,
-  mobile: Smartphone,
+  mobile: DeviceMobile,
   security: Camera,
-  erp: Boxes,
-  data: BarChart3,
-  integration: Plug,
+  erp: Cube,
+  data: ChartBar,
+  integration: PlugsConnected,
 };
 
 const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
@@ -32,6 +33,25 @@ const chip = (active) =>
       ? "border-brand bg-brand text-white"
       : "border-ink/15 bg-white text-ink/70 hover:border-brand hover:text-brand"
   }`;
+
+// مصغّرة العمل في الصف: الصورة لو موجودة، وإلا أيقونة النوع
+function Thumb({ work, Icon, open }) {
+  return (
+    <span
+      className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-xl transition-shadow duration-300 md:h-16 md:w-28 ${
+        open ? "ring-2 ring-brand" : "ring-1 ring-ink/10"
+      }`}
+    >
+      {work.image ? (
+        <Image src={work.image} alt="" fill sizes="112px" className="object-cover" />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center bg-brand-soft text-brand">
+          <Icon size={24} weight="duotone" />
+        </span>
+      )}
+    </span>
+  );
+}
 
 export default function WorksLedger() {
   const { openContactModal } = useContactModal();
@@ -82,18 +102,22 @@ export default function WorksLedger() {
             كل الأعمال
             <span className="ms-2 text-xs font-normal opacity-70">{toAr(works.length)}</span>
           </button>
-          {types.map((t) => (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => pickFilter(t.value)}
-              aria-pressed={filter === t.value}
-              className={chip(filter === t.value)}
-            >
-              {t.label}
-              <span className="ms-2 text-xs font-normal opacity-70">{toAr(t.count)}</span>
-            </button>
-          ))}
+          {types.map((t) => {
+            const Icon = TYPE_ICONS[t.value] || Globe;
+            return (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => pickFilter(t.value)}
+                aria-pressed={filter === t.value}
+                className={`${chip(filter === t.value)} inline-flex items-center gap-2`}
+              >
+                <Icon size={16} weight={filter === t.value ? "fill" : "duotone"} />
+                {t.label}
+                <span className="text-xs font-normal opacity-70">{toAr(t.count)}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* السجل */}
@@ -111,26 +135,27 @@ export default function WorksLedger() {
                   onClick={() => setOpenId(open ? null : w.id)}
                   aria-expanded={open}
                   aria-controls={panelId}
-                  className="group flex w-full items-center gap-4 py-6 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:gap-6 md:py-7"
+                  className="group flex w-full items-center gap-4 py-5 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:gap-6 md:py-6"
                 >
-                  <span
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors duration-300 md:h-14 md:w-14 ${
-                      open ? "bg-brand text-white" : "bg-brand-soft text-brand"
-                    }`}
-                  >
-                    <Icon size={22} />
-                  </span>
+                  <Thumb work={w} Icon={Icon} open={open} />
 
                   <span className="min-w-0 flex-1">
                     <span className="block text-lg font-black leading-snug text-ink transition-colors group-hover:text-brand md:text-2xl">
                       {w.title}
                     </span>
-                    <span className="mt-1 block text-sm text-ink/50">
-                      {typeLabel} · {w.sector} · {toAr(w.year)}
+                    <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/50">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Icon size={15} weight="duotone" />
+                        {typeLabel}
+                      </span>
+                      <span className="h-3 w-px bg-ink/20" aria-hidden="true" />
+                      <span>{w.sector}</span>
+                      <span className="h-3 w-px bg-ink/20" aria-hidden="true" />
+                      <span>{toAr(w.year)}</span>
                     </span>
                   </span>
 
-                  <ul className="hidden max-w-[16rem] flex-wrap justify-end gap-2 lg:flex">
+                  <ul className="hidden max-w-[16rem] flex-wrap justify-end gap-2 xl:flex">
                     {w.tags.map((t) => (
                       <li
                         key={t}
@@ -142,8 +167,9 @@ export default function WorksLedger() {
                     ))}
                   </ul>
 
-                  <ChevronDown
+                  <CaretDown
                     size={20}
+                    weight="bold"
                     className={`shrink-0 text-ink/40 transition-transform duration-300 ${
                       open ? "rotate-180 text-brand" : ""
                     }`}
@@ -155,51 +181,68 @@ export default function WorksLedger() {
                     <motion.div
                       id={panelId}
                       role="region"
+                      aria-label={w.title}
                       initial={reduce ? false : { height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
                       transition={{ duration: reduce ? 0 : 0.3, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <div
-                        className={`grid gap-8 pb-9 ps-0 md:ps-[4.5rem] ${
-                          w.outcome ? "md:grid-cols-3" : "md:grid-cols-2"
-                        }`}
-                      >
-                        <div>
-                          <h3 className="mb-2 text-sm font-black text-sand-deep">المشكلة</h3>
-                          <p className="leading-loose text-ink/70">{w.problem}</p>
-                        </div>
+                      <div className="grid gap-8 pb-10 pt-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-12">
+                        {/* الصورة */}
+                        <figure className="relative aspect-[16/10] overflow-hidden rounded-xl2 bg-brand-soft ring-1 ring-ink/10">
+                          {w.image ? (
+                            <Image
+                              src={w.image}
+                              alt={w.imageAlt || w.title}
+                              fill
+                              sizes="(min-width: 1024px) 45vw, 100vw"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="flex h-full w-full items-center justify-center text-brand/60">
+                              <Icon size={64} weight="duotone" />
+                            </span>
+                          )}
+                        </figure>
 
-                        <div>
-                          <h3 className="mb-2 text-sm font-black text-sand-deep">ما بنيناه</h3>
-                          <ul className="list-disc space-y-2 ps-5 leading-relaxed text-ink/70 marker:text-sand">
-                            {w.built.map((b) => (
-                              <li key={b}>{b}</li>
+                        {/* التفاصيل */}
+                        <div className="space-y-7">
+                          <div>
+                            <h3 className="mb-2 text-sm font-black text-sand-deep">المشكلة</h3>
+                            <p className="leading-loose text-ink/70">{w.problem}</p>
+                          </div>
+
+                          <div>
+                            <h3 className="mb-2 text-sm font-black text-sand-deep">ما بنيناه</h3>
+                            <ul className="list-disc space-y-2 ps-5 leading-relaxed text-ink/70 marker:text-sand">
+                              {w.built.map((b) => (
+                                <li key={b}>{b}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {w.outcome && (
+                            <div>
+                              <h3 className="mb-2 text-sm font-black text-sand-deep">
+                                بعد الإطلاق
+                              </h3>
+                              <p className="leading-loose text-ink/70">{w.outcome}</p>
+                            </div>
+                          )}
+
+                          <ul className="flex flex-wrap gap-2 xl:hidden">
+                            {w.tags.map((t) => (
+                              <li
+                                key={t}
+                                className="rounded-full border border-ink/15 bg-white px-3 py-1 text-xs text-ink/65"
+                                dir="ltr"
+                              >
+                                {t}
+                              </li>
                             ))}
                           </ul>
                         </div>
-
-                        {w.outcome && (
-                          <div>
-                            <h3 className="mb-2 text-sm font-black text-sand-deep">
-                              بعد الإطلاق
-                            </h3>
-                            <p className="leading-loose text-ink/70">{w.outcome}</p>
-                          </div>
-                        )}
-
-                        <ul className="flex flex-wrap gap-2 md:col-span-full lg:hidden">
-                          {w.tags.map((t) => (
-                            <li
-                              key={t}
-                              className="rounded-full border border-ink/15 bg-white px-3 py-1 text-xs text-ink/65"
-                              dir="ltr"
-                            >
-                              {t}
-                            </li>
-                          ))}
-                        </ul>
                       </div>
                     </motion.div>
                   )}

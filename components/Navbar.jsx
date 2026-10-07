@@ -82,6 +82,16 @@ export default function Navbar() {
             </div>
           </li>
 
+          {/* Blog */}
+          <li>
+            <Link
+              href="/blog"
+              className="hover:text-brand transition-colors"
+            >
+              المدونة
+            </Link>
+          </li>
+
           <li>
             <Link
               href="/#contact"
@@ -117,7 +127,7 @@ export default function Navbar() {
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           isOpen
-            ? "max-h-[500px] opacity-100 mt-4"
+            ? "max-h-[600px] opacity-100 mt-4"
             : "max-h-0 opacity-0 mt-0"
         }`}
       >
@@ -174,6 +184,15 @@ export default function Navbar() {
               </div>
             </div>
           </div>
+
+          {/* Blog */}
+          <Link
+            href="/blog"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center px-4 py-3 rounded-xl text-ink/80 hover:bg-brand-soft hover:text-brand transition-colors"
+          >
+            المدونة
+          </Link>
 
           {/* Contact */}
           <Link

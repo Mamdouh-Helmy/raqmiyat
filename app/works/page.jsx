@@ -6,7 +6,7 @@ import { SITE_URL, SITE_NAME } from "@/lib/site";
 import { works } from "@/lib/works";
 
 export const metadata = {
-  title: "أعمالنا",
+  title: "أعمالنا: متاجر وتطبيقات وأنظمة مراقبة وأعمال",
   description:
     "سجل أعمال رقميات. نوثّق كل مشروع بعد تسليمه: المشكلة، وما بنيناه، وما تغيّر بعد الإطلاق.",
   alternates: { canonical: "/works" },
@@ -17,6 +17,7 @@ export const metadata = {
     title: "أعمالنا | رقميات",
     description: "سجل أعمال رقميات. نوثّق كل مشروع بعد تسليمه وقياس نتيجته.",
     url: `${SITE_URL}/works`,
+    images: works[0]?.image ? [{ url: works[0].image, width: 1600, height: 1000 }] : undefined,
   },
 };
 
@@ -34,7 +35,13 @@ export default function WorksPage() {
         itemListElement: works.map((w, i) => ({
           "@type": "ListItem",
           position: i + 1,
-          name: w.title,
+          item: {
+            "@type": "CreativeWork",
+            name: w.title,
+            description: w.problem,
+            ...(w.image ? { image: `${SITE_URL}${w.image}` } : {}),
+            creator: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+          },
         })),
       },
     },
