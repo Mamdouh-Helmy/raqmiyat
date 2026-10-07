@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { SquiggleUnderline } from "./SquiggleUnderline";
 
 const DURATION = 6000;
 
@@ -34,7 +33,57 @@ const slides = [
   },
 ];
 
-const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+// عمود الميزات: "toward" = الجهة اللي فيها القوس، وعليها يقع خط التحديد
+function Feature({ slide, isActive, side, paused, onSelect, onDone }) {
+  const rail =
+    side === "right"
+      ? "border-e-2 pe-6 lg:text-start"
+      : "border-s-2 ps-6 lg:text-start";
+
+  return (
+    <button
+      type="button"
+      aria-current={isActive}
+      onClick={onSelect}
+      className={`relative block w-full py-5 text-start outline-none transition-colors duration-500 focus-visible:bg-brand-soft ${rail} ${
+        isActive ? "border-sand" : "border-ink/10 hover:border-ink/30"
+      }`}
+    >
+      <span
+        className={`block font-heading text-2xl font-extrabold leading-snug transition-colors duration-500 md:text-3xl ${
+          isActive ? "text-ink" : "text-ink/35"
+        }`}
+      >
+        {slide.title}
+      </span>
+
+      <span
+        className={`grid transition-[grid-template-rows] duration-500 ease-out ${
+          isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <span className="overflow-hidden">
+          <span className="block max-w-sm pt-3 text-[15px] leading-loose text-ink/65">
+            {slide.text}
+          </span>
+        </span>
+      </span>
+
+      {/* شريط التقدم: لما يخلص بينقل للميزة اللي بعدها */}
+      {isActive && (
+        <span
+          aria-hidden="true"
+          onAnimationEnd={onDone}
+          className="absolute bottom-0 right-0 h-0.5 w-full origin-right animate-progress bg-sand-deep"
+          style={{
+            animationDuration: `${DURATION}ms`,
+            animationPlayState: paused ? "paused" : "running",
+          }}
+        />
+      )}
+    </button>
+  );
+}
 
 export default function SurveillanceFeatures() {
   const [active, setActive] = useState(0);
@@ -42,108 +91,80 @@ export default function SurveillanceFeatures() {
 
   const next = () => setActive((i) => (i + 1) % slides.length);
 
+  const renderColumn = (from, to, side) => (
+    <div className="flex flex-col gap-2 lg:h-[560px] lg:justify-between lg:py-4">
+      {slides.slice(from, to).map((s, k) => {
+        const i = from + k;
+        return (
+          <Feature
+            key={s.title}
+            slide={s}
+            side={side}
+            isActive={i === active}
+            paused={paused}
+            onSelect={() => setActive(i)}
+            onDone={next}
+          />
+        );
+      })}
+    </div>
+  );
+
   return (
     <section className="container-x section">
-      <div className="inline-block mb-10">
-        <h2 className="text-3xl font-black text-ink">مميزات نظام المراقبة</h2>
-        <SquiggleUnderline />
-      </div>
+      <h2 className="mb-12 font-heading text-4xl font-extrabold leading-tight text-ink md:mb-16 md:text-6xl">
+        مميزات نظام المراقبة
+      </h2>
 
       <div
-        className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-8 lg:gap-14 items-stretch"
+        className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_400px_1fr] lg:gap-14"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* القايمة */}
-        <ol className="border-t border-ink/15">
-          {slides.map((s, i) => {
-            const isActive = i === active;
-            return (
-              <li key={s.title} className="border-b border-ink/15">
-                <button
-                  type="button"
-                  aria-current={isActive}
-                  onClick={() => setActive(i)}
-                  className="relative w-full text-right py-6 pr-0 flex gap-5 outline-none focus-visible:bg-brand-soft"
-                >
-                  <span
-                    className={`font-heading text-3xl leading-none w-10 shrink-0 transition-colors duration-300 ${
-                      isActive ? "text-sand-deep" : "text-ink/20"
-                    }`}
-                  >
-                    {toAr(i + 1)}
-                  </span>
+        {/* الميزتان الأوليان */}
+        {renderColumn(0, 2, "right")}
 
-                  <span className="flex-1">
-                    <span className="flex items-baseline justify-between gap-4">
-                      <span
-                        className={`text-lg md:text-xl font-black transition-colors duration-300 ${
-                          isActive ? "text-ink" : "text-ink/45"
-                        }`}
-                      >
-                        {s.title}
-                      </span>
-                      <span
-                        dir="ltr"
-                        className={`text-xs font-bold transition-opacity duration-300 ${
-                          isActive ? "text-sand-deep opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        {s.tag}
-                      </span>
-                    </span>
+        {/* نافذة القوس: العنصر المميز في القسم */}
+        <div className="relative order-first mx-auto h-[440px] w-full max-w-[340px] lg:order-none lg:h-[560px] lg:max-w-none">
+          <div
+            aria-hidden
+            className="absolute -inset-3 rounded-b-xl2 rounded-t-full border border-sand"
+          />
+          <div className="relative h-full w-full overflow-hidden rounded-b-xl2 rounded-t-full bg-brand-dark">
+            {slides.map((slide, i) => (
+              <div
+                key={slide.image}
+                className={`absolute inset-0 transition-opacity duration-700 ${
+                  i === active ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  sizes="(min-width: 1024px) 400px, 340px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
 
-                    <span
-                      className={`grid transition-[grid-template-rows] duration-500 ease-out ${
-                        isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                      }`}
-                    >
-                      <span className="overflow-hidden">
-                        <span className="block pt-3 text-ink/60 text-[15px] leading-relaxed max-w-md">
-                          {s.text}
-                        </span>
-                      </span>
-                    </span>
-                  </span>
-
-                  {/* شريط التقدم: لما يخلص بينقل للميزة اللي بعدها */}
-                  {isActive && (
-                    <span
-                      key={active}
-                      aria-hidden="true"
-                      onAnimationEnd={next}
-                      className="absolute bottom-0 right-0 h-0.5 w-full origin-right bg-brand animate-progress"
-                      style={{
-                        animationDuration: `${DURATION}ms`,
-                        animationPlayState: paused ? "paused" : "running",
-                      }}
-                    />
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-
-        {/* الصور */}
-        <div className="relative min-h-[320px] lg:min-h-[440px] overflow-hidden rounded-xl2 bg-brand-dark">
-          {slides.map((slide, i) => (
             <div
-              key={slide.image}
-              className={`absolute inset-0 transition-opacity duration-700 ${
-                i === active ? "opacity-100" : "opacity-0"
-              }`}
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent"
+            />
+
+            <span
+              key={active}
+              dir="ltr"
+              className="absolute inset-x-0 bottom-7 mx-auto w-fit animate-fadeIn rounded-full bg-sand px-4 py-1.5 text-sm font-bold text-brand-dark"
             >
-              <Image
-                src={slide.image}
-                alt={slide.title}
-                fill
-                sizes="(min-width: 1024px) 700px, 100vw"
-                className="object-cover"
-              />
-            </div>
-          ))}
+              {slides[active].tag}
+            </span>
+          </div>
         </div>
+
+        {/* الميزتان الأخيرتان */}
+        {renderColumn(2, 4, "left")}
       </div>
     </section>
   );

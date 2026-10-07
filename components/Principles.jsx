@@ -1,5 +1,4 @@
-// components/Principles.jsx
-import { SquiggleUnderline } from "./SquiggleUnderline";
+// components/Principles.jsx  (Server Component — الحركة CSS بس: sticky)
 
 const principles = [
   {
@@ -29,77 +28,80 @@ const principles = [
   },
 ];
 
+// الكروت بتغمق كل ما اتراكمت فوق بعض
+const tones = [
+  { card: "bg-white text-ink ring-1 ring-ink/10", sub: "text-ink/65", num: "text-sand", dark: false },
+  { card: "bg-sand/25 text-ink", sub: "text-ink/70", num: "text-sand", dark: false },
+  { card: "bg-sand/60 text-ink", sub: "text-ink/75", num: "text-brand-dark/30", dark: false },
+  { card: "bg-brand text-white", sub: "text-white/70", num: "text-sand", dark: true },
+  { card: "bg-brand-dark text-white", sub: "text-white/65", num: "text-sand", dark: true },
+];
+
+const lattice =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z' fill='none' stroke='%23b8934a' stroke-opacity='0.2'/%3E%3C/svg%3E\")";
+
 export default function Principles() {
   return (
     <section className="container-x section">
-      <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24">
-        {/* الجانب الثابت */}
-        <div className="lg:sticky lg:top-10 self-start">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="size-2 rotate-45 bg-[#c9a66b]" aria-hidden="true" />
-            <span className="text-xs font-bold tracking-widest text-[#a98445]">
-              مبادئنا
-            </span>
-          </div>
+      <div className="mb-12 flex flex-col gap-5 md:mb-16 md:flex-row md:items-end md:justify-between">
+        <h2 className="max-w-3xl font-heading text-4xl font-extrabold leading-[1.2] text-ink md:text-6xl">
+          كيف نفكر قبل أن نكتب أول سطر
+        </h2>
+        <p className="max-w-xs leading-loose text-ink/60">
+          خمس قناعات نلتزم بها في كل مشروع، صغيراً كان أو كبيراً.
+        </p>
+      </div>
 
-          <div className="inline-block mb-6">
-            <h2 className="text-3xl md:text-5xl font-black text-ink leading-[1.3]">
-              كيف نفكر قبل أن نكتب أول سطر
-            </h2>
-            <SquiggleUnderline />
-          </div>
-
-          <p className="text-ink/60 leading-relaxed max-w-sm">
-            خمس قناعات نلتزم بها في كل مشروع، صغيراً كان أو كبيراً.
-          </p>
-
-          {/* شريط معيّنات زخرفي */}
-          <div className="mt-10 flex items-center gap-2" aria-hidden="true">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span
-                key={i}
-                className="size-3 rotate-45 border border-[#c9a66b]"
-                style={{ backgroundColor: i === 0 ? "#c9a66b" : "transparent", opacity: 1 - i * 0.17 }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* القائمة */}
-        <ol className="relative">
-          {/* الخط الرأسي اللي بيربط المعيّنات */}
-          <span
-            aria-hidden="true"
-            className="absolute right-8 top-10 bottom-10 w-px bg-gradient-to-b from-[#c9a66b]/60 via-[#c9a66b]/25 to-transparent"
-          />
-
-          {principles.map(({ n, title, text }) => (
+      {/* كروت بتتراكم فوق بعض مع السكرول */}
+      <ol className="flex flex-col gap-10 pb-6 md:gap-24">
+        {principles.map(({ n, title, text }, i) => {
+          const t = tones[i];
+          return (
             <li
               key={n}
-              className="group relative grid grid-cols-[4rem_1fr] gap-5 py-7 md:py-8 rounded-xl2 transition-colors duration-300 hover:bg-brand-dark/[0.035]"
+              className="sticky"
+              style={{ top: `calc(5.5rem + ${i * 1.1}rem)` }}
             >
-              {/* المعيّن + الرقم */}
-              <div className="relative grid place-items-center size-16 self-start">
-                <span className="absolute size-10 rotate-45 rounded-[5px] border border-[#c9a66b]/50 bg-white shadow-sm transition-all duration-500 group-hover:rotate-[135deg] group-hover:scale-110 group-hover:border-brand-dark group-hover:bg-brand-dark" />
-                <span className="relative font-heading text-xl leading-none text-brand-dark transition-colors duration-300 group-hover:text-[#c9a66b]">
+              {/* قاعدة معتمة تحت الكارت: الألوان الشفافة (sand/25, sand/60) كانت بتظهر اللي تحتها */}
+              <div className="rounded-xl2 bg-paper">
+              <div
+                className={`relative isolate flex min-h-[300px] flex-col justify-end overflow-hidden rounded-xl2 p-7 shadow-[0_-12px_30px_-18px_rgba(0,0,0,0.35)] md:min-h-[360px] md:flex-row md:items-center md:gap-14 md:p-12 ${t.card}`}
+              >
+                {t.dark && (
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 -z-10"
+                    style={{
+                      backgroundImage: lattice,
+                      backgroundSize: "56px 56px",
+                      WebkitMaskImage:
+                        "linear-gradient(to left, #000 0%, transparent 70%)",
+                      maskImage: "linear-gradient(to left, #000 0%, transparent 70%)",
+                    }}
+                  />
+                )}
+
+                <span
+                  aria-hidden="true"
+                  className={`mb-4 block font-heading text-8xl font-extrabold leading-none md:mb-0 md:w-[260px] md:shrink-0 md:text-center md:text-[14rem] ${t.num}`}
+                >
                   {n}
                 </span>
-              </div>
 
-              {/* النص */}
-              <div className="pl-4 pt-2 transition-transform duration-500 group-hover:-translate-x-1">
-                <h3 className="font-black text-ink text-lg md:text-xl mb-2">
-                  {title}
-                </h3>
-                <span className="block h-px w-8 bg-[#c9a66b] mb-3 transition-all duration-500 group-hover:w-20" />
-                <p className="text-ink/60 leading-relaxed text-[15px] max-w-xl">
-                  {text}
-                </p>
+                <div>
+                  <h3 className="font-heading text-2xl font-extrabold leading-snug md:text-4xl">
+                    {title}
+                  </h3>
+                  <p className={`mt-4 max-w-xl text-base leading-loose md:text-lg ${t.sub}`}>
+                    {text}
+                  </p>
+                </div>
+              </div>
               </div>
             </li>
-          ))}
-        </ol>
-      </div>
+          );
+        })}
+      </ol>
     </section>
   );
 }

@@ -1,98 +1,201 @@
 // components/SiteMonitoring.jsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { SquiggleUnderline } from "./SquiggleUnderline";
 
-const pad = (n) => String(n + 1).padStart(2, "0");
+const INTERVAL = 6000;
+
+const pad = (n) =>
+  (n + 1).toLocaleString("ar-SA", { minimumIntegerDigits: 2, useGrouping: false });
+
+// نسيج هندسي نجدي خفيف جدًا في الخلفية (معينات متشابكة)
+const LATTICE = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M24 2L46 24 24 46 2 24zM24 14L34 24 24 34 14 24z' fill='none' stroke='%23b8934a' stroke-opacity='.14' stroke-width='1'/%3E%3C/svg%3E")`,
+  backgroundSize: "48px 48px",
+};
+
+const fmtTime = (d) =>
+  d.toLocaleTimeString("ar-SA", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+const CORNERS = [
+  "top-5 start-5 border-t-2 border-s-2",
+  "top-5 end-5 border-t-2 border-e-2",
+  "bottom-5 start-5 border-b-2 border-s-2",
+  "bottom-5 end-5 border-b-2 border-e-2",
+];
 
 export default function SiteMonitoring({ images, locations }) {
   const [active, setActive] = useState(0);
+  const [auto, setAuto] = useState(true);
+  const [now, setNow] = useState(null);
+
+  useEffect(() => {
+    setNow(new Date());
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    if (!auto || locations.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setAuto(false);
+      return;
+    }
+    const t = setInterval(
+      () => setActive((a) => (a + 1) % locations.length),
+      INTERVAL
+    );
+    return () => clearInterval(t);
+  }, [auto, locations.length]);
+
+  const select = (i) => {
+    setAuto(false);
+    setActive(i);
+  };
 
   return (
-    <section className="container-x section">
-      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between mb-10">
-        <div className="inline-block self-start">
-          <h2 className="text-3xl font-black text-ink">تغطية كاملة لكل موقع</h2>
-          <SquiggleUnderline />
+    <section className="section bg-brand-dark" style={LATTICE}>
+      <style>{`
+        @keyframes smScan { from { transform: translateY(-100%); } to { transform: translateY(650%); } }
+        @keyframes smBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        .sm-scan { animation: smScan 1.4s cubic-bezier(.5,0,.3,1) 0.2s both; }
+        .sm-bar { transform-origin: right; animation: smBar ${INTERVAL}ms linear both; }
+        @media (prefers-reduced-motion: reduce) { .sm-scan, .sm-bar { animation: none; } .sm-scan { display: none; } }
+      `}</style>
+
+      <div className="container-x">
+        <div className="mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="font-heading text-4xl font-extrabold leading-tight text-white md:text-6xl">
+              عيننا على كل زاوية
+              <br />
+              في منشأتك
+            </h2>
+            <p className="mt-5 max-w-md leading-loose text-white/65">
+              عدسات مثبّتة في كل نقطة حساسة، تنقل الصورة بدقة عالية لحظة
+              بلحظة، وتحفظها لك لمراجعتها وقت ما تحتاج.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 border-white/15 md:border-s md:ps-8">
+            <span className="font-heading text-6xl font-extrabold leading-none text-sand md:text-7xl">
+              {pad(locations.length - 1)}
+            </span>
+            <span className="flex flex-col gap-1 text-sm font-bold text-white/80">
+              <span className="flex items-center gap-2">
+                <span className="size-2 animate-pulse rounded-full bg-red-500" />
+                كاميرات
+              </span>
+              <span>تعمل الآن</span>
+            </span>
+          </div>
         </div>
-        <p className="text-ink/60 leading-relaxed max-w-sm">
-          عدسات مثبّتة في كل نقطة حساسة من منشأتك، تنقل الصورة بدقة عالية
-          لحظة بلحظة.
-        </p>
-      </div>
 
-      {/* الشاشة الرئيسية */}
-      <div className="relative aspect-[16/10] md:aspect-[16/8] overflow-hidden rounded-xl2 bg-brand-dark">
-        <Image
-          key={images[active]}
-          src={images[active]}
-          alt={locations[active]}
-          fill
-          sizes="(min-width: 1024px) 1100px, 100vw"
-          className="object-cover animate-fadeIn"
-        />
-
-        <div className="absolute top-4 right-4 flex items-center gap-3 rounded-full bg-black/55 px-4 py-2 text-xs font-bold text-white backdrop-blur">
-          <span dir="ltr" className="font-mono tracking-wider">
-            CAM {pad(active)}
-          </span>
-          <span className="h-3 w-px bg-white/30" />
-          <span className="flex items-center gap-1.5">
-            <span className="size-2 animate-pulse rounded-full bg-red-500" />
-            مباشر
-          </span>
-        </div>
-
-        <div className="absolute bottom-4 right-4 rounded-xl bg-black/55 px-4 py-2 text-sm font-black text-white backdrop-blur">
-          {locations[active]}
-        </div>
-      </div>
-
-      {/* مصغّرات الكاميرات */}
-      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {locations.map((loc, i) => {
-          const isActive = i === active;
-          return (
-            <button
-              key={loc}
-              type="button"
-              aria-pressed={isActive}
-              onClick={() => setActive(i)}
-              className="group text-right outline-none"
-            >
-              <span
-                className={`relative block aspect-[16/10] overflow-hidden rounded-xl transition-all duration-300 ${
-                  isActive
-                    ? "ring-2 ring-sand ring-offset-2 ring-offset-paper"
-                    : "opacity-60 group-hover:opacity-100 group-focus-visible:ring-2 group-focus-visible:ring-sand"
+        {/* جدار الكاميرات: الكاميرا النشطة تتمدد والباقي يتجمع شرائح */}
+        <div
+          role="group"
+          aria-label="اختيار الكاميرا"
+          className="flex h-[620px] flex-col gap-2 md:gap-3 lg:h-[600px] lg:flex-row"
+        >
+          {locations.map((loc, i) => {
+            const isActive = i === active;
+            return (
+              <button
+                key={loc}
+                type="button"
+                aria-pressed={isActive}
+                aria-label={loc}
+                onClick={() => select(i)}
+                className={`group relative min-h-0 min-w-0 overflow-hidden rounded-xl2 text-start outline-none ring-1 ring-sand/25 transition-[flex] duration-700 ease-[cubic-bezier(.7,0,.2,1)] focus-visible:ring-2 focus-visible:ring-sand ${
+                  isActive ? "flex-[6]" : "flex-[1] hover:ring-sand/60"
                 }`}
               >
                 <Image
                   src={images[i]}
-                  alt=""
+                  alt={isActive ? loc : ""}
                   fill
-                  sizes="(min-width: 768px) 25vw, 50vw"
-                  className="object-cover"
+                  priority={i === 0}
+                  sizes={isActive ? "(min-width: 1024px) 800px, 100vw" : "200px"}
+                  className={`object-cover transition-all duration-700 ${
+                    isActive
+                      ? "scale-100 grayscale-0"
+                      : "scale-110 grayscale brightness-[.45] group-hover:brightness-75"
+                  }`}
                 />
+
+                {/* حالة الشريحة المطوية */}
                 <span
-                  dir="ltr"
-                  className="absolute top-2 right-2 rounded bg-black/55 px-1.5 py-0.5 font-mono text-[10px] text-white"
+                  className={`absolute inset-0 flex items-center justify-center gap-3 px-4 transition-opacity duration-500 lg:flex-col lg:justify-between lg:py-6 ${
+                    isActive ? "opacity-0" : "opacity-100 delay-300"
+                  }`}
                 >
-                  {pad(i)}
+                  <span className="font-heading text-xl font-extrabold text-sand">
+                    {pad(i)}
+                  </span>
+                  <span className="font-heading text-base font-bold text-white lg:[writing-mode:vertical-rl]">
+                    {loc}
+                  </span>
+                  <span aria-hidden className="hidden size-2 rounded-full bg-white/40 lg:block" />
                 </span>
-              </span>
-              <span
-                className={`mt-2 block text-sm font-black transition-colors ${
-                  isActive ? "text-ink" : "text-ink/45"
-                }`}
-              >
-                {loc}
-              </span>
-            </button>
-          );
-        })}
+
+                {/* حالة الشاشة النشطة */}
+                {isActive && (
+                  <span className="absolute inset-0 animate-fadeIn">
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"
+                    />
+                    <span
+                      aria-hidden
+                      className="sm-scan absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-transparent via-sand/25 to-transparent"
+                    />
+
+                    {CORNERS.map((c) => (
+                      <span
+                        key={c}
+                        aria-hidden
+                        className={`absolute size-7 border-sand ${c}`}
+                      />
+                    ))}
+
+                    <span className="absolute inset-x-0 top-0 flex items-center justify-between px-10 pt-9 text-white">
+                      <span className="flex items-center gap-2 rounded-full bg-black/50 px-3.5 py-1.5 text-xs font-bold backdrop-blur-sm">
+                        <span className="size-2 animate-pulse rounded-full bg-red-500" />
+                        بث مباشر
+                      </span>
+                      <span dir="ltr" className="text-sm font-bold tabular-nums text-white/90">
+                        {now ? fmtTime(now) : "\u00A0"}
+                      </span>
+                    </span>
+
+                    <span className="absolute inset-x-0 bottom-0 block px-10 pb-10 text-white">
+                      <span className="block text-sm font-bold text-sand">
+                        كاميرا {pad(i)}
+                      </span>
+                      <span className="mt-1 block font-heading text-3xl font-extrabold md:text-5xl">
+                        {loc}
+                      </span>
+                    </span>
+
+                    {auto && (
+                      <span
+                        aria-hidden
+                        key={`bar-${i}`}
+                        className="sm-bar absolute inset-x-0 bottom-0 h-1 bg-sand"
+                      />
+                    )}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

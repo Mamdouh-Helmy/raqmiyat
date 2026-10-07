@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { SquiggleUnderline } from "./SquiggleUnderline";
 
 const defaultItems = [
   {
@@ -31,146 +30,124 @@ const defaultItems = [
   },
 ];
 
-const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+const lattice =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z' fill='none' stroke='%23b8934a' stroke-opacity='0.2'/%3E%3C/svg%3E\")";
 
 export default function Faq({ items = defaultItems }) {
   const [open, setOpen] = useState(0);
 
   return (
     <section className="container-x section">
-      <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24">
-        {/* الجانب الثابت */}
-        <div className="lg:sticky lg:top-10 self-start">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="size-2 rotate-45 bg-[#c9a66b]" aria-hidden="true" />
-            <span className="text-xs font-bold tracking-widest text-[#a98445]">
-              الأسئلة الشائعة
-            </span>
-          </div>
+      <style>{`
+        @keyframes faqDots { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+        @keyframes faqDot  { 0%, 100% { transform: translateY(0); opacity: .45; } 50% { transform: translateY(-4px); opacity: 1; } }
+        @keyframes faqText { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .faq-dots { animation: faqDots .9s linear both; }
+        .faq-dot  { animation: faqDot .6s ease-in-out infinite; }
+        .faq-dot:nth-child(2) { animation-delay: .12s; }
+        .faq-dot:nth-child(3) { animation-delay: .24s; }
+        .faq-text { animation: faqText .5s ease-out .85s both; }
+        @media (prefers-reduced-motion: reduce) {
+          .faq-dots { display: none; }
+          .faq-text { animation: none; }
+        }
+      `}</style>
 
-          <div className="inline-block mb-6">
-            <h2 className="text-3xl md:text-5xl font-black text-ink leading-[1.3]">
-              أسئلة نسمعها قبل كل مشروع
-            </h2>
-            <SquiggleUnderline />
-          </div>
+      <div className="mb-12 flex flex-col gap-5 md:mb-16 md:flex-row md:items-end md:justify-between">
+        <h2 className="max-w-3xl font-heading text-4xl font-extrabold leading-[1.2] text-ink md:text-6xl">
+          أسئلة نسمعها قبل كل مشروع
+        </h2>
+        <p className="max-w-xs leading-loose text-ink/60">
+          إن لم تجد سؤالك هنا، اكتبه لنا في نموذج التواصل وسنجيبك مباشرة.
+        </p>
+      </div>
 
-          <p className="text-ink/60 leading-relaxed max-w-sm">
-            إن لم تجد سؤالك هنا، اكتبه لنا في نموذج التواصل وسنجيبك مباشرة.
-          </p>
+      {/* محادثة: السؤال من اليمين، والرد من اليسار */}
+      <div className="flex flex-col gap-3 md:gap-4">
+        {items.map(({ q, a }, i) => {
+          const isOpen = open === i;
+          const panelId = `faq-panel-${i}`;
+          const btnId = `faq-btn-${i}`;
 
-          {/* شريط معيّنات زخرفي */}
-          <div className="mt-10 flex items-center gap-2" aria-hidden="true">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span
-                key={i}
-                className="size-3 rotate-45 border border-[#c9a66b]"
-                style={{
-                  backgroundColor: i === 0 ? "#c9a66b" : "transparent",
-                  opacity: 1 - i * 0.17,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* الأسئلة */}
-        <div className="space-y-3">
-          {items.map(({ q, a }, i) => {
-            const isOpen = open === i;
-            const panelId = `faq-panel-${i}`;
-            const btnId = `faq-btn-${i}`;
-
-            return (
-              <div
-                key={q}
-                className={`relative overflow-hidden rounded-xl2 border transition-all duration-300 ${
-                  isOpen
-                    ? "border-[#c9a66b]/50 bg-brand-dark/[0.04] shadow-sm"
-                    : "border-ink/10 bg-transparent hover:border-[#c9a66b]/40 hover:bg-brand-dark/[0.025]"
-                }`}
-              >
-                {/* خط ذهبي جانبي للسؤال المفتوح */}
-                <span
-                  aria-hidden="true"
-                  className={`absolute right-0 top-0 h-full w-[3px] bg-[#c9a66b] origin-top transition-transform duration-500 ${
-                    isOpen ? "scale-y-100" : "scale-y-0"
-                  }`}
-                />
-
-                <h3>
-                  <button
-                    id={btnId}
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={panelId}
-                    onClick={() => setOpen(isOpen ? -1 : i)}
-                    className="group w-full flex items-center gap-4 px-5 md:px-6 py-5 text-right outline-none focus-visible:ring-2 focus-visible:ring-[#c9a66b]/60 rounded-xl2"
-                  >
-                    {/* الرقم داخل معيّن */}
-                    <span className="relative grid place-items-center size-10 shrink-0">
-                      <span
-                        className={`absolute size-7 rotate-45 rounded-[4px] border transition-all duration-500 ${
-                          isOpen
-                            ? "rotate-[135deg] border-brand-dark bg-brand-dark"
-                            : "border-[#c9a66b]/50 bg-white group-hover:rotate-[135deg]"
-                        }`}
-                      />
-                      <span
-                        className={`relative font-heading text-sm leading-none transition-colors duration-300 ${
-                          isOpen ? "text-[#c9a66b]" : "text-brand-dark"
-                        }`}
-                      >
-                        {toAr(i + 1)}
-                      </span>
-                    </span>
-
-                    <span
-                      className={`flex-1 font-black text-base md:text-lg transition-colors duration-300 ${
-                        isOpen ? "text-brand-dark" : "text-ink"
-                      }`}
-                    >
-                      {q}
-                    </span>
-
-                    {/* زر + داخل دايرة */}
-                    <span
-                      className={`grid place-items-center size-8 shrink-0 rounded-full border transition-all duration-300 ${
-                        isOpen
-                          ? "border-[#c9a66b] bg-[#c9a66b] text-brand-dark"
-                          : "border-ink/15 text-ink/50 group-hover:border-[#c9a66b] group-hover:text-[#a98445]"
-                      }`}
-                    >
-                      <Plus
-                        size={16}
-                        weight="bold"
-                        className={`transition-transform duration-300 ${
-                          isOpen ? "rotate-45" : ""
-                        }`}
-                      />
-                    </span>
-                  </button>
-                </h3>
-
-                <div
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={btnId}
-                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${
-                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          return (
+            <div key={q} className="flex flex-col gap-3 md:gap-4">
+              {/* السؤال */}
+              <h3 className="max-w-[94%] self-start md:max-w-2xl">
+                <button
+                  id={btnId}
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => setOpen(isOpen ? -1 : i)}
+                  className={`flex w-full items-center gap-4 rounded-xl2 rounded-es-md px-5 py-4 text-start outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-brand-dark md:px-7 md:py-5 ${
+                    isOpen
+                      ? "bg-sand text-brand-dark"
+                      : "bg-sand/25 text-ink hover:bg-sand/45"
                   }`}
                 >
-                  <div className="overflow-hidden">
-                    {/* pr = عرض المعيّن + الفجوة، عشان النص يتحاذى مع السؤال */}
-                    <p className="text-ink/65 text-[15px] leading-loose pb-6 pl-6 pr-[4.75rem] md:pr-[5.25rem] max-w-2xl">
-                      {a}
-                    </p>
+                  <span className="flex-1 text-lg font-bold leading-snug md:text-2xl">
+                    {q}
+                  </span>
+                  <Plus
+                    size={20}
+                    className={`shrink-0 transition-transform duration-300 ${
+                      isOpen ? "rotate-45" : ""
+                    }`}
+                  />
+                </button>
+              </h3>
+
+              {/* الرد */}
+              <div
+                id={panelId}
+                role="region"
+                aria-labelledby={btnId}
+                className={`grid transition-[grid-template-rows] duration-500 ease-out ${
+                  isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <div className="flex justify-end pb-2">
+                    <div className="relative isolate max-w-[94%] overflow-hidden rounded-xl2 rounded-ee-md bg-brand-dark px-6 py-6 text-white md:max-w-2xl md:px-8 md:py-8">
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 -z-10"
+                        style={{
+                          backgroundImage: lattice,
+                          backgroundSize: "56px 56px",
+                          WebkitMaskImage:
+                            "linear-gradient(to left, #000 0%, transparent 75%)",
+                          maskImage:
+                            "linear-gradient(to left, #000 0%, transparent 75%)",
+                        }}
+                      />
+
+                      {/* نقاط الكتابة: تظهر لحظة ثم يبدأ الرد */}
+                      {isOpen && (
+                        <span
+                          aria-hidden="true"
+                          className="faq-dots absolute start-6 top-7 flex gap-1.5 md:start-8 md:top-9"
+                        >
+                          <span className="faq-dot size-2 rounded-full bg-sand" />
+                          <span className="faq-dot size-2 rounded-full bg-sand" />
+                          <span className="faq-dot size-2 rounded-full bg-sand" />
+                        </span>
+                      )}
+
+                      <p
+                        className={`text-base leading-loose text-white/85 md:text-xl md:leading-loose ${
+                          isOpen ? "faq-text" : "opacity-0"
+                        }`}
+                      >
+                        {a}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
