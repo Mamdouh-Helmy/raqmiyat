@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
 
@@ -124,7 +124,7 @@ export default function FeatureModal({
                       aria-label="إغلاق"
                       className="absolute end-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark md:text-ink/50 md:hover:bg-ink/5 md:hover:text-ink"
                     >
-                      <X size={20} />
+                      <X size={20} weight="bold" />
                     </button>
 
                     {/* الجانب الغامق: نفس لغة الكارت المميز */}
