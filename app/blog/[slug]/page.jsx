@@ -1,27 +1,15 @@
-//app/blog/[slug]/page.jsx
+// app/blog/[slug]/page.jsx
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  CaretDown,
-  CheckCircle,
-  Clock,
-  Info,
-  ListBullets,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronDown, Plus } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCta from "@/components/BlogCta";
 import ReadingProgress from "@/components/ReadingProgress";
 import ShareBar from "@/components/ShareBar";
-import CategoryIcon from "@/components/CategoryIcon";
-import { SquiggleUnderline } from "@/components/SquiggleUnderline";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import {
   posts,
-  categories,
   getPost,
   getToc,
   getRelated,
@@ -82,7 +70,6 @@ export default async function PostPage({ params }) {
   const related = getRelated(post, 3);
   const { newer, older } = getAdjacent(post);
   const modified = post.updated || post.date;
-  const catIcon = categories.find((c) => c.name === post.category)?.icon;
   const kwEn = post.keywordsEn || [];
 
   const publisher = {
@@ -165,25 +152,18 @@ export default async function PostPage({ params }) {
         </nav>
 
         <header className="max-w-3xl">
-          <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-sand-deep">
-            <span className="inline-flex items-center gap-1.5">
-              <CategoryIcon name={catIcon} size={16} weight="fill" />
-              {post.category}
-            </span>
-            <span className="rounded-full bg-ink/5 px-3 py-1 text-ink/60">
-              {scopeLabel(post.scope)}
-            </span>
-          </div>
+          <p className="text-sm">
+            <span className="font-bold text-sand-deep">{post.category}</span>
+            <span className="mx-2 text-ink/30">·</span>
+            <span className="text-ink/55">{scopeLabel(post.scope)}</span>
+          </p>
 
-          <div className="mt-5 inline-block">
-            <h1 className="text-3xl font-black leading-[1.4] text-ink md:text-5xl">
-              {post.title}
-            </h1>
-            <SquiggleUnderline />
-          </div>
-          <p className="mt-6 text-lg leading-relaxed text-ink/60">{post.description}</p>
+          <h1 className="mt-5 font-heading text-3xl font-extrabold leading-[1.4] text-ink md:text-5xl">
+            {post.title}
+          </h1>
+          <p className="mt-6 text-lg leading-loose text-ink/60">{post.description}</p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-x-8 gap-y-4 border-y border-ink/10 py-4">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-x-8 gap-y-4 border-y border-ink/15 py-4">
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink/55">
               <span>بقلم فريق {SITE_NAME}</span>
               <time dateTime={post.date}>{formatDate(post.date)}</time>
@@ -192,52 +172,46 @@ export default async function PostPage({ params }) {
                   حُدّث <time dateTime={modified}>{formatDate(modified)}</time>
                 </span>
               )}
-              <span className="inline-flex items-center gap-1">
-                <Clock size={14} />
-                {toAr(readingMinutes(post))} دقائق قراءة
-              </span>
+              <span>{toAr(readingMinutes(post))} دقائق قراءة</span>
             </p>
             <ShareBar url={url} title={post.title} />
           </div>
         </header>
 
-        <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_20rem] lg:gap-20">
-          <div className="min-w-0 max-w-2xl">
+        <div className="mt-12 grid grid-cols-1 items-start gap-12 lg:grid-cols-3 lg:gap-12">
+          {/* ===== المقال (ثلثين) ===== */}
+          <div className="min-w-0 lg:col-span-2">
             {/* الخلاصة */}
             {post.takeaways && (
               <section
                 aria-labelledby="takeaways-title"
-                className="mb-10 rounded-xl2 bg-brand-soft p-6 md:p-7"
+                className="mb-10 rounded-xl2 bg-sand px-6 py-7 text-brand-dark md:px-8"
               >
-                <h2 id="takeaways-title" className="mb-4 text-base font-black text-ink">
+                <h2 id="takeaways-title" className="mb-1 text-base font-black">
                   الخلاصة قبل أن تقرأ
                 </h2>
-                <ul className="space-y-3">
-                  {post.takeaways.map((t) => (
-                    <li key={t} className="flex gap-3 leading-relaxed text-ink/75">
-                      <CheckCircle size={20} weight="fill" className="mt-1 shrink-0 text-brand" />
+                <ol className="divide-y divide-brand-dark/25">
+                  {post.takeaways.map((t, i) => (
+                    <li key={t} className="flex gap-4 py-4 leading-relaxed">
+                      <span className="w-5 shrink-0 font-black tabular-nums">{toAr(i + 1)}</span>
                       <span>{t}</span>
                     </li>
                   ))}
-                </ul>
+                </ol>
               </section>
             )}
 
             {/* الفهرس على الجوال */}
             {toc.length > 2 && (
-              <details className="group mb-10 rounded-xl border border-ink/10 bg-white lg:hidden">
+              <details className="group mb-10 rounded-xl border border-ink/15 lg:hidden">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-black text-ink">
-                  <span className="inline-flex items-center gap-2">
-                    <ListBullets size={18} weight="bold" className="text-brand" />
-                    محتوى المقال
-                  </span>
-                  <CaretDown
+                  محتوى المقال
+                  <ChevronDown
                     size={16}
-                    weight="bold"
-                    className="text-ink/40 transition-transform group-open:rotate-180"
+                    className="text-ink/40 transition-transform duration-300 group-open:rotate-180"
                   />
                 </summary>
-                <ol className="space-y-2 border-t border-ink/10 px-5 py-4 text-sm">
+                <ol className="space-y-2 border-t border-ink/15 px-5 py-4 text-sm">
                   {toc.map((h) => (
                     <li key={h.id}>
                       <a href={`#${h.id}`} className="text-ink/70 hover:text-brand">
@@ -257,7 +231,7 @@ export default async function PostPage({ params }) {
                     <h2
                       key={i}
                       id={headingId(i)}
-                      className="mb-4 mt-12 scroll-mt-24 text-2xl font-black leading-snug text-ink first:mt-0"
+                      className="mb-4 mt-12 scroll-mt-24 font-heading text-2xl font-extrabold leading-snug text-ink first:mt-0 md:text-3xl"
                     >
                       {block.text}
                     </h2>
@@ -291,13 +265,10 @@ export default async function PostPage({ params }) {
                   return (
                     <aside
                       key={i}
-                      className="my-8 rounded-xl border border-ink/10 border-s-4 border-s-sand bg-white p-5 md:p-6"
+                      className="my-8 border-s-4 border-sand bg-sand/20 px-5 py-5 md:px-6"
                     >
-                      <p className="mb-2 flex items-center gap-2 text-sm font-black text-ink">
-                        <Info size={18} weight="fill" className="text-sand-deep" />
-                        {block.title}
-                      </p>
-                      <p className="leading-loose text-ink/70">{block.text}</p>
+                      <p className="mb-2 font-black text-ink">{block.title}</p>
+                      <p className="leading-loose text-ink/75">{block.text}</p>
                     </aside>
                   );
                 }
@@ -312,21 +283,23 @@ export default async function PostPage({ params }) {
             {/* أسئلة شائعة */}
             {post.faq?.length > 0 && (
               <section aria-labelledby="faq-title" className="mt-14">
-                <h2 id="faq-title" className="mb-5 text-2xl font-black text-ink">
+                <h2
+                  id="faq-title"
+                  className="mb-5 font-heading text-2xl font-extrabold text-ink md:text-3xl"
+                >
                   أسئلة شائعة
                 </h2>
-                <div className="divide-y divide-ink/10 rounded-xl border border-ink/10 bg-white">
+                <div className="divide-y divide-ink/15 border-y border-ink/15">
                   {post.faq.map((f) => (
-                    <details key={f.q} className="group px-5">
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-black text-ink">
+                    <details key={f.q} className="group">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-black text-ink">
                         {f.q}
-                        <CaretDown
-                          size={18}
-                          weight="bold"
-                          className="shrink-0 text-ink/40 transition-transform group-open:rotate-180"
+                        <Plus
+                          size={20}
+                          className="shrink-0 text-ink/50 transition-transform duration-300 group-open:rotate-45"
                         />
                       </summary>
-                      <p className="pb-5 leading-loose text-ink/70">{f.a}</p>
+                      <p className="pb-6 leading-loose text-ink/70">{f.a}</p>
                     </details>
                   ))}
                 </div>
@@ -346,9 +319,9 @@ export default async function PostPage({ params }) {
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer nofollow"
-                        className="group inline-flex items-start gap-2 text-brand underline-offset-4 hover:underline"
+                        className="inline-flex items-start gap-2 text-brand underline-offset-4 hover:underline"
                       >
-                        <ArrowUpRight size={15} weight="bold" className="mt-0.5 shrink-0" />
+                        <ArrowUpRight size={15} className="mt-0.5 shrink-0" />
                         <span dir="auto">{s.label}</span>
                       </a>
                     </li>
@@ -358,19 +331,17 @@ export default async function PostPage({ params }) {
             )}
           </div>
 
-          <aside className="space-y-8 lg:sticky lg:top-10 lg:self-start">
+          {/* ===== السايدبار (ثلث) ===== */}
+          <aside className="space-y-8 lg:col-span-1 lg:sticky lg:top-10 lg:self-start">
             {toc.length > 2 && (
               <nav aria-label="محتوى المقال" className="hidden lg:block">
-                <h2 className="mb-3 flex items-center gap-2 text-sm font-black text-ink/50">
-                  <ListBullets size={16} weight="bold" />
-                  محتوى المقال
-                </h2>
-                <ol className="space-y-2 border-s border-ink/10 text-sm">
+                <h2 className="mb-3 text-sm font-black text-ink/50">محتوى المقال</h2>
+                <ol className="space-y-2 border-s border-ink/15 text-sm">
                   {toc.map((h) => (
                     <li key={h.id}>
                       <a
                         href={`#${h.id}`}
-                        className="-ms-px block border-s-2 border-transparent ps-4 text-ink/65 transition-colors hover:border-sand hover:text-ink"
+                        className="-ms-px block border-s-2 border-transparent ps-4 text-ink/65 transition-colors hover:border-brand-dark hover:text-ink"
                       >
                         {h.text}
                       </a>
@@ -381,94 +352,65 @@ export default async function PostPage({ params }) {
             )}
 
             <BlogCta />
-
-            <div>
-              <h2 className="mb-3 text-sm font-black text-ink/50">الكلمات المفتاحية</h2>
-              <ul className="flex flex-wrap gap-2">
-                {post.keywords.map((k) => (
-                  <li
-                    key={k}
-                    className="rounded-full border border-ink/15 bg-white px-3 py-1 text-xs text-ink/70"
-                  >
-                    {k}
-                  </li>
-                ))}
-              </ul>
-              {kwEn.length > 0 && (
-                <ul dir="ltr" lang="en" className="mt-3 flex flex-wrap gap-2">
-                  {kwEn.map((k) => (
-                    <li
-                      key={k}
-                      className="rounded-full border border-ink/10 bg-paper px-3 py-1 text-xs text-ink/55"
-                    >
-                      {k}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
           </aside>
         </div>
       </article>
 
       {/* السابق والتالي */}
       {(newer || older) && (
-        <nav
-          aria-label="تنقل بين المقالات"
-          className="container-x grid grid-cols-1 gap-4 py-10 md:grid-cols-2"
-        >
-          {older ? (
-            <Link
-              href={`/blog/${older.slug}`}
-              className="group rounded-xl border border-ink/10 bg-white p-5 transition-colors hover:border-sand"
-            >
-              <span className="flex items-center gap-2 text-xs font-bold text-ink/45">
-                <ArrowRight size={14} weight="bold" />
-                المقال السابق
-              </span>
-              <span className="mt-2 block font-black leading-[1.5] text-ink">{older.title}</span>
-            </Link>
-          ) : (
-            <span />
-          )}
-          {newer ? (
-            <Link
-              href={`/blog/${newer.slug}`}
-              className="group rounded-xl border border-ink/10 bg-white p-5 text-end transition-colors hover:border-sand"
-            >
-              <span className="flex items-center justify-end gap-2 text-xs font-bold text-ink/45">
-                المقال التالي
-                <ArrowLeft size={14} weight="bold" />
-              </span>
-              <span className="mt-2 block font-black leading-[1.5] text-ink">{newer.title}</span>
-            </Link>
-          ) : (
-            <span />
-          )}
+        <nav aria-label="تنقل بين المقالات" className="container-x py-10">
+          <div
+            className={`grid overflow-hidden rounded-xl2 ${newer && older ? "md:grid-cols-2" : ""}`}
+          >
+            {older && (
+              <Link
+                href={`/blog/${older.slug}`}
+                className="group bg-sand px-6 py-8 text-brand-dark outline-none transition-colors duration-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-dark md:px-10"
+              >
+                <span className="flex items-center gap-2 text-xs font-bold text-brand-dark/60">
+                  <ArrowRight size={14} />
+                  المقال السابق
+                </span>
+                <span className="mt-3 block font-heading text-xl font-extrabold leading-[1.5] md:text-2xl">
+                  {older.title}
+                </span>
+              </Link>
+            )}
+            {newer && (
+              <Link
+                href={`/blog/${newer.slug}`}
+                className="group bg-brand-dark px-6 py-8 text-white outline-none transition-colors duration-300 hover:bg-brand focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sand md:px-10"
+              >
+                <span className="flex items-center gap-2 text-xs font-bold text-white/55">
+                  المقال التالي
+                  <ArrowLeft size={14} />
+                </span>
+                <span className="mt-3 block font-heading text-xl font-extrabold leading-[1.5] md:text-2xl">
+                  {newer.title}
+                </span>
+              </Link>
+            )}
+          </div>
         </nav>
       )}
 
       {/* مقالات ذات صلة */}
       <section className="container-x section">
-        <h2 className="mb-6 text-xl font-black text-ink">اقرأ أيضاً</h2>
+        <h2 className="mb-6 font-heading text-2xl font-extrabold text-ink md:text-3xl">اقرأ أيضاً</h2>
         <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3">
           {related.map((p) => (
             <Link
               key={p.slug}
               href={`/blog/${p.slug}`}
-              className="group border-t-2 border-ink/15 pt-5 transition-colors duration-300 hover:border-sand"
+              className="group border-t-2 border-ink/15 pt-5 transition-colors duration-300 hover:border-brand-dark"
             >
               <span className="text-xs font-bold text-sand-deep">{p.category}</span>
               <span className="mt-2 block text-lg font-black leading-[1.5] text-ink">
                 {p.title}
               </span>
-              <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand">
+              <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand transition-all duration-300 group-hover:gap-3">
                 اقرأ المقال
-                <ArrowLeft
-                  size={15}
-                  weight="bold"
-                  className="transition-transform duration-300 group-hover:-translate-x-1"
-                />
+                <ArrowLeft size={15} />
               </span>
             </Link>
           ))}

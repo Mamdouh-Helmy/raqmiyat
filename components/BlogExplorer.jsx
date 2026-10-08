@@ -2,24 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Clock,
-  Globe,
-  MagnifyingGlass,
-  MapPin,
-  Stack,
-  X,
-} from "@phosphor-icons/react/dist/ssr";
-import CategoryIcon from "./CategoryIcon";
 
 const PAGE_SIZE = 8;
 
 const SCOPES = [
-  { value: "all", label: "الكل", Icon: Stack },
-  { value: "saudi", label: "السوق السعودي", Icon: MapPin },
-  { value: "global", label: "اتجاهات عالمية", Icon: Globe },
+  { value: "all", label: "الكل" },
+  { value: "saudi", label: "السوق السعودي" },
+  { value: "global", label: "اتجاهات عالمية" },
 ];
 
 const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
@@ -33,14 +22,14 @@ const norm = (s) =>
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه");
 
-const chip = (active) =>
-  `inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
+const tab = (active) =>
+  `border-b-2 pb-1.5 text-base font-bold outline-none transition-colors duration-300 focus-visible:text-brand ${
     active
-      ? "border-brand bg-brand text-white"
-      : "border-ink/15 bg-white text-ink/70 hover:border-brand hover:text-brand"
+      ? "border-brand-dark text-ink"
+      : "border-transparent text-ink/45 hover:text-ink/80"
   }`;
 
-// posts: [{ slug, title, description, category, icon, scope, scopeLabel, dateLabel, minutes, keywords, keywordsEn }]
+// posts: [{ slug, title, description, category, scope, scopeLabel, dateLabel, minutes, keywords, keywordsEn }]
 // categories: [{ name, icon, count }]
 export default function BlogExplorer({ posts, categories }) {
   const [query, setQuery] = useState("");
@@ -90,48 +79,40 @@ export default function BlogExplorer({ posts, categories }) {
   return (
     <div>
       {/* أدوات التصفية */}
-      <div className="space-y-5 border-b border-ink/10 pb-8">
-        <div className="relative max-w-xl">
-          <MagnifyingGlass
-            size={18}
-            weight="bold"
-            className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-ink/40"
-          />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setVisible(PAGE_SIZE);
-            }}
-            placeholder="ابحث: فاتورة، كاميرات، ذكاء اصطناعي، PDPL، SEO..."
-            aria-label="ابحث في المقالات"
-            className="w-full rounded-full border border-ink/15 bg-white py-3 pe-5 ps-11 text-sm text-ink outline-none transition-colors placeholder:text-ink/40 focus:border-brand"
-          />
-        </div>
+      <div className="space-y-7 pb-8">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setVisible(PAGE_SIZE);
+          }}
+          placeholder="ابحث: فاتورة، كاميرات، ذكاء اصطناعي، PDPL، SEO..."
+          aria-label="ابحث في المقالات"
+          className="w-full max-w-xl border-0 border-b border-ink/25 bg-transparent py-3 text-base text-ink outline-none transition-colors duration-300 placeholder:text-ink/40 focus:border-brand-dark"
+        />
 
-        <div className="flex flex-wrap gap-2" role="group" aria-label="تصفية حسب النطاق">
-          {SCOPES.map(({ value, label, Icon }) => (
+        <div className="flex flex-wrap gap-x-7 gap-y-3" role="group" aria-label="تصفية حسب النطاق">
+          {SCOPES.map(({ value, label }) => (
             <button
               key={value}
               type="button"
               onClick={() => change(setScope)(value)}
               aria-pressed={scope === value}
-              className={chip(scope === value)}
+              className={tab(scope === value)}
             >
-              <Icon size={16} weight={scope === value ? "fill" : "duotone"} />
               {label}
-              <span className="text-xs font-normal opacity-70">{toAr(scopeCount(value))}</span>
+              <span className="ms-2 text-xs font-normal opacity-60">{toAr(scopeCount(value))}</span>
             </button>
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2" role="group" aria-label="تصفية حسب الموضوع">
+        <div className="flex flex-wrap gap-x-7 gap-y-3" role="group" aria-label="تصفية حسب الموضوع">
           <button
             type="button"
             onClick={() => change(setCategory)("all")}
             aria-pressed={category === "all"}
-            className={chip(category === "all")}
+            className={tab(category === "all")}
           >
             كل المواضيع
           </button>
@@ -143,48 +124,40 @@ export default function BlogExplorer({ posts, categories }) {
                 type="button"
                 onClick={() => change(setCategory)(c.name)}
                 aria-pressed={category === c.name}
-                className={chip(category === c.name)}
+                className={tab(category === c.name)}
               >
-                <CategoryIcon name={c.icon} size={16} weight={category === c.name ? "fill" : "duotone"} />
                 {c.name}
-                <span className="text-xs font-normal opacity-70">{toAr(c.count)}</span>
+                <span className="ms-2 text-xs font-normal opacity-60">{toAr(c.count)}</span>
               </button>
             ))}
         </div>
       </div>
 
-      <p className="mt-6 text-sm text-ink/50" role="status" aria-live="polite">
+      <p className="mb-2 text-sm text-ink/50" role="status" aria-live="polite">
         {filtered.length === 0
           ? "لا توجد نتائج"
           : `${toAr(filtered.length)} ${filtered.length === 1 ? "مقال" : filtered.length === 2 ? "مقالان" : "مقالات"}`}
       </p>
 
-      {/* الفهرس: صفوف نصية بدل بطاقات متطابقة */}
-      <motion.ol layout className="mt-2 divide-y divide-ink/10">
-        <AnimatePresence mode="popLayout" initial={false}>
-          {shown.map((p) => (
-            <motion.li
+      {/* الفهرس: صفوف مرقمة */}
+      {filtered.length > 0 && (
+        <ol className="border-b border-ink/15">
+          {shown.map((p, i) => (
+            <li
               key={p.slug}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="group relative grid gap-4 py-7 md:grid-cols-[auto_1fr_auto] md:items-start md:gap-8"
+              className="group relative grid animate-fadeIn gap-3 border-t border-ink/15 py-7 md:grid-cols-[3rem_1fr_auto] md:gap-8"
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand transition-colors group-hover:bg-brand group-hover:text-white">
-                <CategoryIcon name={p.icon} size={24} />
+              <span className="text-sm font-bold tabular-nums text-ink/40">
+                {toAr(String(i + 1).padStart(2, "0"))}
               </span>
 
               <div className="min-w-0 max-w-2xl">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                <p className="text-xs">
                   <span className="font-bold text-sand-deep">{p.category}</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-ink/5 px-2.5 py-0.5 font-bold text-ink/60">
-                    {p.scope === "saudi" ? <MapPin size={12} weight="fill" /> : <Globe size={12} weight="fill" />}
-                    {p.scopeLabel}
-                  </span>
-                </div>
-                <h3 className="mt-2 text-xl font-black leading-[1.55] text-ink md:text-2xl">
+                  <span className="mx-2 text-ink/30">·</span>
+                  <span className="text-ink/55">{p.scopeLabel}</span>
+                </p>
+                <h3 className="mt-2 text-xl font-black leading-[1.55] text-ink transition-colors duration-300 group-hover:text-brand md:text-2xl">
                   <Link
                     href={`/blog/${p.slug}`}
                     className="outline-none before:absolute before:inset-0 focus-visible:underline"
@@ -195,30 +168,25 @@ export default function BlogExplorer({ posts, categories }) {
                 <p className="mt-3 text-sm leading-relaxed text-ink/60">{p.description}</p>
               </div>
 
-              <div className="flex items-center gap-4 text-xs text-ink/50 md:flex-col md:items-end md:gap-3">
+              <div className="flex items-center gap-4 text-xs text-ink/50 md:flex-col md:items-end md:gap-2">
                 <span>{p.dateLabel}</span>
-                <span className="inline-flex items-center gap-1">
-                  <Clock size={14} />
-                  {toAr(p.minutes)} دقائق
-                </span>
-                <ArrowLeft
-                  size={18}
-                  weight="bold"
-                  className="hidden text-brand transition-transform duration-300 group-hover:-translate-x-1 md:block"
-                />
+                <span>{toAr(p.minutes)} دقائق</span>
               </div>
-            </motion.li>
+            </li>
           ))}
-        </AnimatePresence>
-      </motion.ol>
+        </ol>
+      )}
 
       {/* لا نتائج */}
       {filtered.length === 0 && (
-        <div className="mt-6 rounded-xl2 border border-dashed border-ink/20 bg-white p-10 text-center">
-          <p className="font-black text-ink">ما لقينا مقالاً بهذه المواصفات</p>
-          <p className="mt-2 text-sm text-ink/60">جرّب كلمة أبسط، أو ارجع لعرض كل المقالات.</p>
-          <button type="button" onClick={reset} className="btn-outline mt-6 inline-flex items-center gap-2">
-            <X size={15} weight="bold" />
+        <div className="mt-4 rounded-xl2 bg-sand px-6 py-10 text-brand-dark md:px-12">
+          <p className="font-heading text-2xl font-extrabold">ما لقينا مقالاً بهذه المواصفات</p>
+          <p className="mt-2 text-brand-dark/75">جرّب كلمة أبسط، أو ارجع لعرض كل المقالات.</p>
+          <button
+            type="button"
+            onClick={reset}
+            className="mt-6 rounded-full bg-brand-dark px-7 py-3 text-sm font-black text-white outline-none transition-colors duration-300 hover:bg-brand focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2 focus-visible:ring-offset-sand"
+          >
             مسح التصفية
           </button>
         </div>
@@ -229,7 +197,7 @@ export default function BlogExplorer({ posts, categories }) {
           <button
             type="button"
             onClick={() => setVisible((v) => v + PAGE_SIZE)}
-            className="rounded-full border border-brand px-7 py-3 text-sm font-black text-brand transition-colors hover:bg-brand hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="rounded-full border border-brand-dark px-8 py-3 text-sm font-black text-brand-dark outline-none transition-colors duration-300 hover:bg-brand-dark hover:text-white focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2"
           >
             عرض المزيد ({toAr(filtered.length - visible)} متبقية)
           </button>

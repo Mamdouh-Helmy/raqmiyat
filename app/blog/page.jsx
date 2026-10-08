@@ -1,19 +1,11 @@
 //app/blog/page.jsx
 import Link from "next/link";
-import {
-  ArrowLeft,
-  CheckCircle,
-  Clock,
-  Globe,
-  MapPin,
-  Rss,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCta from "@/components/BlogCta";
 import BlogExplorer from "@/components/BlogExplorer";
-import CategoryIcon from "@/components/CategoryIcon";
-import { SquiggleUnderline } from "@/components/SquiggleUnderline";
+import BlogTopics from "@/components/BlogTopics";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import {
   posts,
@@ -56,13 +48,11 @@ export const metadata = {
 function LaneItem({ p }) {
   return (
     <li className="group relative py-5">
-      <div className="flex items-center gap-3 text-xs text-ink/50">
+      <p className="text-xs text-ink/50">
         <span className="font-bold text-sand-deep">{p.category}</span>
-        <span className="inline-flex items-center gap-1">
-          <Clock size={13} />
-          {toAr(readingMinutes(p))} دقائق
-        </span>
-      </div>
+        <span className="mx-2">·</span>
+        {toAr(readingMinutes(p))} دقائق
+      </p>
       <h3 className="mt-2 text-lg font-black leading-[1.6] text-ink transition-colors group-hover:text-brand">
         <Link
           href={`/blog/${p.slug}`}
@@ -87,7 +77,6 @@ export default function BlogPage() {
     title: p.title,
     description: p.description,
     category: p.category,
-    icon: categories.find((c) => c.name === p.category)?.icon,
     scope: p.scope,
     scopeLabel: scopeLabel(p.scope),
     dateLabel: formatDate(p.date),
@@ -149,123 +138,81 @@ export default function BlogPage() {
 
       {/* الهيدر */}
       <section className="container-x pt-10 pb-8 md:pt-14">
-        <div className="mb-5 inline-block">
-          <h1 className="text-3xl font-black leading-[1.3] text-ink md:text-5xl">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <h1 className="max-w-3xl font-heading text-4xl font-extrabold leading-[1.2] text-ink md:text-6xl">
             المدونة التقنية
           </h1>
-          <SquiggleUnderline />
+          <p className="max-w-sm leading-loose text-ink/60">
+            نتابع السوق السعودي والاتجاهات العالمية والذكاء الاصطناعي، ونكتب عنها بلغة صاحب المنشأة
+            لا بلغة المبرمج: ما الذي تغيّر، وماذا يعني لك، وما الذي تفعله هذا الأسبوع.
+          </p>
         </div>
-        <p className="max-w-2xl text-base leading-relaxed text-ink/60 md:text-lg">
-          نتابع السوق السعودي والاتجاهات العالمية والذكاء الاصطناعي، ونكتب عنها بلغة صاحب المنشأة
-          لا بلغة المبرمج: ما الذي تغيّر، وماذا يعني لك، وما الذي تفعله هذا الأسبوع.
-        </p>
-        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink/50">
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/15 pt-4 text-sm text-ink/55">
           <span>
             {toAr(posts.length)} مقالاً في {toAr(topics)} مواضيع
           </span>
           <span>آخر تحديث {formatDate(latest.updated || latest.date)}</span>
-          <a
-            href="/blog/feed.xml"
-            className="inline-flex items-center gap-1.5 font-bold text-brand underline-offset-4 hover:underline"
-          >
-            <Rss size={15} weight="bold" />
-            اشترك عبر RSS
-          </a>
+          <Link
+  href="/blog/rss"
+  className="font-bold text-brand underline-offset-4 hover:underline"
+>
+  اشترك عبر RSS
+</Link>
         </div>
       </section>
 
       <section className="container-x section !pt-2">
-        {/* المقال المميز: واجهة الصفحة الأولى */}
-        <article className="relative overflow-hidden rounded-xl2 bg-brand-dark p-8 text-white md:p-12">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-[0.10]"
-            style={{
-              backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 0)",
-              backgroundSize: "22px 22px",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute -top-28 -start-20 h-72 w-72 rounded-full bg-sand/20 blur-3xl"
-          />
+        {/* المقال المميز: لوح نصين */}
+        <article className="group relative grid overflow-hidden rounded-xl2 lg:grid-cols-[1.4fr_1fr]">
+          <div className="bg-brand-dark px-6 py-10 text-white md:px-12 md:py-14">
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="font-bold text-sand">{featured.category}</span>
+              <span className="text-white/55">{scopeLabel(featured.scope)}</span>
+              <span className="text-white/55">{formatDate(featured.date)}</span>
+              <span className="text-white/55">{toAr(readingMinutes(featured))} دقائق</span>
+            </p>
 
-          <div className="relative grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-center">
-            <div>
-              <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-sand">
-                <span className="inline-flex items-center gap-1.5">
-                  <CategoryIcon
-                    name={categories.find((c) => c.name === featured.category)?.icon}
-                    size={16}
-                    weight="fill"
-                  />
-                  {featured.category}
-                </span>
-                <span className="h-3 w-px bg-white/25" />
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-white/80">
-                  {featured.scope === "saudi" ? (
-                    <MapPin size={13} weight="fill" />
-                  ) : (
-                    <Globe size={13} weight="fill" />
-                  )}
-                  {scopeLabel(featured.scope)}
-                </span>
-                <span className="font-normal text-white/55">{formatDate(featured.date)}</span>
-                <span className="inline-flex items-center gap-1 font-normal text-white/55">
-                  <Clock size={13} />
-                  {toAr(readingMinutes(featured))} دقائق
-                </span>
-              </div>
+            <h2 className="mt-6 font-heading text-3xl font-extrabold leading-[1.45] md:text-5xl md:leading-[1.4]">
+              <Link
+                href={`/blog/${featured.slug}`}
+                className="outline-none before:absolute before:inset-0 focus-visible:underline"
+              >
+                {featured.title}
+              </Link>
+            </h2>
+            <p className="mt-5 max-w-xl leading-loose text-white/65">{featured.description}</p>
 
-              <h2 className="mt-6 font-heading text-3xl leading-[1.5] md:text-5xl md:leading-[1.45]">
-                <Link
-                  href={`/blog/${featured.slug}`}
-                  className="outline-none before:absolute before:inset-0 focus-visible:underline"
-                >
-                  {featured.title}
-                </Link>
-              </h2>
-              <p className="mt-5 max-w-xl leading-relaxed text-white/65">{featured.description}</p>
-
-              <span className="mt-8 inline-flex items-center gap-2 rounded-full bg-sand px-6 py-3 text-sm font-black text-brand-dark">
-                اقرأ المقال
-                <ArrowLeft size={16} weight="bold" />
-              </span>
-            </div>
-
-            {featured.takeaways && (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                <h3 className="mb-4 text-sm font-black text-sand">الخلاصة في ثلاث نقاط</h3>
-                <ul className="space-y-4">
-                  {featured.takeaways.map((t) => (
-                    <li key={t} className="flex gap-3 text-sm leading-relaxed text-white/80">
-                      <CheckCircle size={19} weight="fill" className="mt-0.5 shrink-0 text-sand" />
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <span className="mt-8 inline-flex items-center gap-2 text-sm font-black text-sand transition-all duration-300 group-hover:gap-3">
+              اقرأ المقال
+              <ArrowLeft size={16} />
+            </span>
           </div>
+
+          {featured.takeaways && (
+            <div className="bg-sand px-6 py-10 text-brand-dark md:px-10 md:py-14">
+              <h3 className="mb-2 text-sm font-black">الخلاصة في ثلاث نقاط</h3>
+              <ol className="divide-y divide-brand-dark/25">
+                {featured.takeaways.map((t, i) => (
+                  <li key={t} className="flex gap-4 py-4">
+                    <span className="w-6 shrink-0 font-black tabular-nums">{toAr(i + 1)}</span>
+                    <span className="leading-relaxed">{t}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </article>
 
         {/* الأحدث */}
-        <div className="mt-14">
-          <h2 className="mb-6 text-xl font-black text-ink">وصل حديثاً</h2>
+        <div className="mt-16">
+          <h2 className="mb-6 font-heading text-2xl font-extrabold text-ink md:text-3xl">وصل حديثاً</h2>
           <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3">
             {recent.map((p) => (
               <article
                 key={p.slug}
-                className="group relative border-t-2 border-ink/15 pt-5 transition-colors duration-300 hover:border-sand"
+                className="group relative border-t-2 border-ink/15 pt-5 transition-colors duration-300 hover:border-brand-dark"
               >
-                <div className="flex items-center gap-2 text-xs">
-                  <CategoryIcon
-                    name={categories.find((c) => c.name === p.category)?.icon}
-                    size={16}
-                    className="text-sand-deep"
-                  />
-                  <span className="font-bold text-sand-deep">{p.category}</span>
-                </div>
+                <p className="text-xs font-bold text-sand-deep">{p.category}</p>
                 <h3 className="mt-3 text-lg font-black leading-[1.6] text-ink">
                   <Link
                     href={`/blog/${p.slug}`}
@@ -290,9 +237,8 @@ export default function BlogPage() {
           <section aria-labelledby="lane-saudi">
             <h2
               id="lane-saudi"
-              className="flex items-center gap-2 border-b-2 border-brand pb-3 text-lg font-black text-ink"
+              className="border-b-2 border-brand-dark pb-3 text-lg font-black text-ink"
             >
-              <MapPin size={20} weight="fill" className="text-brand" />
               من قلب السوق السعودي
             </h2>
             <ul className="divide-y divide-ink/10">
@@ -304,9 +250,8 @@ export default function BlogPage() {
           <section aria-labelledby="lane-global">
             <h2
               id="lane-global"
-              className="flex items-center gap-2 border-b-2 border-sand pb-3 text-lg font-black text-ink"
+              className="border-b-2 border-sand pb-3 text-lg font-black text-ink"
             >
-              <Globe size={20} weight="fill" className="text-sand-deep" />
               اتجاهات عالمية وابتكار
             </h2>
             <ul className="divide-y divide-ink/10">
@@ -319,40 +264,18 @@ export default function BlogPage() {
 
         {/* كل المقالات */}
         <div id="all" className="mt-20 scroll-mt-24">
-          <h2 className="mb-6 text-2xl font-black text-ink">كل المقالات</h2>
+          <h2 className="mb-8 font-heading text-3xl font-extrabold text-ink md:text-4xl">كل المقالات</h2>
           <BlogExplorer posts={explorerPosts} categories={explorerCategories} />
         </div>
 
-        {/* كلمات مفتاحية */}
-        <div className="mt-20 border-t border-ink/10 pt-8">
-          <h2 className="mb-4 text-sm font-black text-ink/50">المواضيع التي نكتب عنها</h2>
-          <ul className="flex flex-wrap gap-2">
-            {allKeywords.map((k) => (
-              <li
-                key={k}
-                className="rounded-full border border-ink/15 bg-white px-4 py-1.5 text-sm text-ink/70"
-              >
-                {k}
-              </li>
-            ))}
-          </ul>
-          {allKeywordsEn.length > 0 && (
-            <ul dir="ltr" lang="en" className="mt-4 flex flex-wrap gap-2">
-              {allKeywordsEn.map((k) => (
-                <li
-                  key={k}
-                  className="rounded-full border border-ink/10 bg-paper px-4 py-1.5 text-sm text-ink/55"
-                >
-                  {k}
-                </li>
-              ))}
-            </ul>
-          )}
+        {/* دعوة للتواصل */}
+        <div className="mt-6">
+          <BlogCta wide />
         </div>
 
-        {/* دعوة للتواصل */}
-        <div className="mt-16 max-w-md">
-          <BlogCta />
+        {/* كلمات مفتاحية */}
+        <div className="mt-20">
+          <BlogTopics keywords={allKeywords} keywordsEn={allKeywordsEn} />
         </div>
       </section>
 

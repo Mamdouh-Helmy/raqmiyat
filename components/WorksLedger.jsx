@@ -2,9 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  CaretDown,
   Camera,
   ChartBar,
   Cube,
@@ -12,7 +10,6 @@ import {
   Globe,
   PlugsConnected,
 } from "@phosphor-icons/react/dist/ssr";
-import { SquiggleUnderline } from "@/components/SquiggleUnderline";
 import { useContactModal } from "@/components/ContactModalProvider";
 import { works, workTypes } from "@/lib/works";
 
@@ -27,35 +24,70 @@ const TYPE_ICONS = {
 
 const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
-const chip = (active) =>
-  `rounded-full border px-4 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
-    active
-      ? "border-brand bg-brand text-white"
-      : "border-ink/15 bg-white text-ink/70 hover:border-brand hover:text-brand"
-  }`;
+const labelClass = "mb-2 text-sm font-black text-sand";
 
-// مصغّرة العمل في الصف: الصورة لو موجودة، وإلا أيقونة النوع
-function Thumb({ work, Icon, open }) {
+// تفاصيل المشروع: صورة من الحافة للحافة + النص
+function Detail({ work }) {
+  const Icon = TYPE_ICONS[work.type] || Globe;
+
   return (
-    <span
-      className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-xl transition-shadow duration-300 md:h-16 md:w-28 ${
-        open ? "ring-2 ring-brand" : "ring-1 ring-ink/10"
-      }`}
-    >
-      {work.image ? (
-        <Image src={work.image} alt="" fill sizes="112px" className="object-cover" />
-      ) : (
-        <span className="flex h-full w-full items-center justify-center bg-brand-soft text-brand">
-          <Icon size={24} weight="duotone" />
-        </span>
-      )}
-    </span>
+    <div key={work.id} className="animate-fadeIn">
+      <div className="relative aspect-[16/10] bg-white/5">
+        {work.image ? (
+          <Image
+            src={work.image}
+            alt={work.imageAlt || work.title}
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover"
+          />
+        ) : (
+          <span className="flex h-full w-full items-center justify-center text-white/30">
+            <Icon size={72} weight="duotone" />
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-7 px-6 py-8 md:px-10 md:py-10">
+        <div>
+          <h3 className={labelClass}>المشكلة</h3>
+          <p className="leading-loose text-white/80">{work.problem}</p>
+        </div>
+
+        <div>
+          <h3 className={labelClass}>ما بنيناه</h3>
+          <ul className="list-disc space-y-2 ps-5 leading-relaxed text-white/80 marker:text-sand">
+            {work.built.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        </div>
+
+        {work.outcome && (
+          <div>
+            <h3 className={labelClass}>بعد الإطلاق</h3>
+            <p className="leading-loose text-white/80">{work.outcome}</p>
+          </div>
+        )}
+
+        <ul className="flex flex-wrap gap-2 border-t border-white/15 pt-6">
+          {work.tags.map((t) => (
+            <li
+              key={t}
+              dir="ltr"
+              className="rounded-full border border-white/25 px-3 py-1 text-xs text-white/75"
+            >
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
 export default function WorksLedger() {
   const { openContactModal } = useContactModal();
-  const reduce = useReducedMotion();
   const [filter, setFilter] = useState("all");
   const [openId, setOpenId] = useState(works[0]?.id ?? null);
 
@@ -69,206 +101,132 @@ export default function WorksLedger() {
     .map((t) => ({ ...t, count: works.filter((w) => w.type === t.value).length }))
     .filter((t) => t.count > 0);
 
+  const current = visible.find((w) => w.id === openId) ?? visible[0];
+
   function pickFilter(value) {
     setFilter(value);
     const first = value === "all" ? works[0] : works.find((w) => w.type === value);
     setOpenId(first ? first.id : null);
   }
 
+  const tab = (active) =>
+    `border-b-2 pb-1.5 text-base font-bold outline-none transition-colors duration-300 focus-visible:text-brand ${
+      active
+        ? "border-brand-dark text-ink"
+        : "border-transparent text-ink/45 hover:text-ink/80"
+    }`;
+
   return (
     <>
       <section className="container-x pt-10 pb-6 md:pt-14">
-        <div className="mb-5 inline-block">
-          <h1 className="text-3xl font-black leading-[1.3] text-ink md:text-5xl">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <h1 className="max-w-3xl font-heading text-4xl font-extrabold leading-[1.2] text-ink md:text-6xl">
             سجل أعمالنا
           </h1>
-          <SquiggleUnderline />
+          <p className="max-w-sm leading-loose text-ink/60">
+            نوثّق كل مشروع بعد تسليمه: ما المشكلة التي بدأنا منها، وماذا بنينا، وما الذي تغيّر بعد
+            الإطلاق.
+          </p>
         </div>
-        <p className="max-w-2xl text-base leading-relaxed text-ink/60 md:text-lg">
-          نوثّق كل مشروع بعد تسليمه: ما المشكلة التي بدأنا منها، وماذا بنينا، وما الذي
-          تغيّر بعد الإطلاق. افتح أي مشروع لتقرأ تفاصيله.
-        </p>
       </section>
 
       <section className="container-x section !pt-6">
         {/* التصفية */}
-        <div className="flex flex-wrap gap-2" role="group" aria-label="تصفية الأعمال حسب النوع">
+        <div
+          className="mb-6 flex flex-wrap gap-x-7 gap-y-3"
+          role="group"
+          aria-label="تصفية الأعمال حسب النوع"
+        >
           <button
             type="button"
             onClick={() => pickFilter("all")}
             aria-pressed={filter === "all"}
-            className={chip(filter === "all")}
+            className={tab(filter === "all")}
           >
             كل الأعمال
-            <span className="ms-2 text-xs font-normal opacity-70">{toAr(works.length)}</span>
+            <span className="ms-2 text-xs font-normal opacity-60">{toAr(works.length)}</span>
           </button>
-          {types.map((t) => {
-            const Icon = TYPE_ICONS[t.value] || Globe;
-            return (
-              <button
-                key={t.value}
-                type="button"
-                onClick={() => pickFilter(t.value)}
-                aria-pressed={filter === t.value}
-                className={`${chip(filter === t.value)} inline-flex items-center gap-2`}
-              >
-                <Icon size={16} weight={filter === t.value ? "fill" : "duotone"} />
-                {t.label}
-                <span className="text-xs font-normal opacity-70">{toAr(t.count)}</span>
-              </button>
-            );
-          })}
+          {types.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => pickFilter(t.value)}
+              aria-pressed={filter === t.value}
+              className={tab(filter === t.value)}
+            >
+              {t.label}
+              <span className="ms-2 text-xs font-normal opacity-60">{toAr(t.count)}</span>
+            </button>
+          ))}
         </div>
 
-        {/* السجل */}
-        <ul className="mt-8 border-t border-ink/15">
-          {visible.map((w) => {
-            const Icon = TYPE_ICONS[w.type] || Globe;
-            const open = openId === w.id;
-            const panelId = `work-${w.id}`;
-            const typeLabel = workTypes.find((t) => t.value === w.type)?.label;
+        <div className="grid overflow-hidden rounded-xl2 lg:grid-cols-[1fr_1.1fr]">
+          {/* القايمة + الدعوة */}
+          <div className="flex flex-col justify-between gap-10 bg-sand px-6 py-8 text-brand-dark md:px-10 md:py-10">
+            <ol className="border-b border-brand-dark/25">
+              {visible.map((w, i) => {
+                const active = current?.id === w.id;
+                const typeLabel = workTypes.find((t) => t.value === w.type)?.label;
 
-            return (
-              <li key={w.id} className="border-b border-ink/15">
-                <button
-                  type="button"
-                  onClick={() => setOpenId(open ? null : w.id)}
-                  aria-expanded={open}
-                  aria-controls={panelId}
-                  className="group flex w-full items-center gap-4 py-5 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:gap-6 md:py-6"
-                >
-                  <Thumb work={w} Icon={Icon} open={open} />
-
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-lg font-black leading-snug text-ink transition-colors group-hover:text-brand md:text-2xl">
-                      {w.title}
-                    </span>
-                    <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/50">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Icon size={15} weight="duotone" />
-                        {typeLabel}
-                      </span>
-                      <span className="h-3 w-px bg-ink/20" aria-hidden="true" />
-                      <span>{w.sector}</span>
-                      <span className="h-3 w-px bg-ink/20" aria-hidden="true" />
-                      <span>{toAr(w.year)}</span>
-                    </span>
-                  </span>
-
-                  <ul className="hidden max-w-[16rem] flex-wrap justify-end gap-2 xl:flex">
-                    {w.tags.map((t) => (
-                      <li
-                        key={t}
-                        className="rounded-full border border-ink/15 bg-white px-3 py-1 text-xs text-ink/65"
-                        dir="ltr"
-                      >
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <CaretDown
-                    size={20}
-                    weight="bold"
-                    className={`shrink-0 text-ink/40 transition-transform duration-300 ${
-                      open ? "rotate-180 text-brand" : ""
-                    }`}
-                  />
-                </button>
-
-                <AnimatePresence initial={false}>
-                  {open && (
-                    <motion.div
-                      id={panelId}
-                      role="region"
-                      aria-label={w.title}
-                      initial={reduce ? false : { height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: reduce ? 0 : 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
+                return (
+                  <li key={w.id}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenId(w.id)}
+                      aria-current={active ? "true" : undefined}
+                      className={`flex w-full items-baseline gap-4 border-t border-brand-dark/25 py-5 text-start outline-none transition-opacity duration-300 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-dark md:gap-6 ${
+                        active ? "opacity-100" : "opacity-50 hover:opacity-85"
+                      }`}
                     >
-                      <div className="grid gap-8 pb-10 pt-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-12">
-                        {/* الصورة */}
-                        <figure className="relative aspect-[16/10] overflow-hidden rounded-xl2 bg-brand-soft ring-1 ring-ink/10">
-                          {w.image ? (
-                            <Image
-                              src={w.image}
-                              alt={w.imageAlt || w.title}
-                              fill
-                              sizes="(min-width: 1024px) 45vw, 100vw"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <span className="flex h-full w-full items-center justify-center text-brand/60">
-                              <Icon size={64} weight="duotone" />
-                            </span>
-                          )}
-                        </figure>
+                      <span className="w-8 shrink-0 text-sm font-bold tabular-nums">
+                        {toAr(String(i + 1).padStart(2, "0"))}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span
+                          className={`block text-xl leading-snug md:text-2xl ${
+                            active ? "font-black" : "font-bold"
+                          }`}
+                        >
+                          {w.title}
+                        </span>
+                        <span className="mt-1.5 block text-sm text-brand-dark/70">
+                          {typeLabel} · {w.sector} · {toAr(w.year)}
+                        </span>
+                      </span>
+                    </button>
 
-                        {/* التفاصيل */}
-                        <div className="space-y-7">
-                          <div>
-                            <h3 className="mb-2 text-sm font-black text-sand-deep">المشكلة</h3>
-                            <p className="leading-loose text-ink/70">{w.problem}</p>
-                          </div>
-
-                          <div>
-                            <h3 className="mb-2 text-sm font-black text-sand-deep">ما بنيناه</h3>
-                            <ul className="list-disc space-y-2 ps-5 leading-relaxed text-ink/70 marker:text-sand">
-                              {w.built.map((b) => (
-                                <li key={b}>{b}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {w.outcome && (
-                            <div>
-                              <h3 className="mb-2 text-sm font-black text-sand-deep">
-                                بعد الإطلاق
-                              </h3>
-                              <p className="leading-loose text-ink/70">{w.outcome}</p>
-                            </div>
-                          )}
-
-                          <ul className="flex flex-wrap gap-2 xl:hidden">
-                            {w.tags.map((t) => (
-                              <li
-                                key={t}
-                                className="rounded-full border border-ink/15 bg-white px-3 py-1 text-xs text-ink/65"
-                                dir="ltr"
-                              >
-                                {t}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                    {/* الموبايل: التفاصيل تفتح تحت الصف مباشرة */}
+                    {active && (
+                      <div className="mb-6 overflow-hidden rounded-xl bg-brand-dark text-white lg:hidden">
+                        <Detail work={w} />
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </li>
-            );
-          })}
-        </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
 
-        {/* دعوة للتواصل */}
-        <div className="mt-16 flex flex-col items-start justify-between gap-6 rounded-xl2 bg-brand-dark p-8 text-white md:flex-row md:items-center md:p-12">
-          <div className="max-w-xl">
-            <h2 className="text-2xl font-black leading-snug md:text-3xl">
-              عندك مشكلة تشبه إحدى هذه؟
-            </h2>
-            <p className="mt-3 leading-relaxed text-white/65">
-              احكِ لنا ما يعطّل عملك الآن، ونقترح عليك نقطة بداية واضحة قبل أي التزام.
-            </p>
+            <div>
+              <h2 className="font-heading text-2xl font-extrabold leading-snug md:text-3xl">
+                عندك مشكلة تشبه إحدى هذه؟
+              </h2>
+              <p className="mt-3 max-w-md leading-loose text-brand-dark/75">
+                احكِ لنا ما يعطّل عملك الآن، ونقترح عليك نقطة بداية واضحة قبل أي التزام.
+              </p>
+              <button
+                type="button"
+                onClick={() => openContactModal("مناقشة مشروع")}
+                className="mt-6 inline-flex items-center justify-center rounded-full bg-brand-dark px-8 py-3.5 text-sm font-black text-white outline-none transition-colors duration-300 hover:bg-brand focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2 focus-visible:ring-offset-sand"
+              >
+                ناقش مشروعك معنا
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => openContactModal("مناقشة مشروع")}
-            className="btn-primary shrink-0"
-          >
-            ناقش مشروعك معنا
-          </button>
+
+          {/* الديسكتوب: لوح التفاصيل */}
+          <div className="hidden bg-brand-dark text-white lg:block">
+            {current && <Detail work={current} />}
+          </div>
         </div>
       </section>
     </>

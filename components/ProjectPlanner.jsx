@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useContactModal } from "./ContactModalProvider";
 
+const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+
 const types = [
   {
     key: "web",
@@ -32,30 +34,46 @@ const stages = [
   {
     key: "idea",
     label: "لدي فكرة فقط",
-    hint: "لم أحدد التفاصيل بعد",
     step: "جلسة استكشاف نحوّل فيها الفكرة إلى نطاق عمل ومراحل واضحة.",
   },
   {
     key: "spec",
     label: "لدي تصور ومتطلبات",
-    hint: "أعرف ما أريده تقريباً",
     step: "نراجع المتطلبات معك ونحدد ما يدخل النسخة الأولى وما ينتظر.",
   },
   {
     key: "existing",
     label: "لدي نظام قائم",
-    hint: "يحتاج تطويراً أو إعادة بناء",
     step: "نفحص الكود والبنية الحالية قبل أي وعد بالتعديل أو إعادة البناء.",
   },
 ];
 
-// أسابيع تقريبية — عدّلها حسب خبرتكم الفعلية
+// أسابيع تقريبية [الأدنى، الأقصى] — عدّلها حسب خبرتكم الفعلية
 const durations = {
-  web: { idea: "٨ – ١٢", spec: "٦ – ٩", existing: "٤ – ٨" },
-  mobile: { idea: "١٠ – ١٦", spec: "٨ – ١٢", existing: "٥ – ١٠" },
-  store: { idea: "٦ – ١٠", spec: "٤ – ٧", existing: "٣ – ٦" },
-  erp: { idea: "١٦ – ٢٦", spec: "١٢ – ٢٠", existing: "٨ – ١٦" },
+  web: { idea: [8, 12], spec: [6, 9], existing: [4, 8] },
+  mobile: { idea: [10, 16], spec: [8, 12], existing: [5, 10] },
+  store: { idea: [6, 10], spec: [4, 7], existing: [3, 6] },
+  erp: { idea: [16, 26], spec: [12, 20], existing: [8, 16] },
 };
+
+// مقياس الشريط: أكبر مدة في البيانات
+const SCALE = Math.max(
+  ...Object.values(durations).flatMap((o) => Object.values(o).map(([, max]) => max))
+);
+
+// خط الموقع العادي (من غير font-heading)
+const choice = (active) =>
+  `shrink-0 whitespace-nowrap border-b-2 pb-1 text-base font-bold leading-relaxed outline-none transition-colors duration-300 focus-visible:text-white md:text-lg ${
+    active
+      ? "border-sand text-sand"
+      : "border-transparent text-white/45 hover:text-white/85"
+  }`;
+
+// صف اختيارات: سطر واحد دايماً، وعلى الموبايل بيتحرك أفقياً من غير scrollbar
+const rowClass = "flex flex-col gap-2 md:flex-row md:items-baseline md:gap-8";
+const optionsClass =
+  "flex flex-nowrap items-baseline gap-x-6 overflow-x-auto md:gap-x-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+const labelClass = "shrink-0 text-sm font-bold text-white/50 md:w-24 md:text-base";
 
 export default function ProjectPlanner() {
   const { openContactModal } = useContactModal();
@@ -64,7 +82,8 @@ export default function ProjectPlanner() {
 
   const type = types[typeIdx];
   const stage = stages[stageIdx];
-  const duration = durations[type.key][stage.key];
+  const [min, max] = durations[type.key][stage.key];
+  const duration = `${toAr(min)} – ${toAr(max)}`;
 
   // اللي اختاره الزائر: بيتعرض في الـ modal وبيتبعت للباك ويظهر في صفحة الأدمن
   function handleDiscuss() {
@@ -79,113 +98,117 @@ export default function ProjectPlanner() {
 
   return (
     <section className="container-x section">
-      <div className="grid overflow-hidden rounded-xl2 lg:grid-cols-[1.1fr_1fr]">
-        {/* الاختيارات */}
-        <div className="bg-sand px-6 py-10 text-brand-dark md:px-12 md:py-14">
-          <h2 className="font-heading text-3xl font-extrabold leading-[1.25] md:text-5xl">
-            كم يستغرق مشروعك تقريباً؟
-          </h2>
-          <p className="mt-4 max-w-md leading-loose text-brand-dark/75">
-            اختر نوع المشروع ومرحلتك الحالية، وسنعطيك فكرة أولية عن المدة وعن أول خطوة معنا.
-          </p>
+      <div className="rounded-xl2 bg-brand-dark px-6 py-10 text-white md:px-12 md:py-14">
+        <h2 className="font-heading text-2xl font-extrabold leading-[1.25] md:text-4xl">
+          كم يستغرق مشروعك تقريباً؟
+        </h2>
 
-          {/* ١ */}
-          <p className="mb-3 mt-10 text-sm font-black">١. ماذا تريد أن تبني؟</p>
-          <div
-            role="group"
-            aria-label="نوع المشروع"
-            className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-brand-dark/30 bg-brand-dark/30"
-          >
-            {types.map((t, i) => {
-              const active = i === typeIdx;
-              return (
+        {/* الاختيارات: كل صف سطر واحد */}
+        <div className="mt-8 space-y-5 md:mt-10 md:space-y-6">
+          <div className={rowClass}>
+            <span className={labelClass}>أريد بناء</span>
+            <div role="radiogroup" aria-label="نوع المشروع" className={optionsClass}>
+              {types.map((t, i) => (
                 <button
                   key={t.key}
                   type="button"
-                  aria-pressed={active}
+                  role="radio"
+                  aria-checked={i === typeIdx}
                   onClick={() => setTypeIdx(i)}
-                  className={`px-4 py-5 text-base font-bold outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-dark md:py-6 ${
-                    active
-                      ? "bg-brand-dark text-white"
-                      : "bg-sand text-brand-dark hover:bg-brand-dark/10"
-                  }`}
+                  className={choice(i === typeIdx)}
                 >
                   {t.label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          {/* ٢ */}
-          <p className="mb-1 mt-10 text-sm font-black">٢. أين أنت الآن؟</p>
-          <div role="radiogroup" aria-label="مرحلة المشروع" className="border-b border-brand-dark/30">
-            {stages.map((s, i) => {
-              const active = i === stageIdx;
-              return (
+          <div className={rowClass}>
+            <span className={labelClass}>وحالياً</span>
+            <div role="radiogroup" aria-label="مرحلة المشروع" className={optionsClass}>
+              {stages.map((s, i) => (
                 <button
                   key={s.key}
                   type="button"
                   role="radio"
-                  aria-checked={active}
+                  aria-checked={i === stageIdx}
                   onClick={() => setStageIdx(i)}
-                  className="flex w-full items-center gap-4 border-t border-brand-dark/30 py-4 text-right outline-none transition-colors duration-300 hover:bg-brand-dark/[0.05] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-dark"
+                  className={choice(i === stageIdx)}
                 >
-                  <span
-                    aria-hidden="true"
-                    className={`grid size-5 shrink-0 place-items-center rounded-full border-2 border-brand-dark transition-colors duration-300 ${
-                      active ? "bg-brand-dark" : "bg-transparent"
-                    }`}
-                  >
-                    <span className={`size-1.5 rounded-full bg-sand ${active ? "opacity-100" : "opacity-0"}`} />
-                  </span>
-                  <span className="flex-1">
-                    <span className={`block text-base ${active ? "font-black" : "font-bold"}`}>
-                      {s.label}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-brand-dark/60">{s.hint}</span>
-                  </span>
+                  {s.label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
 
         {/* النتيجة */}
-        <div className="flex flex-col justify-between gap-10 bg-brand-dark px-6 py-10 text-white md:px-12 md:py-14">
-          <div key={`${type.key}-${stage.key}`} className="animate-fadeIn">
-            <p className="text-sm font-bold text-sand">تقدير أولي للنسخة الأولى</p>
-
-            <div className="mt-4 flex items-baseline gap-3" aria-live="polite">
-              <span className="font-heading text-7xl font-extrabold leading-none text-sand md:text-8xl">
-                {duration}
-              </span>
-              <span className="text-lg text-white/65">أسبوع</span>
+        <div className="mt-10 border-t border-white/15 pt-8 md:mt-12 md:pt-10" aria-live="polite">
+          <div className="grid items-end gap-6 lg:grid-cols-[auto_1fr] lg:gap-14">
+            {/* الرقم */}
+            <div key={`${type.key}-${stage.key}`} className="animate-fadeIn">
+              <p className="text-xs font-bold text-white/55 md:text-sm">تقدير أولي للنسخة الأولى</p>
+              <div className="mt-2 flex items-baseline gap-3">
+                <span className="font-heading text-6xl font-extrabold leading-none text-sand md:text-7xl">
+                  {duration}
+                </span>
+                <span className="text-lg text-white/65">أسبوع</span>
+              </div>
             </div>
 
-            <dl className="mt-10 divide-y divide-white/15 border-y border-white/15">
-              <div className="py-5">
-                <dt className="mb-1.5 text-xs font-bold text-white/50">أول ما تراه</dt>
-                <dd className="leading-loose text-white/90">{type.first}</dd>
+            {/* مقياس الأسابيع */}
+            <div>
+              <div className="flex gap-[3px]" dir="rtl" aria-hidden="true">
+                {Array.from({ length: SCALE }, (_, i) => (
+                  <span
+                    key={i}
+                    className={`h-9 flex-1 rounded-[3px] transition-colors duration-500 md:h-12 ${
+                      i < min ? "bg-sand" : i < max ? "bg-sand/35" : "bg-white/10"
+                    }`}
+                    style={{ transitionDelay: `${i * 14}ms` }}
+                  />
+                ))}
               </div>
-              <div className="py-5">
-                <dt className="mb-1.5 text-xs font-bold text-white/50">أول خطوة معنا</dt>
-                <dd className="leading-loose text-white/90">{stage.step}</dd>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 text-xs text-white/50">
+                <span className="flex items-center gap-4">
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2.5 rounded-[2px] bg-sand" aria-hidden="true" />
+                    المدة المتوقعة
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2.5 rounded-[2px] bg-sand/35" aria-hidden="true" />
+                    قد تمتد إليها
+                  </span>
+                </span>
+                <span>الأسبوع ١ ← الأسبوع {toAr(SCALE)}</span>
               </div>
-            </dl>
+            </div>
           </div>
 
-          <div>
-            <button
-              type="button"
-              onClick={handleDiscuss}
-              className="group inline-flex items-center gap-2 rounded-full bg-sand px-8 py-3.5 text-sm font-black text-brand-dark outline-none transition-all duration-300 hover:gap-3 hover:bg-white focus-visible:ring-2 focus-visible:ring-white"
-            >
-              ناقش هذا المشروع
-              <ArrowLeft size={16} />
-            </button>
-            <p className="mt-4 text-xs text-white/45">
-              التقدير استرشادي، ويتحدد بدقة بعد جلسة الاستكشاف.
-            </p>
+          {/* التفاصيل + الزرار في صف واحد */}
+          <div
+            key={`d-${type.key}-${stage.key}`}
+            className="mt-8 grid animate-fadeIn gap-6 md:mt-10 md:grid-cols-[1fr_1fr_auto] md:items-end md:gap-10"
+          >
+            <div className="border-t border-white/15 pt-4">
+              <p className="mb-1.5 text-xs font-bold text-white/50">أول ما تراه</p>
+              <p className="leading-relaxed text-white/90">{type.first}</p>
+            </div>
+            <div className="border-t border-white/15 pt-4">
+              <p className="mb-1.5 text-xs font-bold text-white/50">أول خطوة معنا</p>
+              <p className="leading-relaxed text-white/90">{stage.step}</p>
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={handleDiscuss}
+                className="inline-flex items-center gap-2 rounded-full bg-sand px-7 py-3 text-sm font-black text-brand-dark outline-none transition-all duration-300 hover:gap-3 hover:bg-white focus-visible:ring-2 focus-visible:ring-white"
+              >
+                ناقش هذا المشروع
+                <ArrowLeft size={16} />
+              </button>
+              <p className="mt-2.5 text-[11px] text-white/40">التقدير استرشادي، ويتحدد بعد جلسة الاستكشاف.</p>
+            </div>
           </div>
         </div>
       </div>

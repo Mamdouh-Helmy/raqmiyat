@@ -1,16 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Check,
-  LinkSimple,
-  LinkedinLogo,
-  WhatsappLogo,
-  XLogo,
-} from "@phosphor-icons/react/dist/ssr";
 
-const btn =
-  "inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink/60 transition-colors hover:border-brand hover:bg-brand hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+const link =
+  "text-sm font-bold text-ink/60 outline-none transition-colors duration-300 hover:text-brand focus-visible:text-brand focus-visible:underline";
 
 export default function ShareBar({ url, title }) {
   const [copied, setCopied] = useState(false);
@@ -26,42 +19,39 @@ export default function ShareBar({ url, title }) {
   }
 
   const text = encodeURIComponent(title);
-  const link = encodeURIComponent(url);
+  const href = encodeURIComponent(url);
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="me-1 text-xs font-bold text-ink/50">شارك المقال</span>
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+      <span className="text-xs font-bold text-ink/45">شارك</span>
       <a
-        href={`https://wa.me/?text=${text}%20${link}`}
+        href={`https://wa.me/?text=${text}%20${href}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="شارك عبر واتساب"
-        className={btn}
+        className={link}
       >
-        <WhatsappLogo size={18} weight="fill" />
+        واتساب
       </a>
       <a
-        href={`https://twitter.com/intent/tweet?text=${text}&url=${link}`}
+        href={`https://twitter.com/intent/tweet?text=${text}&url=${href}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="شارك عبر X"
-        className={btn}
+        className={link}
       >
-        <XLogo size={16} weight="fill" />
+        X
       </a>
       <a
-        href={`https://www.linkedin.com/sharing/share-offsite/?url=${link}`}
+        href={`https://www.linkedin.com/sharing/share-offsite/?url=${href}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="شارك عبر لينكدإن"
-        className={btn}
+        className={link}
       >
-        <LinkedinLogo size={18} weight="fill" />
+        لينكدإن
       </a>
-      <button type="button" onClick={copy} aria-label="انسخ رابط المقال" className={btn}>
-        {copied ? <Check size={16} weight="bold" /> : <LinkSimple size={16} weight="bold" />}
+      <button type="button" onClick={copy} className={link}>
+        {copied ? "تم نسخ الرابط" : "انسخ الرابط"}
       </button>
-      <span role="status" className="text-xs font-bold text-brand">
+      <span role="status" className="sr-only">
         {copied ? "تم نسخ الرابط" : ""}
       </span>
     </div>
