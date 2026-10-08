@@ -4,13 +4,34 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, X } from "lucide-react";
+import {
+  CaretDown,
+  List,
+  X,
+  House,
+  Briefcase,
+  BookOpenText,
+  PhoneCall,
+  Code,
+  ShieldCheck,
+  ArrowLeft,
+} from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useContactModal } from "./ContactModalProvider";
 
 const SERVICES = [
-  { href: "/software", label: "الحلول البرمجية" },
-  { href: "/security", label: "أنظمة الأمان" },
+  {
+    href: "/software",
+    label: "الحلول البرمجية",
+    desc: "مواقع وتطبيقات وأنظمة مخصصة",
+    icon: Code,
+  },
+  {
+    href: "/security",
+    label: "أنظمة الأمان",
+    desc: "كاميرات وتحكم في الدخول",
+    icon: ShieldCheck,
+  },
 ];
 
 export default function Navbar() {
@@ -69,11 +90,19 @@ export default function Navbar() {
     setServicesOpen(false);
   }, [pathname]);
 
+  // Escape + قفل سكرول الصفحة لما القائمة مفتوحة
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e) => e.key === "Escape" && setIsOpen(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [isOpen]);
 
   function handleRequestClick() {
@@ -88,7 +117,7 @@ export default function Navbar() {
     handleRequestClick();
   }
 
-  // ───── ستايلات ─────
+  // ───── ستايلات الديسكتوب ─────
   const desktopLink = (on) =>
     `relative flex items-center gap-1 py-2 transition-colors duration-200 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-center after:rounded-full after:bg-sand after:transition-transform after:duration-300 ${
       on
@@ -100,19 +129,38 @@ export default function Navbar() {
           }`
     }`;
 
-  const mobileLink = (on) =>
-    `flex items-center justify-between rounded-xl px-4 py-3 transition-colors ${
-      on
-        ? "bg-brand-soft font-black text-brand"
-        : "text-ink/80 hover:bg-brand-soft hover:text-brand"
+  // ───── ستايلات الموبايل ─────
+  // ظهور تدريجي لكل عنصر (stagger)
+  const reveal = (i) => ({
+    style: { transitionDelay: isOpen ? `${80 + i * 55}ms` : "0ms" },
+    className: `transition-all duration-500 ease-out ${
+      isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+    }`,
+  });
+
+  const mobileRow = (on) =>
+    `group flex w-full items-center gap-4 rounded-2xl px-3 py-3.5 text-right transition-colors ${
+      on ? "bg-brand-soft" : "active:bg-brand-soft/60"
     }`;
+
+  const iconBox = (on) =>
+    `flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors ${
+      on
+        ? "bg-brand text-white"
+        : "bg-ink/5 text-ink/70 group-hover:bg-brand-soft group-hover:text-brand"
+    }`;
+
+  const labelCls = (on) =>
+    `flex-1 text-lg ${on ? "font-black text-brand" : "font-bold text-ink"}`;
 
   return (
     <>
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
           showBg
-            ? "bg-paper/90 shadow-[0_1px_0_0_rgba(0,0,0,0.06)] backdrop-blur-md"
+            ? `${isOpen ? "bg-white" : "bg-paper/90 backdrop-blur-md"} ${
+                isOpen ? "shadow-none" : "shadow-[0_1px_0_0_rgba(0,0,0,0.06)]"
+              }`
             : "bg-transparent shadow-none backdrop-blur-none"
         }`}
       >
@@ -174,8 +222,9 @@ export default function Navbar() {
                   className={desktopLink(servicesActive)}
                 >
                   الخدمات
-                  <ChevronDown
+                  <CaretDown
                     size={14}
+                    weight="bold"
                     className="transition-transform duration-300 group-focus-within:rotate-180 group-hover:rotate-180"
                   />
                 </button>
@@ -245,101 +294,196 @@ export default function Navbar() {
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
               aria-expanded={isOpen}
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-brand transition-all duration-300 hover:bg-brand hover:text-white md:hidden"
+              aria-controls="mobile-menu"
+              className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 md:hidden ${
+                isOpen
+                  ? "bg-brand text-white"
+                  : overHero
+                  ? "bg-white/15 text-white backdrop-blur-sm"
+                  : "bg-brand-soft text-brand"
+              }`}
             >
-              {isOpen ? <X size={23} /> : <Menu size={23} />}
+              <List
+                size={24}
+                weight="bold"
+                className={`absolute transition-all duration-300 ${
+                  isOpen ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
+                }`}
+              />
+              <X
+                size={24}
+                weight="bold"
+                className={`absolute transition-all duration-300 ${
+                  isOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"
+                }`}
+              />
             </button>
           </nav>
+        </div>
+      </header>
 
-          {/* قائمة الموبايل */}
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
-              isOpen ? "mt-4 max-h-[700px] opacity-100" : "mt-0 max-h-0 opacity-0"
-            }`}
-          >
-            <div className="space-y-1 rounded-2xl border border-ink/5 bg-white p-3 shadow-xl">
+      {/* ───── قائمة الموبايل: شاشة كاملة ───── */}
+      <div
+        id="mobile-menu"
+        aria-hidden={!isOpen}
+        className={`fixed inset-0 z-40 md:hidden transition-[opacity,visibility] duration-300 ${
+          isOpen
+            ? "visible opacity-100"
+            : "pointer-events-none invisible opacity-0"
+        }`}
+      >
+        <div className="relative flex h-full flex-col overflow-y-auto overflow-x-hidden bg-white px-5 pb-6 pt-24">
+          {/* ───── أشكال الخلفية ───── */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            {/* دايرة كبيرة فوق */}
+            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-soft" />
+            {/* حلقة */}
+            <div className="absolute -left-16 top-1/3 h-52 w-52 rounded-full border-[18px] border-sand/30" />
+            {/* نقاط */}
+            <div
+              className="absolute bottom-40 right-4 h-28 w-28 opacity-40"
+              style={{
+                backgroundImage:
+                  "radial-gradient(currentColor 1.5px, transparent 1.5px)",
+                backgroundSize: "14px 14px",
+              }}
+            />
+            {/* دايرة تحت */}
+            <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-brand-soft/70" />
+            {/* مربع مائل */}
+            <div className="absolute bottom-56 left-8 h-10 w-10 rotate-12 rounded-xl bg-sand/40" />
+          </div>
+
+          <ul className="relative z-10 space-y-1">
+            {/* الرئيسية */}
+            <li {...reveal(0)}>
               <Link
                 href="/"
                 onClick={() => setIsOpen(false)}
                 aria-current={active.home ? "page" : undefined}
-                className={mobileLink(active.home)}
+                className={mobileRow(active.home)}
               >
-                الرئيسية
+                <span className={iconBox(active.home)}>
+                  <House size={24} weight="duotone" />
+                </span>
+                <span className={labelCls(active.home)}>الرئيسية</span>
+                <ArrowLeft size={18} weight="bold" className="text-ink/30" />
               </Link>
+            </li>
 
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setServicesOpen(!servicesOpen)}
-                  aria-expanded={servicesOpen}
-                  className={`w-full ${mobileLink(servicesActive)}`}
-                >
-                  <span>الخدمات</span>
-                  <ChevronDown
-                    size={18}
-                    className={`transition-transform duration-300 ${
-                      servicesOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    servicesOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+            {/* الخدمات (أكورديون) */}
+            <li {...reveal(1)}>
+              <button
+                type="button"
+                onClick={() => setServicesOpen(!servicesOpen)}
+                aria-expanded={servicesOpen}
+                className={mobileRow(servicesActive)}
+              >
+                <span className={iconBox(servicesActive)}>
+                  <Briefcase size={24} weight="duotone" />
+                </span>
+                <span className={labelCls(servicesActive)}>الخدمات</span>
+                <CaretDown
+                  size={20}
+                  weight="bold"
+                  className={`text-ink/40 transition-transform duration-300 ${
+                    servicesOpen ? "rotate-180" : ""
                   }`}
-                >
-                  <div className="space-y-1 pb-1 pr-4 pt-1">
+                />
+              </button>
+
+              <div
+                className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                  servicesOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <div className="mr-[1.35rem] space-y-1 border-r-2 border-ink/10 py-1 pr-4">
                     {SERVICES.map((s) => {
                       const on = isActive(s.href);
+                      const Icon = s.icon;
                       return (
                         <Link
                           key={s.href}
                           href={s.href}
                           onClick={() => setIsOpen(false)}
                           aria-current={on ? "page" : undefined}
-                          className={`block rounded-lg px-4 py-2.5 text-sm transition-colors ${
+                          tabIndex={servicesOpen ? 0 : -1}
+                          className={`flex items-center gap-3 rounded-xl px-3 py-3 transition-colors ${
                             on
-                              ? "bg-brand-soft font-black text-brand"
-                              : "text-ink/60 hover:bg-brand-soft hover:text-brand"
+                              ? "bg-brand-soft text-brand"
+                              : "text-ink/80 active:bg-brand-soft/60"
                           }`}
                         >
-                          {s.label}
+                          <Icon size={22} weight="duotone" className="shrink-0" />
+                          <span className="flex-1">
+                            <span
+                              className={`block text-base ${
+                                on ? "font-black" : "font-bold"
+                              }`}
+                            >
+                              {s.label}
+                            </span>
+                            <span className="block text-xs text-ink/50">
+                              {s.desc}
+                            </span>
+                          </span>
                         </Link>
                       );
                     })}
                   </div>
                 </div>
               </div>
+            </li>
 
+            {/* المدونة */}
+            <li {...reveal(2)}>
               <Link
                 href="/blog"
                 onClick={() => setIsOpen(false)}
                 aria-current={active.blog ? "page" : undefined}
-                className={mobileLink(active.blog)}
+                className={mobileRow(active.blog)}
               >
-                المدونة
+                <span className={iconBox(active.blog)}>
+                  <BookOpenText size={24} weight="duotone" />
+                </span>
+                <span className={labelCls(active.blog)}>المدونة</span>
+                <ArrowLeft size={18} weight="bold" className="text-ink/30" />
               </Link>
+            </li>
 
+            {/* تواصل معنا */}
+            <li {...reveal(3)}>
               <Link
                 href="/#contact"
                 onClick={() => setIsOpen(false)}
                 aria-current={active.contact ? "location" : undefined}
-                className={mobileLink(active.contact)}
+                className={mobileRow(active.contact)}
               >
-                تواصل معنا
+                <span className={iconBox(active.contact)}>
+                  <PhoneCall size={24} weight="duotone" />
+                </span>
+                <span className={labelCls(active.contact)}>تواصل معنا</span>
+                <ArrowLeft size={18} weight="bold" className="text-ink/30" />
               </Link>
+            </li>
+          </ul>
 
-              <button
-                type="button"
-                onClick={handleMobileRequestClick}
-                className="btn-primary mt-2 block !w-full !py-3 text-center"
-              >
-                اطلب استشارة
-              </button>
-            </div>
+          {/* زر الاستشارة في آخر الشاشة */}
+          <div {...reveal(4)} className={`relative z-10 mt-auto pt-8 ${reveal(4).className}`}>
+            <button
+              type="button"
+              onClick={handleMobileRequestClick}
+              className="btn-primary block !w-full !py-4 text-center text-base"
+            >
+              اطلب استشارة مجانية
+            </button>
+            <p className="mt-3 text-center text-xs text-ink/50">
+              هنرد عليك في أقرب وقت
+            </p>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* مساحة بديلة للصفحات غير الرئيسية (الـ header fixed) */}
       {!isHome && <div aria-hidden="true" className="h-[4.5rem]" />}
