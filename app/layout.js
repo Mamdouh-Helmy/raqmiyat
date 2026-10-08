@@ -1,7 +1,8 @@
-//app/layout.js
+// app/layout.js
 import localFont from "next/font/local";
 import "./globals.css";
 import { ContactModalProvider } from "@/components/ContactModalProvider";
+import PageTransition from "@/components/PageTransition";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 // خط متغيّر: كل الأوزان من 400 لـ 700 في ملف واحد (عربي + لاتيني)
@@ -72,7 +73,10 @@ export default function RootLayout({ children }) {
       className={`${elMessiri.variable} ${rakkas.variable}`}
     >
       <body className="font-arabic antialiased">
-        <ContactModalProvider>{children}</ContactModalProvider>
+        <ContactModalProvider>
+          {children}
+          <PageTransition />
+        </ContactModalProvider>
       </body>
     </html>
   );

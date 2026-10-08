@@ -1,7 +1,7 @@
 // components/TechStack.jsx  (Server Component — مفيش JS إضافي)
 import { SquiggleUnderline } from "./SquiggleUnderline";
 
-// الترتيب من اللي المستخدم بيشوفه لحد البيانات
+// الترتيب من اللي المستخدم بيشوفه لحد البيانات والبنية
 const layers = [
   {
     name: "الواجهة",
@@ -11,6 +11,9 @@ const layers = [
       { name: "Next.js", role: "سرعة وظهور في محركات البحث" },
       { name: "Tailwind CSS", role: "تصميم متناسق ومتجاوب" },
       { name: "Flutter", role: "تطبيقات موبايل بكود واحد" },
+      { name: "React Native", role: "تطبيقات أصلية لأندرويد وآيفون" },
+      { name: "Framer Motion", role: "حركات وانتقالات سلسة" },
+      { name: "Figma", role: "تصميم الواجهات قبل البرمجة" },
     ],
   },
   {
@@ -19,7 +22,11 @@ const layers = [
     tools: [
       { name: "Node.js", role: "تشغيل منطق النظام على الخادم" },
       { name: "Express.js", role: "واجهات API سريعة وواضحة" },
+      { name: "NestJS", role: "هيكلة منظمة للأنظمة الكبيرة" },
+      { name: ".NET", role: "أنظمة مؤسسية قوية وآمنة" },
       { name: "TypeScript", role: "كود أدق وأخطاء أقل" },
+      { name: "Python", role: "أتمتة وذكاء اصطناعي وتحليل بيانات" },
+      { name: "GraphQL", role: "جلب البيانات المطلوبة فقط" },
     ],
   },
   {
@@ -28,6 +35,21 @@ const layers = [
     tools: [
       { name: "PostgreSQL", role: "قاعدة بيانات علائقية موثوقة" },
       { name: "MongoDB", role: "تخزين مرن لبياناتك" },
+      { name: "MySQL", role: "قاعدة بيانات مستقرة وواسعة الدعم" },
+      { name: "Redis", role: "تخزين مؤقت لسرعة فائقة" },
+      { name: "Prisma", role: "تعامل آمن ومنظم مع قاعدة البيانات" },
+      { name: "Firebase", role: "بيانات لحظية وإشعارات فورية" },
+    ],
+  },
+  {
+    name: "البنية",
+    note: "الاستضافة والنشر",
+    tools: [
+      { name: "Docker", role: "بيئة تشغيل موحدة وثابتة" },
+      { name: "AWS", role: "استضافة سحابية قابلة للتوسع" },
+      { name: "Vercel", role: "نشر فوري وسريع للواجهات" },
+      { name: "Nginx", role: "توزيع الأحمال وحماية الخادم" },
+      { name: "GitHub Actions", role: "نشر واختبار تلقائي مع كل تحديث" },
     ],
   },
 ];
