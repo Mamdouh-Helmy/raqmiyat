@@ -300,7 +300,7 @@ export default function Navbar() {
                   ? "bg-brand text-white"
                   : overHero
                   ? "bg-white/15 text-white backdrop-blur-sm"
-                  : "bg-brand-soft text-brand"
+                  : "bg-transparent text-brand"
               }`}
             >
               <List
