@@ -1,94 +1,66 @@
+// components/Hero.jsx
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import AboutModal from "@/components/AboutModal";
 
-// شبكة معيّنات السدو للخلفية
-const lattice =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z' fill='none' stroke='%23c9a66b' stroke-opacity='0.16'/%3E%3C/svg%3E\")";
-
-// تحت الكلمة الذهبية
-const squiggle =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3E%3Cpath d='M0 4 Q6 -1 12 4 T24 4' stroke='%23c9a66b' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")";
-
-const outline = { WebkitTextStroke: "1.5px #c9a66b" };
-
 export default function Hero() {
   const [aboutOpen, setAboutOpen] = useState(false);
 
   return (
-    <section className="container-x section">
-      <div className="relative isolate overflow-hidden rounded-xl2 bg-brand-dark text-white">
-        {/* الخلفية */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage: lattice,
-            backgroundSize: "56px 56px",
-            WebkitMaskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
-            maskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
-          }}
-        />
-        <span
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-l from-transparent via-[#c9a66b]/80 to-transparent"
-        />
+    <section className="relative isolate flex min-h-svh w-full items-end overflow-hidden bg-brand-dark text-white">
+      <Image
+        src="/hero.png"
+        alt="أفق الرياض"
+        fill
+        priority
+        sizes="100vw"
+        className="-z-20 object-cover"
+      />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2">
-          {/* النص */}
-          <div className="flex flex-col justify-center px-6 py-12 md:px-14 md:py-20">
-            <h1 className="font-arabic text-4xl font-black leading-[1.25] md:text-6xl">
-              مستقبل البرمجيات
-              <span className="mt-2 block w-fit">
-                <span className="block text-transparent" style={outline}>
-                  برؤية سعودية
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="-mt-1 block h-2 w-full"
-                  style={{
-                    backgroundImage: squiggle,
-                    backgroundRepeat: "repeat-x",
-                    backgroundSize: "24px 8px",
-                  }}
-                />
-              </span>
-            </h1>
+      {/* تعتيم من ناحية النص (يمين في RTL) */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_left,rgba(10,26,20,0.92)_0%,rgba(10,26,20,0.65)_45%,rgba(10,26,20,0.1)_100%)]"
+      />
+      {/* تعتيم من فوق عشان الـ Navbar الأبيض يتقري */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-brand-dark/70 to-transparent"
+      />
+      {/* تعتيم من تحت */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 -z-10 h-1/3 bg-gradient-to-t from-brand-dark/80 to-transparent"
+      />
 
-            <p className="mt-8 max-w-xl text-base leading-loose text-white/65 md:text-lg">
-              نقدم حلولاً برمجية متطورة وخدمات أمنية متكاملة لدعم التحول الرقمي في المملكة.
-            </p>
+      <div className="container-x w-full pb-12 pt-36 md:pb-20">
+        <h1 className="max-w-2xl font-arabic text-4xl font-black leading-[1.35] md:text-6xl lg:text-7xl lg:leading-[1.3]">
+          برمجيات تشتغل،
+          <br />
+          وكاميرات ما تغفل.
+        </h1>
 
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a
-                href="#contact"
-                className="inline-flex items-center justify-center rounded-full bg-[#c9a66b] px-8 py-3.5 text-sm font-black text-brand-dark outline-none transition-all duration-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-white"
-              >
-                ابدأ الآن
-              </a>
-              <button
-                type="button"
-                onClick={() => setAboutOpen(true)}
-                className="inline-flex items-center justify-center rounded-full border border-white/30 px-8 py-3.5 text-sm font-bold text-white outline-none transition-all duration-300 hover:border-[#c9a66b] hover:text-[#c9a66b] focus-visible:ring-2 focus-visible:ring-[#c9a66b]"
-              >
-                تعرف علينا
-              </button>
-            </div>
-          </div>
+        <p className="mt-6 max-w-lg text-base leading-[2] text-white/75 md:text-lg">
+          نبني الأنظمة والتطبيقات ونركّب أنظمة المراقبة، ونتولى التشغيل والدعم
+          بعد التسليم.
+        </p>
 
-          {/* الصورة: بتملا الخانة كلها (فوق وتحت وعرض)، والخانة بنفس نسبة الصورة فمفيش قص */}
-          <div className="relative aspect-[4/3] border-t border-[#c9a66b]/40 lg:aspect-auto lg:min-h-full lg:border-s lg:border-t-0">
-            <Image
-              src="/hero.png"
-              alt="أفق الرياض"
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-          </div>
+        <div className="mt-9 flex flex-wrap items-center gap-3">
+          <a
+            href="#contact"
+            className="inline-flex items-center justify-center rounded-full bg-[#c9a66b] px-8 py-3.5 text-sm font-black text-brand-dark outline-none transition-colors duration-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-white"
+          >
+            ابدأ مشروعك
+          </a>
+          <button
+            type="button"
+            onClick={() => setAboutOpen(true)}
+            className="inline-flex items-center justify-center rounded-full border border-white/40 px-8 py-3.5 text-sm font-bold text-white outline-none transition-colors duration-300 hover:bg-white hover:text-brand-dark focus-visible:ring-2 focus-visible:ring-white"
+          >
+            تعرف علينا
+          </button>
         </div>
       </div>
 

@@ -22,8 +22,13 @@ module.exports = {
         paper: "#f6f7f5",
       },
       fontFamily: {
-        arabic: ["var(--font-arabic)", "sans-serif"],
-        heading: ["var(--font-arabic-heading)", "sans-serif"],
+        arabic: ["var(--font-arabic)", "Tahoma", "Arial", "sans-serif"],
+        heading: [
+          "var(--font-arabic-heading)",
+          "var(--font-arabic)",
+          "Tahoma",
+          "sans-serif",
+        ],
       },
       keyframes: {
         marquee: {

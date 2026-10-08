@@ -1,6 +1,6 @@
 // app/blog/rss/page.jsx
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Rss } from "lucide-react";
+import { ArrowLeft, Rss } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CopyFeedUrl from "@/components/CopyFeedUrl";
@@ -14,19 +14,28 @@ export const metadata = {
   description:
     "تابع مقالات المدونة التقنية في قارئ RSS المفضل لديك دون الحاجة لزيارة الموقع في كل مرة.",
   alternates: { canonical: "/blog/rss" },
-  robots: { index: true, follow: true },
 };
 
-const readers = [
-  { name: "Feedly", href: `https://feedly.com/i/subscription/feed/${encodeURIComponent(FEED_URL)}` },
-  { name: "Inoreader", href: `https://www.inoreader.com/?add_feed=${encodeURIComponent(FEED_URL)}` },
-  { name: "NewsBlur", href: `https://www.newsblur.com/?url=${encodeURIComponent(FEED_URL)}` },
+const steps = [
+  "انسخ رابط الـ RSS من الأعلى.",
+  "افتح قارئ RSS الذي تستخدمه (Feedly أو Inoreader أو أي قارئ آخر).",
+  "اختر إضافة اشتراك جديد (Add feed) والصق الرابط.",
+  "ستصلك المقالات الجديدة تلقائياً بمجرد نشرها.",
 ];
 
-const steps = [
-  "انسخ رابط الـ RSS من الأعلى، أو اضغط على اسم القارئ الذي تستخدمه.",
-  "أضف الرابط في قارئك كاشتراك جديد (Add feed / Subscribe).",
-  "ستصلك المقالات الجديدة تلقائياً بمجرد نشرها.",
+const faqs = [
+  {
+    q: "ما هو RSS؟",
+    a: "ملف يحتوي على قائمة بآخر مقالات المدونة. قارئ RSS يتابعه عنك ويعرض لك أي مقال جديد في مكان واحد، دون أن تزور الموقع في كل مرة.",
+  },
+  {
+    q: "هل الاشتراك مجاني؟",
+    a: "نعم، الاشتراك مجاني ولا يتطلب بريداً إلكترونياً ولا حساباً لدينا. وأغلب قراء RSS الشهيرة لها خطة مجانية.",
+  },
+  {
+    q: "كيف ألغي الاشتراك؟",
+    a: "من داخل قارئ RSS نفسه: احذف الاشتراك من قائمة مصادرك، ولا يلزم أي إجراء من جهتنا.",
+  },
 ];
 
 export default function RssPage() {
@@ -36,8 +45,13 @@ export default function RssPage() {
     <main className="bg-paper">
       <Navbar />
 
+      {/* ───────── الهيدر ───────── */}
       <header className="container-x pt-10 pb-8 md:pt-14">
         <nav aria-label="مسار الصفحة" className="mb-8 text-xs text-ink/50">
+          <Link href="/" className="transition-colors hover:text-brand">
+            الرئيسية
+          </Link>
+          <span className="mx-2">/</span>
           <Link href="/blog" className="transition-colors hover:text-brand">
             المدونة
           </Link>
@@ -55,8 +69,8 @@ export default function RssPage() {
       </header>
 
       <section className="container-x section !pt-4">
+        {/* ───────── بطاقة الاشتراك (٢) + الخطوات (١) ───────── */}
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* بطاقة الاشتراك: عمودين */}
           <div className="rounded-xl2 bg-brand-dark px-6 py-10 text-white md:px-10 md:py-12 lg:col-span-2">
             <span
               aria-hidden="true"
@@ -66,34 +80,14 @@ export default function RssPage() {
             </span>
             <h2 className="mt-6 font-heading text-2xl font-extrabold md:text-3xl">رابط الاشتراك</h2>
             <p className="mt-3 text-sm leading-loose text-white/60">
-              الصق هذا الرابط في أي قارئ RSS، أو اختر أحد القراء الجاهزة بالأسفل.
+              انسخ هذا الرابط والصقه في أي قارئ RSS مثل Feedly أو Inoreader.
             </p>
 
             <div className="mt-6">
               <CopyFeedUrl url={FEED_URL} />
             </div>
-
-            <div className="mt-8 border-t border-white/15 pt-6">
-              <p className="mb-3 text-sm font-black text-sand">اشترك مباشرة عبر</p>
-              <ul className="flex flex-wrap gap-2.5">
-                {readers.map((r) => (
-                  <li key={r.name}>
-                    <a
-                      href={r.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-bold text-white/90 transition-colors hover:border-sand hover:text-sand"
-                    >
-                      {r.name}
-                      <ArrowUpRight size={14} aria-hidden="true" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
 
-          {/* الخطوات: عمود */}
           <aside className="rounded-xl2 bg-sand px-6 py-10 text-brand-dark md:px-8 md:py-12">
             <h2 className="text-base font-black">كيف تبدأ؟</h2>
             <ol className="mt-3 divide-y divide-brand-dark/25">
@@ -109,7 +103,7 @@ export default function RssPage() {
           </aside>
         </div>
 
-        {/* آخر المقالات في الـ feed */}
+        {/* ───────── آخر ما في الـ feed ───────── */}
         <div className="mt-16">
           <h2 className="mb-6 font-heading text-2xl font-extrabold text-ink md:text-3xl">
             آخر ما في الـ feed
@@ -148,6 +142,32 @@ export default function RssPage() {
             >
               عرض ملف XML الخام
             </a>
+          </div>
+        </div>
+
+        {/* ───────── أسئلة شائعة ───────── */}
+        <div className="mt-20 max-w-3xl">
+          <h2 className="mb-6 font-heading text-2xl font-extrabold text-ink md:text-3xl">
+            أسئلة شائعة
+          </h2>
+          <div className="space-y-3">
+            {faqs.map((f) => (
+              <details
+                key={f.q}
+                className="group rounded-xl border border-ink/15 bg-white/60 transition-colors open:border-brand-dark open:bg-white"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-black text-ink [&::-webkit-details-marker]:hidden">
+                  {f.q}
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-xl leading-none text-ink/50 transition-transform duration-300 group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="px-5 pb-6 leading-loose text-ink/70">{f.a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>

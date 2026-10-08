@@ -11,9 +11,15 @@ html {
 }
 
 body {
-  font-family: var(--font-arabic), sans-serif;
+  font-family: var(--font-arabic), Tahoma, sans-serif;
   background-color: #f6f7f5;
   color: #16241d;
+}
+
+/* Rakkas وزنه واحد (400): امنع الـ bold المزيف على العناوين */
+.font-heading,
+.heading-decorative {
+  font-synthesis: none;
 }
 
 .container-x {
@@ -134,4 +140,3 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
-

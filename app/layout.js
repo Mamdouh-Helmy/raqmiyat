@@ -1,18 +1,20 @@
 //app/layout.js
-import { El_Messiri, Rakkas } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ContactModalProvider } from "@/components/ContactModalProvider";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
-const elMessiri = El_Messiri({
-  subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
+// خط متغيّر: كل الأوزان من 400 لـ 700 في ملف واحد (عربي + لاتيني)
+const elMessiri = localFont({
+  src: "./fonts/El_Messiri,Rakkas/ElMessiri-VariableFont_wght.ttf",
+  weight: "400 700",
   variable: "--font-arabic",
   display: "swap",
 });
 
-const rakkas = Rakkas({
-  subsets: ["arabic"],
+// وزن واحد (400) للعناوين
+const rakkas = localFont({
+  src: "./fonts/Rakkas/Rakkas-Regular.ttf",
   weight: "400",
   variable: "--font-arabic-heading",
   display: "swap",
@@ -64,10 +66,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ar" dir="rtl">
-      <body
-        className={`${elMessiri.variable} ${rakkas.variable} font-arabic antialiased`}
-      >
+    <html
+      lang="ar"
+      dir="rtl"
+      className={`${elMessiri.variable} ${rakkas.variable}`}
+    >
+      <body className="font-arabic antialiased">
         <ContactModalProvider>{children}</ContactModalProvider>
       </body>
     </html>
