@@ -1,16 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { validateContactForm, inputClass } from "@/lib/validate";
-
-const info = [
-  { icon: MapPin, text: "الرياض، المملكة العربية السعودية" },
-  { icon: Phone, text: "+966501053303" },
-  { icon: Mail, text: "raqmyat@raqmyat.com" },
-];
+import { validateContactForm } from "@/lib/validate";
 
 const emptyForm = { name: "", email: "", phone: "", message: "" };
+
+const base =
+  "w-full border-0 border-b bg-transparent px-0 py-2.5 text-base text-white outline-none transition-colors duration-300 placeholder:text-white/30";
+const fieldClass = (hasError) =>
+  `${base} ${hasError ? "border-red-300" : "border-white/25 focus:border-sand"}`;
+
+function Field({ label, error, children }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-bold text-white/55">{label}</span>
+      {children}
+      {error && <span className="mt-1 block text-xs text-red-300">{error}</span>}
+    </label>
+  );
+}
 
 export default function ContactSection() {
   const [form, setForm] = useState(emptyForm);
@@ -54,129 +62,126 @@ export default function ContactSection() {
     }
   }
 
+  const err = (f) => touched[f] && errors[f];
+
   return (
     <section id="contact" className="container-x section">
-      <div className="text-center mb-10">
-        <span className="inline-block bg-brand-soft text-ink/70 text-xs font-bold px-4 py-2 rounded-full mb-6">
-          تواصل معنا
-        </span>
-        <h2 className="text-3xl font-black text-ink mb-3">
+      <div className="rounded-xl2 bg-brand-dark px-6 py-10 text-white md:px-12 md:py-12">
+        {/* العنوان */}
+        <h2 className="max-w-4xl font-heading text-4xl font-extrabold leading-[1.15] md:text-6xl">
           نسعد بتواصلك معنا
         </h2>
-        <p className="text-ink/60 max-w-xl mx-auto">
-          سواء كان لديك سؤال عن خدماتنا أو مشروع تريد مناقشته، فريقنا جاهز
-          للرد عليك في أقرب وقت.
+        <p className="mt-4 max-w-xl leading-loose text-white/60">
+          سواء كان لديك سؤال عن خدماتنا أو مشروع تريد مناقشته، فريقنا جاهز للرد عليك في أقرب وقت.
         </p>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6">
-        <div className="rounded-xl2 bg-brand-dark text-white p-10 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xl font-black mb-8">معلومات التواصل</h3>
-            <ul className="space-y-6">
-              {info.map(({ icon: Icon, text }) => (
-                <li key={text} className="flex items-start gap-4">
-                  <span className="w-11 h-11 shrink-0 rounded-xl bg-white/10 flex items-center justify-center">
-                    <Icon size={18} />
-                  </span>
-                  <span className="text-white/70 leading-relaxed text-sm pt-2">
-                    {text}
-                  </span>
-                </li>
-              ))}
-            </ul>
+        <div className="mt-8 grid gap-10 border-t border-white/15 pt-8 md:mt-10 md:pt-10 lg:grid-cols-12 lg:gap-14">
+          {/* بيانات التواصل */}
+          <div className="flex flex-col gap-7 lg:col-span-5">
+            <div>
+              <p className="mb-2 text-xs font-bold text-white/50">اتصل بنا</p>
+              <a
+                href="tel:+966501053303"
+                dir="ltr"
+                className="inline-block text-right text-2xl font-black tabular-nums outline-none transition-colors duration-300 hover:text-sand focus-visible:text-sand md:text-3xl"
+              >
+                +966 50 105 3303
+              </a>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-bold text-white/50">راسلنا</p>
+              <a
+                href="mailto:raqmyat@raqmyat.com"
+                dir="ltr"
+                className="inline-block break-all text-right text-xl font-black outline-none transition-colors duration-300 hover:text-sand focus-visible:text-sand md:text-2xl"
+              >
+                raqmyat@raqmyat.com
+              </a>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-bold text-white/50">المقر</p>
+              <p className="text-lg font-bold text-white/90">الرياض، المملكة العربية السعودية</p>
+            </div>
           </div>
-          {/* <div className="relative rounded-xl overflow-hidden min-h-[140px] mt-10 bg-gradient-to-br from-emerald-800 to-brand-dark border border-white/10">
-        
-          </div> */}
-        </div>
 
-        {status === "success" ? (
-          <div className="card p-10 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-brand-soft text-brand flex items-center justify-center mb-5 text-2xl">
-              ✓
-            </div>
-            <h3 className="text-xl font-black text-ink mb-2">
-              تم إرسال رسالتك بنجاح
-            </h3>
-            <p className="text-ink/60 text-sm mb-6">
-              سنتواصل معك في أقرب وقت ممكن.
-            </p>
-            <button onClick={() => setStatus("idle")} className="btn-outline">
-              إرسال رسالة أخرى
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} noValidate className="card p-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <input
-                  placeholder="الاسم الكامل"
-                  value={form.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                  onBlur={() => blurField("name")}
-                  className={inputClass(touched.name && errors.name)}
-                />
-                {touched.name && errors.name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                )}
+          {/* النموذج */}
+          <div className="lg:col-span-7">
+            {status === "success" ? (
+              <div className="flex h-full flex-col items-start justify-center gap-3">
+                <h3 className="font-heading text-3xl font-extrabold text-sand">
+                  تم إرسال رسالتك بنجاح
+                </h3>
+                <p className="leading-loose text-white/65">سنتواصل معك في أقرب وقت ممكن.</p>
+                <button
+                  type="button"
+                  onClick={() => setStatus("idle")}
+                  className="mt-2 rounded-full border border-white/30 px-7 py-3 text-sm font-bold outline-none transition-colors duration-300 hover:border-sand hover:text-sand focus-visible:ring-2 focus-visible:ring-sand"
+                >
+                  إرسال رسالة أخرى
+                </button>
               </div>
-              <div>
-                <input
-                  type="email"
-                  placeholder="البريد الإلكتروني"
-                  value={form.email}
-                  onChange={(e) => updateField("email", e.target.value)}
-                  onBlur={() => blurField("email")}
-                  className={inputClass(touched.email && errors.email)}
-                />
-                {touched.email && errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                )}
-              </div>
-            </div>
+            ) : (
+              <form onSubmit={handleSubmit} noValidate className="grid gap-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Field label="الاسم الكامل" error={err("name")}>
+                    <input
+                      value={form.name}
+                      onChange={(e) => updateField("name", e.target.value)}
+                      onBlur={() => blurField("name")}
+                      className={fieldClass(err("name"))}
+                    />
+                  </Field>
+                  <Field label="البريد الإلكتروني" error={err("email")}>
+                    <input
+                      type="email"
+                      dir="ltr"
+                      value={form.email}
+                      onChange={(e) => updateField("email", e.target.value)}
+                      onBlur={() => blurField("email")}
+                      className={`${fieldClass(err("email"))} text-right`}
+                    />
+                  </Field>
+                </div>
 
-            <div className="mt-4">
-              <input
-                placeholder="رقم الهاتف (اختياري)"
-                value={form.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
-                onBlur={() => blurField("phone")}
-                className={inputClass(touched.phone && errors.phone)}
-              />
-              {touched.phone && errors.phone && (
-                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-              )}
-            </div>
+                <Field label="رقم الهاتف (اختياري)" error={err("phone")}>
+                  <input
+                    type="tel"
+                    dir="ltr"
+                    value={form.phone}
+                    onChange={(e) => updateField("phone", e.target.value)}
+                    onBlur={() => blurField("phone")}
+                    className={`${fieldClass(err("phone"))} text-right`}
+                  />
+                </Field>
 
-            <div className="mt-4">
-              <textarea
-                placeholder="اكتب رسالتك هنا..."
-                rows={5}
-                value={form.message}
-                onChange={(e) => updateField("message", e.target.value)}
-                onBlur={() => blurField("message")}
-                className={inputClass(touched.message && errors.message)}
-              />
-              {touched.message && errors.message && (
-                <p className="text-red-500 text-xs mt-1">{errors.message}</p>
-              )}
-            </div>
+                <Field label="رسالتك" error={err("message")}>
+                  <textarea
+                    rows={3}
+                    value={form.message}
+                    onChange={(e) => updateField("message", e.target.value)}
+                    onBlur={() => blurField("message")}
+                    className={`${fieldClass(err("message"))} resize-none`}
+                  />
+                </Field>
 
-            <button
-              type="submit"
-              className="btn-primary mt-6 w-full md:w-auto"
-              disabled={status === "loading"}
-            >
-              {status === "loading" ? "جارِ الإرسال..." : "إرسال الرسالة"}
-            </button>
-            {status === "error" && (
-              <p className="text-red-600 text-sm mt-3">
-                حدث خطأ أثناء الإرسال، حاول مرة أخرى.
-              </p>
+                <div className="flex flex-wrap items-center gap-5">
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="inline-flex items-center justify-center rounded-full bg-sand px-9 py-3 text-sm font-black text-brand-dark outline-none transition-colors duration-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-white disabled:opacity-60"
+                  >
+                    {status === "loading" ? "جارِ الإرسال..." : "إرسال الرسالة"}
+                  </button>
+                  {status === "error" && (
+                    <p className="text-sm text-red-300">حدث خطأ أثناء الإرسال، حاول مرة أخرى.</p>
+                  )}
+                </div>
+              </form>
             )}
-          </form>
-        )}
+          </div>
+        </div>
       </div>
     </section>
   );

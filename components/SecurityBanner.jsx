@@ -1,57 +1,60 @@
 "use client";
 
 import Image from "next/image";
+import { Check } from "lucide-react";
 import { useContactModal } from "@/components/ContactModalProvider";
+
+const features = [
+  "كاميرات عالية الدقة داخلية وخارجية",
+  "رؤية ليلية وتسجيل مستمر",
+  "مشاهدة مباشرة من الجوال",
+  "صيانة وعقود دعم دورية",
+];
 
 export default function SecurityBanner() {
   const { openContactModal } = useContactModal();
 
   return (
     <section className="container-x section">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-6">
-        <div className="relative rounded-xl2 overflow-hidden min-h-[320px] bg-gradient-to-b from-emerald-950 to-emerald-900">
+      <div className="grid overflow-hidden rounded-xl2 bg-sand text-brand-dark lg:grid-cols-2">
+        {/* الصورة: من الحافة للحافة وبطول اللوح كله */}
+        <div className="relative min-h-[300px] lg:min-h-[480px]">
           <Image
             src="/security.png"
             alt="غرفة مراقبة بالكاميرات"
             fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
           />
         </div>
 
-        <div className="rounded-xl2 bg-brand-dark text-white p-10 flex flex-col justify-center">
-          <h2 className="text-3xl font-black mb-4">
+        {/* النص */}
+        <div className="flex flex-col justify-center px-6 py-12 md:px-14 md:py-16">
+          <h2 className="font-heading text-3xl font-extrabold leading-[1.3] md:text-5xl">
             حماية منشأتك تبدأ من أنظمة مراقبة موثوقة
           </h2>
-          <p className="text-white/70 leading-relaxed max-w-xl mb-6">
-            نصمم ونركّب وندعم أنظمة كاميرات المراقبة وأجهزة التسجيل وأنظمة
-            التحكم في الدخول، مع مراقبة مركزية ومتابعة عن بُعد من الجوال على
-            مدار الساعة.
+
+          <p className="mt-6 max-w-xl leading-loose text-brand-dark/75">
+            نصمم ونركّب وندعم أنظمة كاميرات المراقبة وأجهزة التسجيل وأنظمة التحكم في الدخول، مع مراقبة
+            مركزية ومتابعة عن بُعد من الجوال على مدار الساعة.
           </p>
 
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-8 text-sm text-white/80">
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              كاميرات عالية الدقة داخلية وخارجية
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              رؤية ليلية وتسجيل مستمر
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              مشاهدة مباشرة من الجوال
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              صيانة وعقود دعم دورية
-            </li>
+          <ul className="mt-8 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+            {features.map((f) => (
+              <li key={f} className="flex items-start gap-3 text-sm font-bold leading-relaxed md:text-base">
+                <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-brand-dark text-sand">
+                  <Check size={12} strokeWidth={3} />
+                </span>
+                {f}
+              </li>
+            ))}
           </ul>
 
-          <div>
+          <div className="mt-10">
             <button
               type="button"
               onClick={() => openContactModal("فحص أمني")}
-              className="btn-white"
+              className="inline-flex items-center justify-center rounded-full bg-brand-dark px-8 py-3.5 text-sm font-black text-white outline-none transition-colors duration-300 hover:bg-brand focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2 focus-visible:ring-offset-sand"
             >
               اطلب معاينة واستشارة
             </button>

@@ -4,66 +4,91 @@ import { useState } from "react";
 import Image from "next/image";
 import AboutModal from "@/components/AboutModal";
 
-function SquiggleUnderline() {
-  return (
-    <div
-      className="w-full -mt-0.5"
-      style={{
-        height: "8px",
-        backgroundImage:
-          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3E%3Cpath d='M0 4 Q6 -1 12 4 T24 4' stroke='%231c3b2e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
-        backgroundRepeat: "repeat-x",
-        backgroundSize: "24px 8px",
-      }}
-    />
-  );
-}
+// شبكة معيّنات السدو للخلفية
+const lattice =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z' fill='none' stroke='%23c9a66b' stroke-opacity='0.16'/%3E%3C/svg%3E\")";
+
+// تحت الكلمة الذهبية
+const squiggle =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3E%3Cpath d='M0 4 Q6 -1 12 4 T24 4' stroke='%23c9a66b' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")";
+
+const outline = { WebkitTextStroke: "1.5px #c9a66b" };
 
 export default function Hero() {
   const [aboutOpen, setAboutOpen] = useState(false);
 
   return (
     <section className="container-x section">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-6">
-        <div className="card p-8 flex flex-col gap-8">
-          <div className="flex flex-col gap-4">
-            <div className="inline-block self-start">
-              <h1 className="font-arabic text-3xl lg:text-4xl font-black leading-snug text-ink">
-                مستقبل البرمجيات
-                <br />
-                برؤية سعودية
-              </h1>
-              <SquiggleUnderline />
-            </div>
-            <p className="text-ink/60 leading-relaxed text-sm lg:text-base">
-              نقدم حلولاً برمجية متطورة وخدمات أمنية متكاملة لدعم التحول
-              الرقمي في المملكة.
+      <div className="relative isolate overflow-hidden rounded-xl2 bg-brand-dark text-white">
+        {/* الخلفية */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10"
+          style={{
+            backgroundImage: lattice,
+            backgroundSize: "56px 56px",
+            WebkitMaskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
+            maskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
+          }}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-l from-transparent via-[#c9a66b]/80 to-transparent"
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          {/* النص */}
+          <div className="flex flex-col justify-center px-6 py-12 md:px-14 md:py-20">
+            <h1 className="font-arabic text-4xl font-black leading-[1.25] md:text-6xl">
+              مستقبل البرمجيات
+              <span className="mt-2 block w-fit">
+                <span className="block text-transparent" style={outline}>
+                  برؤية سعودية
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="-mt-1 block h-2 w-full"
+                  style={{
+                    backgroundImage: squiggle,
+                    backgroundRepeat: "repeat-x",
+                    backgroundSize: "24px 8px",
+                  }}
+                />
+              </span>
+            </h1>
+
+            <p className="mt-8 max-w-xl text-base leading-loose text-white/65 md:text-lg">
+              نقدم حلولاً برمجية متطورة وخدمات أمنية متكاملة لدعم التحول الرقمي في المملكة.
             </p>
+
+            <div className="mt-10 flex flex-wrap gap-3">
+              <a
+                href="#contact"
+                className="inline-flex items-center justify-center rounded-full bg-[#c9a66b] px-8 py-3.5 text-sm font-black text-brand-dark outline-none transition-all duration-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-white"
+              >
+                ابدأ الآن
+              </a>
+              <button
+                type="button"
+                onClick={() => setAboutOpen(true)}
+                className="inline-flex items-center justify-center rounded-full border border-white/30 px-8 py-3.5 text-sm font-bold text-white outline-none transition-all duration-300 hover:border-[#c9a66b] hover:text-[#c9a66b] focus-visible:ring-2 focus-visible:ring-[#c9a66b]"
+              >
+                تعرف علينا
+              </button>
+            </div>
           </div>
 
-          <div className="w-10 h-1 rounded-full bg-brand/30" />
-
-          <div className="flex gap-3 mt-auto">
-            <a
-              href="#contact"
-              className="btn-primary inline-flex items-center justify-center"
-            >
-              ابدأ الآن
-            </a>
-            <button className="btn-outline" onClick={() => setAboutOpen(true)}>
-              تعرف علينا
-            </button>
+          {/* الصورة: بتملا الخانة كلها (فوق وتحت وعرض)، والخانة بنفس نسبة الصورة فمفيش قص */}
+          <div className="relative aspect-[4/3] border-t border-[#c9a66b]/40 lg:aspect-auto lg:min-h-full lg:border-s lg:border-t-0">
+            <Image
+              src="/hero.png"
+              alt="أفق الرياض"
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
           </div>
-        </div>
-        <div className="relative rounded-xl2 overflow-hidden min-h-[420px]">
-          <Image
-            src="/hero.png"
-            alt="أفق الرياض"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/70 via-brand-dark/20 to-transparent" />
         </div>
       </div>
 

@@ -1,17 +1,19 @@
+// components/ServicesGrid.jsx  (Server Component — الحركة CSS بس)
 import Link from "next/link";
 import Image from "next/image";
-import { ShieldCheck, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 export default function ServicesGrid() {
   return (
     <section className="container-x section">
-      <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
         {/* الحلول البرمجية */}
         <Link
           href="/software"
-          className="card group p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center transition-shadow duration-300 hover:shadow-lg"
+          className="group grid overflow-hidden rounded-xl2 bg-sand text-brand-dark outline-none transition-shadow duration-300 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand-dark md:grid-cols-2"
         >
-          <div className="relative rounded-xl overflow-hidden min-h-[280px] bg-brand-dark">
+          {/* الصورة: من الحافة للحافة وبطول الكارت كله */}
+          <div className="relative min-h-[260px] md:min-h-full">
             <Image
               src="/services/software.png"
               alt="الحلول البرمجية"
@@ -21,20 +23,17 @@ export default function ServicesGrid() {
             />
           </div>
 
-          <div>
-            <h3 className="text-2xl md:text-3xl font-black text-ink mb-4 leading-snug">
+          <div className="flex flex-col justify-center p-8 md:p-10">
+            <h3 className="mb-4 font-heading text-3xl font-extrabold leading-snug md:text-4xl">
               الحلول البرمجية
             </h3>
-            <p className="text-ink/60 leading-relaxed mb-6">
-              نطوّر مواقع الويب وتطبيقات الجوال وأنظمة ERP وLMS مخصصة لاحتياج
-              منشأتك، من تحليل المتطلبات حتى التشغيل والدعم الفني المستمر.
+            <p className="mb-8 leading-loose text-brand-dark/75">
+              نطوّر مواقع الويب وتطبيقات الجوال وأنظمة ERP وLMS مخصصة لاحتياج منشأتك، من تحليل
+              المتطلبات حتى التشغيل والدعم الفني المستمر.
             </p>
-            <span className="inline-flex items-center gap-2 text-brand font-bold text-sm">
+            <span className="inline-flex items-center gap-2 text-sm font-black transition-all duration-300 group-hover:gap-3">
               اكتشف الخدمة
-              <ArrowLeft
-                size={16}
-                className="transition-transform duration-300 group-hover:-translate-x-1"
-              />
+              <ArrowLeft size={16} />
             </span>
           </div>
         </Link>
@@ -42,30 +41,19 @@ export default function ServicesGrid() {
         {/* أنظمة المراقبة */}
         <Link
           href="/security"
-          className="group rounded-xl2 bg-brand-dark text-white p-8 flex flex-col justify-between transition-colors duration-300 hover:bg-brand"
+          className="group flex flex-col justify-end rounded-xl2 bg-brand-dark p-8 text-white outline-none transition-colors duration-300 hover:bg-brand focus-visible:ring-2 focus-visible:ring-sand md:p-10"
         >
-          {/* المعيّن: العنصر الوحيد اللي شايل الهوية هنا */}
-          <div className="relative grid place-items-center size-16 mb-16">
-            <span className="absolute size-12 rotate-45 rounded-lg border border-[#c9a66b]/70 transition-transform duration-500 group-hover:rotate-[135deg]" />
-            <ShieldCheck size={24} className="relative text-[#c9a66b]" />
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-black mb-3 leading-snug">
-              أنظمة المراقبة والحماية
-            </h3>
-            <p className="text-white/60 leading-relaxed mb-6">
-              تصميم وتركيب وصيانة كاميرات المراقبة وأنظمة التحكم في الدخول،
-              مع متابعة مركزية وعن بُعد على مدار الساعة.
-            </p>
-            <span className="inline-flex items-center gap-2 text-white font-bold text-sm">
-              اكتشف الخدمة
-              <ArrowLeft
-                size={16}
-                className="transition-transform duration-300 group-hover:-translate-x-1"
-              />
-            </span>
-          </div>
+          <h3 className="mb-3 font-heading text-2xl font-extrabold leading-snug md:text-3xl">
+            أنظمة المراقبة والحماية
+          </h3>
+          <p className="mb-8 leading-loose text-white/70">
+            تصميم وتركيب وصيانة كاميرات المراقبة وأنظمة التحكم في الدخول، مع متابعة مركزية وعن بُعد
+            على مدار الساعة.
+          </p>
+          <span className="inline-flex items-center gap-2 text-sm font-black text-sand transition-all duration-300 group-hover:gap-3">
+            اكتشف الخدمة
+            <ArrowLeft size={16} />
+          </span>
         </Link>
       </div>
     </section>
