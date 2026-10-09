@@ -10,11 +10,14 @@ export default function Hero() {
 
   return (
     <section className="relative isolate flex min-h-svh w-full items-end overflow-hidden bg-brand-dark text-white">
+      {/* quality 60: الصورة تحتها تعتيم كتير فالفرق مش بيبان، والحجم بيقل.
+          لازم 60 تكون مضافة في images.qualities جوه next.config.js */}
       <Image
         src="/hero.webp"
         alt="أفق الرياض"
         fill
         priority
+        quality={60}
         sizes="100vw"
         className="-z-20 object-cover"
       />

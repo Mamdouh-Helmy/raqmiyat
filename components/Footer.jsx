@@ -42,7 +42,7 @@ export default function Footer({ site = "main" }) {
       <div className="container-x grid grid-cols-1 md:grid-cols-4 gap-10 pb-6 text-sm">
         <div>
           <h3 className="font-black text-ink mb-5">المقر الرئيسي</h3>
-          <ul className="space-y-4 text-ink/60">
+          <ul className="space-y-4 text-ink/75">
             <li className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-brand-soft flex items-center justify-center shrink-0">
                 <MapPin size={15} className="text-brand" />
@@ -70,7 +70,7 @@ export default function Footer({ site = "main" }) {
 
         <div>
           <h3 className="font-black text-ink mb-5">روابط سريعة</h3>
-          <ul className="space-y-3 text-ink/60">
+          <ul className="space-y-3 text-ink/75">
             {quickLinks.map(({ label, href, action }) => (
               <li key={label}>
                 {action === "about" ? (
@@ -93,7 +93,7 @@ export default function Footer({ site = "main" }) {
 
         <div>
           <h3 className="font-black text-ink mb-5">الخدمات</h3>
-          <ul className="space-y-3 text-ink/60">
+          <ul className="space-y-3 text-ink/75">
             {services.map(({ label, section, path }) => (
               <li key={label}>
                 <Link
@@ -118,7 +118,7 @@ export default function Footer({ site = "main" }) {
             />
             <span className="font-heading text-2xl text-brand">رقميات</span>
           </Link>
-          <p className="text-ink/60 leading-relaxed mb-5">
+          <p className="text-ink/75 leading-relaxed mb-5">
             نحن شريككم الموثوق في رحلة التحول الرقمي، نقدم حلولاً برمجية
             وأمنية تتجاوز التوقعات وتدعم رؤية المملكة 2030.
           </p>
@@ -137,7 +137,7 @@ export default function Footer({ site = "main" }) {
         </div>
       </div>
 
-      <div className="container-x flex flex-col md:flex-row items-center justify-between mt-14 pt-6 border-t border-ink/10 text-xs text-ink/70 gap-3">
+      <div className="container-x flex flex-col md:flex-row items-center justify-between mt-14 pt-6 border-t border-ink/10 text-xs text-ink/75 gap-3">
         <span>© 2026 شركة رقميات للحلول التقنية. جميع الحقوق محفوظة.</span>
         <div className="flex gap-6">
           <Link href={resolve("/")} className="hover:text-brand transition-colors">
