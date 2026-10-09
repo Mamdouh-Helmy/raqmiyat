@@ -23,25 +23,42 @@ export default function AdminLeadsPage() {
   const router = useRouter();
   const [leads, setLeads] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | idle | error
+  const [reloadKey, setReloadKey] = useState(0); // بتتغير عشان نعيد التحميل
   const [confirmId, setConfirmId] = useState(null); // الطلب اللي مستني تأكيد الحذف
   const [deletingId, setDeletingId] = useState(null);
   const [deleteErrorId, setDeleteErrorId] = useState(null);
 
-  async function fetchLeads() {
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/contact");
-      if (res.status === 401) {
-        router.push("/admin/login");
-        return;
+  // تحميل الطلبات: أول مرة، وكل ما reloadKey يتغير (زر التحديث)
+  useEffect(() => {
+    let ignore = false;
+
+    async function load() {
+      try {
+        const res = await fetch("/api/contact");
+        if (ignore) return;
+        if (res.status === 401) {
+          router.push("/admin/login");
+          return;
+        }
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (ignore) return;
+        setLeads(data.contacts || []);
+        setStatus("idle");
+      } catch {
+        if (!ignore) setStatus("error");
       }
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setLeads(data.contacts || []);
-      setStatus("idle");
-    } catch {
-      setStatus("error");
     }
+
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, [router, reloadKey]);
+
+  function refresh() {
+    setStatus("loading");
+    setReloadKey((key) => key + 1);
   }
 
   async function deleteLead(id) {
@@ -64,11 +81,6 @@ export default function AdminLeadsPage() {
     }
   }
 
-  useEffect(() => {
-    fetchLeads();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const stats = useMemo(() => {
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -89,7 +101,7 @@ export default function AdminLeadsPage() {
           <p className="text-ink/45 text-sm mt-1">كل الرسائل الواردة من نماذج الموقع.</p>
         </div>
         <button
-          onClick={fetchLeads}
+          onClick={refresh}
           className="flex items-center gap-2 text-sm font-bold text-brand border border-brand/20 hover:bg-brand-soft px-4 py-2.5 rounded-xl transition-colors"
         >
           <RefreshCw size={15} /> تحديث

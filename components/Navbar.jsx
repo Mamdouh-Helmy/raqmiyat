@@ -47,7 +47,17 @@ export default function Navbar({ site = "main" }) {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [contactInView, setContactInView] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const { openContactModal } = useContactModal();
+
+  // ───── تصفير الحالة عند تغيير الصفحة ─────
+  // بنعدّل الـ state أثناء الـ render بدل useEffect (من غير render زيادة)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setIsOpen(false);
+    setServicesOpen(false);
+    setContactInView(false);
+  }
 
   const onMain = site === "main";
   const isHome = onMain && pathname === "/";
@@ -74,15 +84,16 @@ export default function Navbar({ site = "main" }) {
     contact: isHome && contactInView,
   };
 
+  // تغيير شكل النافبار بعد النزول
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [pathname]);
+  }, []);
 
+  // تمييز "تواصل معنا" لما قسم التواصل يظهر في نص الشاشة
   useEffect(() => {
-    setContactInView(false);
     if (!isHome) return;
     const el = document.getElementById("contact");
     if (!el) return;
@@ -93,12 +104,7 @@ export default function Navbar({ site = "main" }) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [isHome, pathname]);
-
-  useEffect(() => {
-    setIsOpen(false);
-    setServicesOpen(false);
-  }, [pathname]);
+  }, [isHome]);
 
   // Escape + قفل سكرول الصفحة لما القائمة مفتوحة
   useEffect(() => {
@@ -115,6 +121,10 @@ export default function Navbar({ site = "main" }) {
     };
   }, [isOpen]);
 
+  function closeMenu() {
+    setIsOpen(false);
+  }
+
   function handleRequestClick() {
     document
       .getElementById("cta-section")
@@ -123,7 +133,7 @@ export default function Navbar({ site = "main" }) {
   }
 
   function handleMobileRequestClick() {
-    setIsOpen(false);
+    closeMenu();
     handleRequestClick();
   }
 
@@ -141,11 +151,11 @@ export default function Navbar({ site = "main" }) {
 
   // ───── ستايلات الموبايل ─────
   // ظهور تدريجي لكل عنصر (stagger)
-  const reveal = (i) => ({
+  const reveal = (i, extraClass = "") => ({
     style: { transitionDelay: isOpen ? `${80 + i * 55}ms` : "0ms" },
     className: `transition-all duration-500 ease-out ${
       isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-    }`,
+    } ${extraClass}`.trim(),
   });
 
   const mobileRow = (on) =>
@@ -186,7 +196,7 @@ export default function Navbar({ site = "main" }) {
             {/* الشعار: الاسم ظاهر دايماً، والصورة تظهر بعد النزول */}
             <Link
               href={mainHref(site, "/")}
-              onClick={() => setIsOpen(false)}
+              onClick={closeMenu}
               aria-label="رقميات"
               className="flex items-center gap-2.5"
             >
@@ -301,7 +311,7 @@ export default function Navbar({ site = "main" }) {
             {/* زر قائمة الموبايل */}
             <button
               type="button"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsOpen((open) => !open)}
               aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
               aria-expanded={isOpen}
               aria-controls="mobile-menu"
@@ -317,14 +327,18 @@ export default function Navbar({ site = "main" }) {
                 size={24}
                 weight="bold"
                 className={`absolute transition-all duration-300 ${
-                  isOpen ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
+                  isOpen
+                    ? "rotate-90 scale-0 opacity-0"
+                    : "rotate-0 scale-100 opacity-100"
                 }`}
               />
               <X
                 size={24}
                 weight="bold"
                 className={`absolute transition-all duration-300 ${
-                  isOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"
+                  isOpen
+                    ? "rotate-0 scale-100 opacity-100"
+                    : "-rotate-90 scale-0 opacity-0"
                 }`}
               />
             </button>
@@ -344,7 +358,10 @@ export default function Navbar({ site = "main" }) {
       >
         <div className="relative flex h-full flex-col overflow-y-auto overflow-x-hidden bg-white px-5 pb-6 pt-24">
           {/* ───── أشكال الخلفية ───── */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          >
             {/* دايرة كبيرة فوق */}
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-soft" />
             {/* حلقة */}
@@ -369,7 +386,7 @@ export default function Navbar({ site = "main" }) {
             <li {...reveal(0)}>
               <Link
                 href={mainHref(site, "/")}
-                onClick={() => setIsOpen(false)}
+                onClick={closeMenu}
                 aria-current={active.home ? "page" : undefined}
                 className={mobileRow(active.home)}
               >
@@ -385,7 +402,7 @@ export default function Navbar({ site = "main" }) {
             <li {...reveal(1)}>
               <button
                 type="button"
-                onClick={() => setServicesOpen(!servicesOpen)}
+                onClick={() => setServicesOpen((open) => !open)}
                 aria-expanded={servicesOpen}
                 className={mobileRow(servicesActive)}
               >
@@ -416,7 +433,7 @@ export default function Navbar({ site = "main" }) {
                         <Link
                           key={s.key}
                           href={SERVICE_URLS[s.key]}
-                          onClick={() => setIsOpen(false)}
+                          onClick={closeMenu}
                           aria-current={on ? "page" : undefined}
                           tabIndex={servicesOpen ? 0 : -1}
                           className={`flex items-center gap-3 rounded-xl px-3 py-3 transition-colors ${
@@ -450,7 +467,7 @@ export default function Navbar({ site = "main" }) {
             <li {...reveal(2)}>
               <Link
                 href={mainHref(site, "/blog")}
-                onClick={() => setIsOpen(false)}
+                onClick={closeMenu}
                 aria-current={active.blog ? "page" : undefined}
                 className={mobileRow(active.blog)}
               >
@@ -466,7 +483,7 @@ export default function Navbar({ site = "main" }) {
             <li {...reveal(3)}>
               <Link
                 href={mainHref(site, "/#contact")}
-                onClick={() => setIsOpen(false)}
+                onClick={closeMenu}
                 aria-current={active.contact ? "location" : undefined}
                 className={mobileRow(active.contact)}
               >
@@ -480,7 +497,7 @@ export default function Navbar({ site = "main" }) {
           </ul>
 
           {/* زر الاستشارة في آخر الشاشة */}
-          <div {...reveal(4)} className={`relative z-10 mt-auto pt-8 ${reveal(4).className}`}>
+          <div {...reveal(4, "relative z-10 mt-auto pt-8")}>
             <button
               type="button"
               onClick={handleMobileRequestClick}

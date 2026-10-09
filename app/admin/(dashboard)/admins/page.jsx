@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, X, ShieldCheck, UserRound } from "lucide-react";
 
@@ -29,6 +29,7 @@ export default function AdminsPage() {
   const router = useRouter();
   const [admins, setAdmins] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | idle | error
+  const [reloadKey, setReloadKey] = useState(0); // بتتغير عشان نعيد التحميل
 
   const [createOpen, setCreateOpen] = useState(false);
   const [newAdmin, setNewAdmin] = useState({ username: "", password: "" });
@@ -45,30 +46,44 @@ export default function AdminsPage() {
   const [deleteError, setDeleteError] = useState("");
 
   // الجلسة خلصت أو الحساب اتمسح: رجّعه لصفحة الدخول بدل رسالة خطأ عامة
-  function redirectIfUnauthorized(res) {
-    if (res.status !== 401) return false;
-    router.push("/admin/login");
-    return true;
-  }
+  const redirectIfUnauthorized = useCallback(
+    (res) => {
+      if (res.status !== 401) return false;
+      router.push("/admin/login");
+      return true;
+    },
+    [router]
+  );
 
-  async function fetchAdmins() {
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/admin/admins");
-      if (redirectIfUnauthorized(res)) return;
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setAdmins(data.admins || []);
-      setStatus("idle");
-    } catch {
-      setStatus("error");
-    }
-  }
-
+  // تحميل القائمة: أول مرة، وكل ما reloadKey يتغير
   useEffect(() => {
-    fetchAdmins();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let ignore = false;
+
+    async function load() {
+      try {
+        const res = await fetch("/api/admin/admins");
+        if (ignore) return;
+        if (redirectIfUnauthorized(res)) return;
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (ignore) return;
+        setAdmins(data.admins || []);
+        setStatus("idle");
+      } catch {
+        if (!ignore) setStatus("error");
+      }
+    }
+
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, [redirectIfUnauthorized, reloadKey]);
+
+  function reload() {
+    setStatus("loading");
+    setReloadKey((key) => key + 1);
+  }
 
   function openCreate() {
     setNewAdmin({ username: "", password: "" });
@@ -93,7 +108,7 @@ export default function AdminsPage() {
         return;
       }
       setCreateOpen(false);
-      fetchAdmins();
+      reload();
     } catch {
       setCreateError("حدث خطأ أثناء الإنشاء.");
     } finally {
@@ -127,7 +142,7 @@ export default function AdminsPage() {
         return;
       }
       setEditTarget(null);
-      fetchAdmins();
+      reload();
     } catch {
       setEditError("حدث خطأ أثناء التحديث.");
     } finally {
@@ -147,7 +162,7 @@ export default function AdminsPage() {
         return;
       }
       setDeleteTarget(null);
-      fetchAdmins();
+      reload();
     } catch {
       setDeleteError("حدث خطأ أثناء الحذف.");
     } finally {

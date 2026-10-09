@@ -79,8 +79,13 @@ export default function PageTransition() {
     if (!isArrival()) return;
 
     let cancelled = false;
+
+    /* eslint-disable react-hooks/set-state-in-effect --
+       لازم يحصل قبل أول paint، والـ flag بيتقرا من المتصفح بس (تجنّب hydration mismatch) */
     setInstant(true);
     go("in");
+    /* eslint-enable react-hooks/set-state-in-effect */
+
     finishArrival(); // الستارة اتركّبت، نقدر نظهر الصفحة
 
     fontsReady().then(() => {

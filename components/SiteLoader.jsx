@@ -22,6 +22,7 @@ export default function SiteLoader() {
   useEffect(() => {
     // جاي من دومين شقيق: PageTransition هي اللي بتفتح، مفيش لودر
     if (isArrival()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- الحالة بتعتمد على flag بيتقرا من المتصفح بس، ولو اتحط في useState هيعمل hydration mismatch
       setPhase("done");
       return;
     }
