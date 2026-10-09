@@ -1,25 +1,13 @@
-import {
-  Aref_Ruqaa,
-  Reem_Kufi,
-  Lalezar,
-  Markazi_Text,
-  Rakkas,
-} from "next/font/google";
 import { SquiggleUnderline } from "./najdi-icons";
 
-// كل شريك بخط مختلف عشان يبانوا علامات تجارية حقيقية مش placeholders
-const ruqaa = Aref_Ruqaa({ subsets: ["arabic"], weight: ["700"] });
-const kufi = Reem_Kufi({ subsets: ["arabic"], weight: ["700"] });
-const lalezar = Lalezar({ subsets: ["arabic"], weight: ["400"] });
-const markazi = Markazi_Text({ subsets: ["arabic"], weight: ["700"] });
-const rakkas = Rakkas({ subsets: ["arabic"], weight: ["400"] });
-
+// بنستخدم الخطوط المحمّلة أصلاً في الموقع (El Messiri و Rakkas)
+// بدل تحميل 5 خطوط إضافية. التنوع بالوزن والحجم والمسافات.
 const partners = [
-  { name: "مؤسسة نجد", cls: `${ruqaa.className} text-3xl` },
-  { name: "وزارة التقنية", cls: `${kufi.className} text-2xl tracking-wide` },
-  { name: "صناعات مكة", cls: `${lalezar.className} text-3xl` },
-  { name: "أعمال الرياض", cls: `${markazi.className} text-3xl` },
-  { name: "شركة جدة", cls: `${rakkas.className} text-2xl` },
+  { name: "مؤسسة نجد", cls: "font-arabic font-black text-3xl" },
+  { name: "وزارة التقنية", cls: "font-arabic font-medium text-2xl tracking-wide" },
+  { name: "صناعات مكة", cls: "font-heading text-3xl" },
+  { name: "أعمال الرياض", cls: "font-arabic font-bold text-3xl" },
+  { name: "شركة جدة", cls: "font-heading text-2xl tracking-wide" },
 ];
 
 const stats = [
