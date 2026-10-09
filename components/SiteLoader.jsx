@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { isArrival } from "@/lib/arrival";
 
 const MIN_VISIBLE = 1400; // أقل مدة ظهور (ms)
 const MAX_WAIT = 15000; // أمان: يقفل بعد كده مهما حصل
@@ -18,6 +19,12 @@ export default function SiteLoader() {
   const [phase, setPhase] = useState("loading"); // loading | leaving | done
 
   useEffect(() => {
+    // جاي من دومين شقيق: PageTransition هي اللي بتفتح، مفيش لودر
+    if (isArrival()) {
+      setPhase("done");
+      return;
+    }
+
     const root = document.documentElement;
     const start = performance.now();
     root.style.overflow = "hidden";

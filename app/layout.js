@@ -4,6 +4,7 @@ import "./globals.css";
 import { ContactModalProvider } from "@/components/ContactModalProvider";
 import PageTransition from "@/components/PageTransition";
 import SiteLoader from "@/components/SiteLoader";
+import { ARRIVAL_CSS, ARRIVAL_SCRIPT } from "@/lib/arrival";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 // خط متغيّر: كل الأوزان من 400 لـ 700 في ملف واحد (عربي + لاتيني)
@@ -68,11 +69,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
+    // suppressHydrationWarning: سكريبت الوصول بيضيف attribute على <html> قبل الـ hydration
     <html
       lang="ar"
       dir="rtl"
+      suppressHydrationWarning
       className={`${elMessiri.variable} ${rakkas.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: ARRIVAL_SCRIPT }} />
+        <style dangerouslySetInnerHTML={{ __html: ARRIVAL_CSS }} />
+      </head>
       <body className="font-arabic antialiased">
         {/* لو الـ JS مقفول، نخفي اللودر عشان الموقع ما يفضلش محجوب */}
         <noscript>

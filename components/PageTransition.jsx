@@ -3,39 +3,55 @@
 
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { finishArrival, isArrival } from "@/lib/arrival";
+import { COVER, STRIPS, TOTAL, getCurtainStyles } from "@/lib/curtainStyles";
+import { resolveCrossDomainTarget } from "@/lib/links";
 
-// ───── إعدادات الحركة (عدّل براحتك) ─────
-const STRIPS = 5; // عدد الشرائط
-const DURATION = 450; // مدة حركة كل شريط (ms)
-const STAGGER = 45; // الفرق بين كل شريط والتاني
-const LAYER_GAP = 110; // الفرق بين الطبقة الرملية والطبقة الأساسية
-const TOTAL = DURATION + STAGGER * (STRIPS - 1) + LAYER_GAP;
-const EASE = "cubic-bezier(0.76, 0, 0.24, 1)";
+const NAVIGATION_TIMEOUT = 4000; // لو الصفحة اتأخرت، اكشف بعد كده
+const ARRIVAL_HOLD = 250; // وقفة قبل ما الستارة تفتح بعد الوصول من دومين شقيق
+const FONTS_MAX_WAIT = 1500;
 
-// تعبئة الاسم الذهبية (بتبدأ بعد ما الشرائط تغطي)
-const FILL_DELAY = 380;
-const FILL_MS = 460;
-const COVER = Math.max(TOTAL, FILL_DELAY + FILL_MS + 60); // الوقت اللي بعده نكشف
+const LAYERS = ["sand", "brand"];
+const LAYER_BG = { sand: "bg-sand", brand: "bg-brand" };
 
 // نفس شبكة المعيّنات المستخدمة في اللودر
 const lattice =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z' fill='none' stroke='%23c9a66b' stroke-opacity='0.08'/%3E%3C/svg%3E\")";
 
+const isPlainLeftClick = (e) =>
+  !e.defaultPrevented &&
+  e.button === 0 &&
+  !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
+
+const opensElsewhere = (link) =>
+  (link.target && link.target !== "_self") || link.hasAttribute("download");
+
+// نفس الصفحة (أو مجرد hash)
+const isSamePage = (url) =>
+  url.pathname === window.location.pathname &&
+  url.search === window.location.search;
+
+const fontsReady = () =>
+  Promise.race([
+    document.fonts?.ready,
+    new Promise((resolve) => setTimeout(resolve, FONTS_MAX_WAIT)),
+  ]);
+
 export default function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // idle → in (الستارة بتنزل) → out (الستارة بتكمل وتكشف الصفحة الجديدة)
   const [phase, setPhase] = useState("idle");
+  const [instant, setInstant] = useState(false);
   const phaseRef = useRef("idle");
   const covered = useRef(false); // الستارة غطّت الشاشة
   const arrived = useRef(false); // الصفحة الجديدة وصلت
   const timers = useRef([]);
 
-  const go = useCallback((p) => {
-    phaseRef.current = p;
-    setPhase(p);
+  const go = useCallback((next) => {
+    phaseRef.current = next;
+    setPhase(next);
   }, []);
 
   const later = useCallback((fn, ms) => {
@@ -47,50 +63,74 @@ export default function PageTransition() {
     timers.current = [];
   }, []);
 
-  const tryReveal = useCallback(() => {
-    if (phaseRef.current !== "in" || !covered.current || !arrived.current) {
-      return;
-    }
+  const reveal = useCallback(() => {
     go("out");
     later(() => go("idle"), TOTAL + 50);
   }, [go, later]);
 
-  // الصفحة الجديدة وصلت
+  const tryReveal = useCallback(() => {
+    if (phaseRef.current === "in" && covered.current && arrived.current) {
+      reveal();
+    }
+  }, [reveal]);
+
+  // ───── الوصول من دومين شقيق: الستارة مقفولة من أول فريم ثم تفتح ─────
+  useLayoutEffect(() => {
+    if (!isArrival()) return;
+
+    let cancelled = false;
+    setInstant(true);
+    go("in");
+    finishArrival(); // الستارة اتركّبت، نقدر نظهر الصفحة
+
+    fontsReady().then(() => {
+      if (cancelled) return;
+      later(() => {
+        setInstant(false);
+        reveal();
+      }, ARRIVAL_HOLD);
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimers();
+    };
+  }, [go, later, reveal, clearTimers]);
+
+  // ───── الصفحة الجديدة وصلت (تنقل داخلي) ─────
   useEffect(() => {
     arrived.current = true;
     tryReveal();
   }, [pathname, tryReveal]);
 
-  // اعتراض الضغط على اللينكات الداخلية
+  // ───── رجوع من bfcache (زر Back): ما نسيبش الستارة مقفولة ─────
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onPageShow = (e) => {
+      if (!e.persisted) return;
+      clearTimers();
+      setInstant(false);
+      go("idle");
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [go, clearTimers]);
 
-    const onClick = (e) => {
-      if (reduce.matches || phaseRef.current !== "idle") return;
-      if (e.defaultPrevented || e.button !== 0) return;
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  // ───── طريقتين للانتقال ─────
+  const leaveToDomain = useCallback(
+    (href) => {
+      clearTimers();
+      go("in");
+      later(() => window.location.assign(href), COVER);
+      later(reveal, NAVIGATION_TIMEOUT); // لو التحميل فشل، ما نسيبش الستارة مقفولة
+    },
+    [clearTimers, go, later, reveal]
+  );
 
-      const a = e.target?.closest?.("a[href]");
-      if (!a) return;
-      if (a.target && a.target !== "_self") return;
-      if (a.hasAttribute("download")) return;
-
-      const url = new URL(a.href, window.location.href);
-      if (url.origin !== window.location.origin) return;
-
-      // نفس الصفحة (أو مجرد hash) → من غير أنيميشن
-      if (
-        url.pathname === window.location.pathname &&
-        url.search === window.location.search
-      ) {
-        return;
-      }
-
-      e.preventDefault();
+  const navigateInternally = useCallback(
+    (url) => {
       clearTimers();
       covered.current = false;
       arrived.current = false;
-
       go("in");
       router.push(url.pathname + url.search + url.hash);
 
@@ -99,97 +139,72 @@ export default function PageTransition() {
         tryReveal();
       }, COVER);
 
-      // أمان: لو الصفحة اتأخرت، اكشف بعد 4 ثواني
       later(() => {
         covered.current = true;
         arrived.current = true;
         tryReveal();
-      }, 4000);
+      }, NAVIGATION_TIMEOUT);
+    },
+    [clearTimers, go, later, router, tryReveal]
+  );
+
+  // ───── اعتراض الضغط على اللينكات ─────
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const onClick = (e) => {
+      if (reduceMotion.matches || phaseRef.current !== "idle") return;
+      if (!isPlainLeftClick(e)) return;
+
+      const link = e.target?.closest?.("a[href]");
+      if (!link || opensElsewhere(link)) return;
+
+      const url = new URL(link.href, window.location.href);
+
+      const crossDomain = resolveCrossDomainTarget(url, window.location.origin);
+      if (crossDomain) {
+        e.preventDefault();
+        leaveToDomain(crossDomain);
+        return;
+      }
+
+      // دومين خارجي، أو نفس الصفحة: سيبه عادي
+      if (url.origin !== window.location.origin || isSamePage(url)) return;
+
+      e.preventDefault();
+      navigateInternally(url);
     };
 
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, [router, go, later, clearTimers, tryReveal]);
+  }, [leaveToDomain, navigateInternally]);
 
   useEffect(() => clearTimers, [clearTimers]);
 
-  const stripStyle = (layer, i) => {
-    if (phase === "idle") {
-      return { transform: "translateY(-101%)", transition: "none" };
-    }
-    const isBrand = layer === "brand";
-    const gap =
-      phase === "in" ? (isBrand ? LAYER_GAP : 0) : isBrand ? 0 : LAYER_GAP;
-    return {
-      transform: phase === "in" ? "translateY(0)" : "translateY(101%)",
-      transition: `transform ${DURATION}ms ${EASE} ${i * STAGGER + gap}ms`,
-    };
-  };
-
-  // المحتوى كله: يظهر بعد التغطية، ويختفي أول ما الكشف يبدأ
-  const contentStyle =
-    phase === "in"
-      ? {
-          opacity: 1,
-          transform: "translateY(0)",
-          transition: "opacity 300ms ease-out 320ms, transform 400ms ease-out 320ms",
-        }
-      : phase === "out"
-      ? {
-          opacity: 0,
-          transform: "translateY(-14px)",
-          transition: "opacity 220ms ease-in, transform 220ms ease-in",
-        }
-      : {
-          opacity: 0,
-          transform: "translateY(14px)",
-          transition: "none",
-        };
-
-  // التعبئة الذهبية بتمسح من اليمين (RTL)
-  const fillStyle =
-    phase === "in"
-      ? {
-          clipPath: "inset(0 0 0 0%)",
-          transition: `clip-path ${FILL_MS}ms ease-out ${FILL_DELAY}ms`,
-        }
-      : phase === "out"
-      ? { clipPath: "inset(0 0 0 0%)", transition: "none" }
-      : { clipPath: "inset(0 0 0 100%)", transition: "none" };
-
-  const lineStyle =
-    phase === "in"
-      ? {
-          transform: "scaleX(1)",
-          transition: `transform ${FILL_MS}ms ease-out ${FILL_DELAY}ms`,
-        }
-      : phase === "out"
-      ? { transform: "scaleX(1)", transition: "none" }
-      : { transform: "scaleX(0)", transition: "none" };
+  const styles = getCurtainStyles(phase, instant);
 
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[100] overflow-hidden ${
+      // visible: عشان تفضل ظاهرة حتى لو الـ body مخفي لحظة الوصول
+      className={`visible fixed inset-0 z-[100] overflow-hidden ${
         phase === "idle" ? "pointer-events-none" : "pointer-events-auto"
       }`}
     >
-      {["sand", "brand"].map((layer) => (
+      {LAYERS.map((layer) => (
         <div key={layer} className="absolute inset-0 flex">
           {Array.from({ length: STRIPS }).map((_, i) => (
             <div
               key={i}
-              className={`h-full flex-1 will-change-transform ${
-                layer === "brand" ? "bg-brand" : "bg-sand"
-              }`}
-              style={{ marginInline: "-0.5px", ...stripStyle(layer, i) }}
+              className={`h-full flex-1 will-change-transform ${LAYER_BG[layer]}`}
+              style={{ marginInline: "-0.5px", ...styles.strip(layer, i) }}
             />
           ))}
         </div>
       ))}
 
       {/* المحتوى فوق الشرائط */}
-      <div className="absolute inset-0 text-white" style={contentStyle}>
+      <div className="absolute inset-0 text-white" style={styles.content}>
         {/* شبكة المعيّنات */}
         <div
           className="absolute inset-0"
@@ -226,10 +241,7 @@ export default function PageTransition() {
             >
               رقميات
             </span>
-            <span
-              className="absolute inset-0 block text-sand"
-              style={fillStyle}
-            >
+            <span className="absolute inset-0 block text-sand" style={styles.fill}>
               رقميات
             </span>
           </div>
@@ -237,10 +249,7 @@ export default function PageTransition() {
 
         {/* خط رفيع على الحافة السفلية */}
         <div className="absolute inset-x-0 bottom-0 h-px bg-white/15">
-          <div
-            className="h-full origin-right bg-sand"
-            style={lineStyle}
-          />
+          <div className="h-full origin-right bg-sand" style={styles.line} />
         </div>
       </div>
     </div>
