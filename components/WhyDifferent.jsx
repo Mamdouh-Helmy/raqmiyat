@@ -34,7 +34,7 @@ export default function WhyDifferent() {
               <div key={title} className="flex gap-6">
                 <Icon className="w-12 h-12 shrink-0 text-sand mt-0.5" />
                 <div className="border-r border-sand/40 pr-6">
-                  <h4 className="font-black text-xl mb-2">{title}</h4>
+                  <h3 className="font-black text-xl mb-2">{title}</h3>
                   <p className="text-paper/65 text-sm leading-relaxed max-w-md">{text}</p>
                 </div>
               </div>
@@ -50,7 +50,6 @@ export default function WhyDifferent() {
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover object-center"
-            priority
           />
         </div>
       </div>
