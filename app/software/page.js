@@ -19,7 +19,7 @@ import {
   BarChart3,
   Plug,
 } from "lucide-react";
-import { SITE_URL } from "@/lib/site";
+import { SOFTWARE_URL } from "@/lib/site";
 
 export const metadata = {
   title: "الحلول البرمجية",
@@ -32,15 +32,14 @@ export const metadata = {
     "أنظمة ERP",
     "متاجر إلكترونية",
   ],
-  alternates: { canonical: "/software" },
+  alternates: { canonical: SOFTWARE_URL },
   openGraph: {
     type: "website",
     locale: "ar_SA",
     siteName: "رقميات",
     title: "الحلول البرمجية | رقميات",
-    description:
-      "تطبيقات ويب وموبايل ومتاجر إلكترونية وأنظمة مؤسسية مخصصة.",
-    url: `${SITE_URL}/software`,
+    description: "تطبيقات ويب وموبايل ومتاجر إلكترونية وأنظمة مؤسسية مخصصة.",
+    url: SOFTWARE_URL,
   },
 };
 
@@ -147,7 +146,7 @@ const stats = [
 export default function SoftwarePage() {
   return (
     <main className="bg-paper">
-      <Navbar />
+      <Navbar site="software" />
       <PageHero
         title="نبني برمجيات تنمو مع أعمالك"
         subtitle="من الفكرة إلى الإطلاق، نصمم وننفّذ حلولاً برمجية مخصصة بدقة هندسية وتجربة مستخدم استثنائية."
@@ -166,7 +165,7 @@ export default function SoftwarePage() {
       <Testimonial />
       <Faq />
       <CTASection />
-      <Footer />
+      <Footer site="software" />
     </main>
   );
 }

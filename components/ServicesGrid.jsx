@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
+import { SECURITY_URL, SOFTWARE_URL } from "@/lib/site";
 
 export default function ServicesGrid() {
   return (
@@ -9,7 +10,7 @@ export default function ServicesGrid() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
         {/* الحلول البرمجية */}
         <Link
-          href="/software"
+          href={SOFTWARE_URL}
           className="group grid overflow-hidden rounded-xl2 bg-sand text-brand-dark outline-none transition-shadow duration-300 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand-dark md:grid-cols-2"
         >
           {/* الصورة: من الحافة للحافة وبطول الكارت كله */}
@@ -40,7 +41,7 @@ export default function ServicesGrid() {
 
         {/* أنظمة المراقبة */}
         <Link
-          href="/security"
+          href={SECURITY_URL}
           className="group flex flex-col justify-end rounded-xl2 bg-brand-dark p-8 text-white outline-none transition-colors duration-300 hover:bg-brand focus-visible:ring-2 focus-visible:ring-sand md:p-10"
         >
           <h3 className="mb-3 font-heading text-2xl font-extrabold leading-snug md:text-3xl">

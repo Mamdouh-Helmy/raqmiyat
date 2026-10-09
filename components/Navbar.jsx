@@ -18,26 +18,30 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useContactModal } from "./ContactModalProvider";
+import { mainHref, SERVICE_URLS } from "@/lib/links";
 
+// key = اسم الـ subdomain. الرابط الفعلي من SERVICE_URLS
 const SERVICES = [
   {
-    href: "/software",
+    key: "software",
     label: "الحلول البرمجية",
     desc: "مواقع وتطبيقات وأنظمة مخصصة",
     icon: Code,
   },
   {
-    href: "/security",
+    key: "security",
     label: "أنظمة الأمان",
     desc: "كاميرات وتحكم في الدخول",
     icon: ShieldCheck,
   },
 ];
 
-// الصفحات اللي بتبدأ بقسم غامق والنافبار شفاف فوقه عند الصفر
+// الصفحات اللي بتبدأ بقسم غامق والنافبار شفاف فوقه عند الصفر (الموقع الرئيسي بس)
 const HERO_PATHS = ["/", "/works"];
 
-export default function Navbar() {
+// site: "main" (www) | "security" | "software"
+// على الـ subdomains الـ "/" هو صفحة القسم، فمنعتمدش على usePathname هناك
+export default function Navbar({ site = "main" }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -45,8 +49,9 @@ export default function Navbar() {
   const [contactInView, setContactInView] = useState(false);
   const { openContactModal } = useContactModal();
 
-  const isHome = pathname === "/";
-  const isHeroPage = HERO_PATHS.includes(pathname);
+  const onMain = site === "main";
+  const isHome = onMain && pathname === "/";
+  const isHeroPage = onMain && HERO_PATHS.includes(pathname);
 
   // فوق القسم الغامق: صفحات الهيرو + عند الصفر + القائمة مقفولة
   const overHero = isHeroPage && !scrolled && !isOpen;
@@ -58,9 +63,9 @@ export default function Navbar() {
   const showLogo = !overHero;
 
   const isActive = (href) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    onMain && (pathname === href || pathname.startsWith(`${href}/`));
 
-  const servicesActive = SERVICES.some((s) => isActive(s.href));
+  const servicesActive = SERVICES.some((s) => s.key === site);
 
   const active = {
     home: isHome && !contactInView,
@@ -180,7 +185,7 @@ export default function Navbar() {
           >
             {/* الشعار: الاسم ظاهر دايماً، والصورة تظهر بعد النزول */}
             <Link
-              href="/"
+              href={mainHref(site, "/")}
               onClick={() => setIsOpen(false)}
               aria-label="رقميات"
               className="flex items-center gap-2.5"
@@ -212,7 +217,7 @@ export default function Navbar() {
             <ul className="hidden items-center gap-9 text-sm font-medium md:flex">
               <li>
                 <Link
-                  href="/"
+                  href={mainHref(site, "/")}
                   aria-current={active.home ? "page" : undefined}
                   className={desktopLink(active.home)}
                 >
@@ -237,11 +242,11 @@ export default function Navbar() {
                 <div className="invisible absolute right-0 top-full z-50 pt-3 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                   <div className="w-56 rounded-2xl border border-ink/5 bg-white p-2 shadow-xl">
                     {SERVICES.map((s) => {
-                      const on = isActive(s.href);
+                      const on = s.key === site;
                       return (
                         <Link
-                          key={s.href}
-                          href={s.href}
+                          key={s.key}
+                          href={SERVICE_URLS[s.key]}
                           aria-current={on ? "page" : undefined}
                           className={`flex items-center justify-between rounded-xl px-4 py-2.5 text-sm transition-colors ${
                             on
@@ -265,7 +270,7 @@ export default function Navbar() {
 
               <li>
                 <Link
-                  href="/blog"
+                  href={mainHref(site, "/blog")}
                   aria-current={active.blog ? "page" : undefined}
                   className={desktopLink(active.blog)}
                 >
@@ -275,7 +280,7 @@ export default function Navbar() {
 
               <li>
                 <Link
-                  href="/#contact"
+                  href={mainHref(site, "/#contact")}
                   aria-current={active.contact ? "location" : undefined}
                   className={desktopLink(active.contact)}
                 >
@@ -363,7 +368,7 @@ export default function Navbar() {
             {/* الرئيسية */}
             <li {...reveal(0)}>
               <Link
-                href="/"
+                href={mainHref(site, "/")}
                 onClick={() => setIsOpen(false)}
                 aria-current={active.home ? "page" : undefined}
                 className={mobileRow(active.home)}
@@ -405,12 +410,12 @@ export default function Navbar() {
                 <div className="overflow-hidden">
                   <div className="mr-[1.35rem] space-y-1 border-r-2 border-ink/10 py-1 pr-4">
                     {SERVICES.map((s) => {
-                      const on = isActive(s.href);
+                      const on = s.key === site;
                       const Icon = s.icon;
                       return (
                         <Link
-                          key={s.href}
-                          href={s.href}
+                          key={s.key}
+                          href={SERVICE_URLS[s.key]}
                           onClick={() => setIsOpen(false)}
                           aria-current={on ? "page" : undefined}
                           tabIndex={servicesOpen ? 0 : -1}
@@ -444,7 +449,7 @@ export default function Navbar() {
             {/* المدونة */}
             <li {...reveal(2)}>
               <Link
-                href="/blog"
+                href={mainHref(site, "/blog")}
                 onClick={() => setIsOpen(false)}
                 aria-current={active.blog ? "page" : undefined}
                 className={mobileRow(active.blog)}
@@ -460,7 +465,7 @@ export default function Navbar() {
             {/* تواصل معنا */}
             <li {...reveal(3)}>
               <Link
-                href="/#contact"
+                href={mainHref(site, "/#contact")}
                 onClick={() => setIsOpen(false)}
                 aria-current={active.contact ? "location" : undefined}
                 className={mobileRow(active.contact)}

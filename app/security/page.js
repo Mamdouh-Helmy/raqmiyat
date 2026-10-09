@@ -9,7 +9,7 @@ import ProcessSteps from "@/components/ProcessSteps";
 import Testimonial from "@/components/Testimonial";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
-import { SITE_URL } from "@/lib/site";
+import { SECURITY_URL } from "@/lib/site";
 
 export const metadata = {
   title: "أنظمة كاميرات المراقبة",
@@ -22,7 +22,7 @@ export const metadata = {
     "كاميرات رؤية ليلية",
     "مراقبة عن بعد",
   ],
-  alternates: { canonical: "/security" },
+  alternates: { canonical: SECURITY_URL },
   openGraph: {
     type: "website",
     locale: "ar_SA",
@@ -30,10 +30,11 @@ export const metadata = {
     title: "أنظمة كاميرات المراقبة | رقميات",
     description:
       "تركيب وصيانة أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي.",
-    url: `${SITE_URL}/security`,
+    url: SECURITY_URL,
   },
 };
 
+// ...من هنا `const items = [...]` و `export default function SecurityPage()` بدون أي تغيير
 
 // icon هنا اسم (string) مش كومبوننت — SecurityServices بيحوله للأيقونة الفعلية
 // الأرقام في stats تقديرية، عدّلها حسب مواصفاتكم الفعلية
@@ -105,8 +106,7 @@ const items = [
     title: "المتابعة عبر الجوال",
     text: "تطبيق مخصص يتيح لك مشاهدة كل الكاميرات مباشرة من أي مكان وفي أي وقت.",
     image: "/security/services/mobile-app.webp",
-    intro:
-      "كل كاميراتك في شاشة واحدة، سواء كنت في المكتب أو في سفر.",
+    intro: "كل كاميراتك في شاشة واحدة، سواء كنت في المكتب أو في سفر.",
     stats: [
       { value: "١", label: "تطبيق لكل الكاميرات" },
       { value: "٢", label: "iOS وAndroid" },
@@ -229,7 +229,7 @@ const items = [
 export default function SecurityPage() {
   return (
     <main className="bg-paper">
-      <Navbar />
+      <Navbar site="security" />
       <SecurityIntro
         title="عين ساهرة على منشأتك، ٢٤ ساعة"
         subtitle="أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي، تركيب احترافي ومتابعة مستمرة تضمن أمان موقعك."
@@ -257,7 +257,7 @@ export default function SecurityPage() {
       <ProcessSteps />
       <Testimonial />
       <CTASection />
-      <Footer />
+      <Footer site="security" />
     </main>
   );
 }
