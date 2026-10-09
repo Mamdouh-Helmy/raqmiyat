@@ -151,7 +151,7 @@ export default function SoftwarePage() {
       <PageHero
         title="نبني برمجيات تنمو مع أعمالك"
         subtitle="من الفكرة إلى الإطلاق، نصمم وننفّذ حلولاً برمجية مخصصة بدقة هندسية وتجربة مستخدم استثنائية."
-        screenshot="/screenshots/software-hero.png"
+        screenshot="/screenshots/software-hero.webp"
       />
       <TechStack />
       <FeatureGrid

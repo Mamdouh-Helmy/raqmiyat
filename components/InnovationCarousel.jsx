@@ -12,21 +12,21 @@ const slides = [
     text: "نصمم ونركّب كاميرات المراقبة وأنظمة التحكم في الدخول، مع متابعة مركزية وعن بُعد من الجوال على مدار الساعة.",
     cta: "اطلب معاينة",
     action: { type: "contact", subject: "فحص أمني" },
-    image: "/carousel/ai.png",
+    image: "/carousel/ai.webp",
   },
   {
     title: "برمجيات وأنظمة تُبنى لأعمالك",
     text: "مواقع وتطبيقات وأنظمة ERP وLMS مخصصة لاحتياج منشأتك، من التحليل حتى التشغيل والدعم.",
     cta: "ناقش مشروعك",
     action: { type: "contact", subject: "مناقشة مشروع" },
-    image: "/carousel/team.png",
+    image: "/carousel/team.webp",
   },
   {
     title: "شريك تقني من الفكرة للتشغيل",
     text: "فريق يرافقك في كل مرحلة بمعايير جودة وأمان عالية، وعقود دعم وصيانة تضمن استمرارية عملك.",
     cta: "احجز استشارة مجانية",
     action: { type: "contact", subject: "استشارة مجانية" },
-    image: "/carousel/vision2030.png",
+    image: "/carousel/vision2030.webp",
   },
 ];
 

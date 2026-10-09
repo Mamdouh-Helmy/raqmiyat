@@ -76,7 +76,7 @@ export default async function PostPage({ params }) {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
+    logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.webp` },
   };
 
   const article = {
@@ -92,7 +92,7 @@ export default async function PostPage({ params }) {
     isAccessibleForFree: true,
     datePublished: post.date,
     dateModified: modified,
-    image: [`${SITE_URL}/logo.png`],
+    image: [`${SITE_URL}/logo.webp`],
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     isPartOf: { "@type": "Blog", "@id": `${SITE_URL}/blog#blog`, name: "المدونة التقنية" },
     about: post.keywords.slice(0, 3).map((k) => ({ "@type": "Thing", name: k })),

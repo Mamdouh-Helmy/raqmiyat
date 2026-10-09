@@ -49,9 +49,9 @@ export default function AdminLoginPage() {
           }}
         />
         <div className="relative flex flex-col items-center text-center">
-          {/* حط ملف اللوجو في public/logo.png (أو غيّر الامتداد هنا لو svg/webp) */}
+          {/* حط ملف اللوجو في public/logo.webp (أو غيّر الامتداد هنا لو svg/webp) */}
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="شعار الموقع"
             width={88}
             height={88}
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
         <form onSubmit={handleSubmit} className="w-full max-w-sm">
           <div className="md:hidden w-20 h-20 rounded-2xl bg-brand-soft flex items-center justify-center mx-auto mb-6 p-3">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="شعار الموقع"
               width={56}
               height={56}

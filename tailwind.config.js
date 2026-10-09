@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -54,5 +56,17 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // variants بتاعة مروحة الكروت (FeatureGrid)
+    plugin(({ addVariant }) => {
+      // وضع المروحة: شاشة كبيرة + ماوس حقيقي (التاتش بياخد التصميم العادي)
+      addVariant(
+        "fan",
+        "@media (min-width: 1024px) and (hover: hover) and (pointer: fine)"
+      );
+      // الكروت اللي "قبل" الكارت المتهوّر/المتفوكس، والكروت اللي "بعده"
+      addVariant("fan-before", ["&:has(~ li:hover)", "&:has(~ li:focus-within)"]);
+      addVariant("fan-after", ["li:hover ~ &", "li:focus-within ~ &"]);
+    }),
+  ],
 };

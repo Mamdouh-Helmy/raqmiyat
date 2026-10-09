@@ -140,3 +140,12 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
+
+@keyframes loader-spin {
+  from { transform: rotate(45deg); }
+  to   { transform: rotate(405deg); }
+}
+@keyframes loader-spin-rev {
+  from { transform: rotate(45deg); }
+  to   { transform: rotate(-315deg); }
+}

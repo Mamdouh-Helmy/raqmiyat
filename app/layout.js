@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ContactModalProvider } from "@/components/ContactModalProvider";
 import PageTransition from "@/components/PageTransition";
+import SiteLoader from "@/components/SiteLoader";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 // خط متغيّر: كل الأوزان من 400 لـ 700 في ملف واحد (عربي + لاتيني)
@@ -37,9 +38,9 @@ export const metadata = {
     canonical: "/",
   },
   icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: [{ url: "/logo.webp", type: "image/webp" }],
+    shortcut: "/logo.webp",
+    apple: "/logo.webp",
   },
   openGraph: {
     title,
@@ -48,7 +49,7 @@ export const metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: "/logo.png",
+        url: "/logo.webp",
         width: 512,
         height: 512,
         alt: "شعار رقميات",
@@ -61,7 +62,7 @@ export const metadata = {
     card: "summary",
     title,
     description,
-    images: ["/logo.png"],
+    images: ["/logo.webp"],
   },
 };
 
@@ -73,6 +74,13 @@ export default function RootLayout({ children }) {
       className={`${elMessiri.variable} ${rakkas.variable}`}
     >
       <body className="font-arabic antialiased">
+        {/* لو الـ JS مقفول، نخفي اللودر عشان الموقع ما يفضلش محجوب */}
+        <noscript>
+          <style>{`#site-loader{display:none!important}`}</style>
+        </noscript>
+
+        <SiteLoader />
+
         <ContactModalProvider>
           {children}
           <PageTransition />

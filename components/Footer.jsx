@@ -101,7 +101,7 @@ export default function Footer() {
         <div>
           <Link href="/" className="flex items-center gap-2.5 mb-4">
             <Image
-              src="/raqmiyat.png"
+              src="/raqmiyat.webp"
               alt="شعار رقميات"
               width={32}
               height={32}

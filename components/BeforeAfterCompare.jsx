@@ -3,24 +3,21 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronsLeftRight, Moon, Sun } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// نفس النسيج الهندسي النجدي المستخدم في SiteMonitoring
-const LATTICE = {
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M24 2L46 24 24 46 2 24zM24 14L34 24 24 34 14 24z' fill='none' stroke='%23b8934a' stroke-opacity='.14' stroke-width='1'/%3E%3C/svg%3E")`,
-  backgroundSize: "48px 48px",
+// حروف مفرغة: بتمثّل الرؤية الغير واضحة
+const hollow = {
+  WebkitTextStroke: "2px rgba(255,255,255,0.9)",
+  WebkitTextFillColor: "transparent",
 };
 
-const CORNERS = [
-  "top-5 left-5 border-t-2 border-l-2",
-  "top-5 right-5 border-t-2 border-r-2",
-  "bottom-5 left-5 border-b-2 border-l-2",
-  "bottom-5 right-5 border-b-2 border-r-2",
-];
+const HEADLINE =
+  "font-heading text-[15vw] leading-[1.1] md:text-[9.5vw] md:leading-[1.05]";
 
 export default function BeforeAfterCompare({ beforeImage, afterImage }) {
   // position = نسبة ظهور الصورة العادية من اليسار (٠–١٠٠)
   const [position, setPosition] = useState(50);
+  const [touched, setTouched] = useState(false);
   const posRef = useRef(50);
   const rafRef = useRef(0);
   const interacted = useRef(false);
@@ -48,6 +45,7 @@ export default function BeforeAfterCompare({ beforeImage, afterImage }) {
 
   const takeControl = () => {
     interacted.current = true;
+    setTouched(true);
     cancelAnimationFrame(rafRef.current);
   };
 
@@ -69,7 +67,7 @@ export default function BeforeAfterCompare({ beforeImage, afterImage }) {
         if (interacted.current) return;
         await tween(50, 900);
       },
-      { threshold: 0.6 }
+      { threshold: 0.5 }
     );
     io.observe(el);
     return () => {
@@ -78,137 +76,138 @@ export default function BeforeAfterCompare({ beforeImage, afterImage }) {
     };
   }, []);
 
-  const showingBefore = position > 85;
-  const showingAfter = position < 15;
-
   const jump = (to) => {
     takeControl();
     tween(to, 700);
   };
 
+  const dominant = position >= 50 ? "before" : "after";
+
   return (
-    <section className="section bg-brand-dark" style={LATTICE}>
-      <div className="container-x">
-        <div className="mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2 className="font-heading text-4xl font-extrabold leading-tight text-white md:text-6xl">
-              شاهد الفرق
-              <br />
-              بنفسك
-            </h2>
-            <p className="mt-5 max-w-md leading-loose text-white/65">
-              حرّك الخط لترى كيف تتحول الرؤية العادية إلى وضوح كامل مع تقنية
-              الرؤية الليلية الذكية.
-            </p>
-          </div>
+    <section
+      ref={frameRef}
+      dir="ltr"
+      className="relative isolate h-[88svh] min-h-[34rem] select-none overflow-hidden bg-black focus-within:ring-2 focus-within:ring-inset focus-within:ring-sand md:min-h-[40rem]"
+    >
+      {/* After: الصورة كاملة */}
+      <Image
+        src={afterImage}
+        alt="رؤية ليلية واضحة"
+        fill
+        sizes="100vw"
+        className="object-cover"
+        draggable={false}
+      />
 
-          <div
-            role="group"
-            aria-label="تبديل العرض"
-            className="flex shrink-0 self-start rounded-full border border-sand/30 bg-black/20 p-1 md:self-auto"
-          >
-            <button
-              type="button"
-              aria-pressed={showingBefore}
-              onClick={() => jump(100)}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-sand ${
-                showingBefore ? "bg-white text-brand-dark" : "text-white/70 hover:text-white"
-              }`}
-            >
-              <Sun size={15} />
-              كاميرا عادية
-            </button>
-            <button
-              type="button"
-              aria-pressed={showingAfter}
-              onClick={() => jump(0)}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-sand ${
-                showingAfter ? "bg-sand text-brand-dark" : "text-white/70 hover:text-white"
-              }`}
-            >
-              <Moon size={15} />
-              رؤية رقميات الذكية
-            </button>
-          </div>
-        </div>
-
-        <div
-          ref={frameRef}
-          dir="ltr"
-          className="relative aspect-[4/3] select-none overflow-hidden rounded-xl2 bg-black ring-1 ring-sand/30 focus-within:ring-2 focus-within:ring-sand md:aspect-[16/8]"
-        >
-          {/* After: الصورة كاملة */}
-          <Image
-            src={afterImage}
-            alt="رؤية ليلية واضحة"
-            fill
-            sizes="(min-width: 1024px) 1100px, 100vw"
-            className="object-cover"
-            draggable={false}
-          />
-
-          {/* Before: مقصوصة بـ clip-path فقط */}
-          <div
-            className="absolute inset-0"
-            style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
-          >
-            <Image
-              src={beforeImage}
-              alt="رؤية عادية"
-              fill
-              sizes="(min-width: 1024px) 1100px, 100vw"
-              className="object-cover"
-              draggable={false}
-            />
-          </div>
-
-          {CORNERS.map((c) => (
-            <span
-              key={c}
-              aria-hidden
-              className={`pointer-events-none absolute size-7 border-sand/90 ${c}`}
-            />
-          ))}
-
-          {/* التسميات */}
-          <div className="pointer-events-none absolute left-12 top-8 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
-            <Sun size={13} />
-            كاميرا عادية
-          </div>
-          <div className="pointer-events-none absolute right-12 top-8 flex items-center gap-1.5 rounded-full bg-sand px-3 py-1.5 text-xs font-bold text-brand-dark">
-            <Moon size={13} />
-            رؤية رقميات الذكية
-          </div>
-
-          {/* الخط الفاصل: شعاع مضيء */}
-          <div
-            className="pointer-events-none absolute inset-y-0 w-0.5 bg-sand shadow-[0_0_24px_4px_rgba(184,147,74,0.55)]"
-            style={{ left: `${position}%` }}
-          >
-            <div
-              aria-hidden
-              className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-sand/25 to-transparent"
-            />
-            <div className="absolute left-0 top-1/2 flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-sand text-brand-dark shadow-lg ring-4 ring-brand-dark/40">
-              <ChevronsLeftRight size={22} strokeWidth={2.5} />
-            </div>
-          </div>
-
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="any"
-            value={position}
-            onPointerDown={takeControl}
-            onKeyDown={takeControl}
-            onChange={(e) => apply(Number(e.target.value))}
-            style={{ touchAction: "pan-y" }}
-            className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
-            aria-label="قارن بين الرؤية العادية والرؤية الليلية"
-          />
-        </div>
+      {/* Before: مقصوصة بـ clip-path فقط */}
+      <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
+        <Image
+          src={beforeImage}
+          alt="رؤية عادية"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          draggable={false}
+        />
       </div>
+
+      {/* تعتيم خفيف للقراءة بس */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/5 to-black/55"
+      />
+
+      {/* العنوان: نفس الكلام مرتين، مفرّغ على جهة الكاميرا العادية ومليان على جهة رقميات */}
+      <div
+        dir="rtl"
+        className="pointer-events-none absolute inset-x-0 top-0 px-4 pt-24 text-center md:pt-32"
+        style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
+      >
+        <h2 className={`${HEADLINE} text-white`} style={hollow}>
+          شاهد الفرق بنفسك
+        </h2>
+      </div>
+      <div
+        dir="rtl"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 px-4 pt-24 text-center md:pt-32"
+        style={{ clipPath: `inset(0 0 0 ${position}%)` }}
+      >
+        <p className={`${HEADLINE} text-sand`}>شاهد الفرق بنفسك</p>
+      </div>
+
+      <p
+        dir="rtl"
+        className="pointer-events-none absolute inset-x-0 top-[calc(6rem+30vw)] mx-auto max-w-md px-6 text-center leading-loose text-white/80 md:top-[calc(8rem+19vw)]"
+      >
+        حرّك الخط لترى كيف تتحول الرؤية العادية إلى وضوح كامل مع تقنية الرؤية الليلية الذكية.
+      </p>
+
+      {/* الخط الفاصل: خط أبيض رفيع بيعدّي على العنوان نفسه */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white"
+        style={{ left: `${position}%` }}
+      >
+        <ChevronLeft
+          size={22}
+          strokeWidth={2.5}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-white"
+        />
+        <ChevronRight
+          size={22}
+          strokeWidth={2.5}
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-white"
+        />
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="any"
+        value={position}
+        onPointerDown={takeControl}
+        onKeyDown={takeControl}
+        onChange={(e) => apply(Number(e.target.value))}
+        style={{ touchAction: "pan-y" }}
+        className="absolute inset-0 z-10 h-full w-full cursor-ew-resize opacity-0"
+        aria-label="قارن بين الرؤية العادية والرؤية الليلية"
+      />
+
+      {/* التسميات: نص بسيط في الركنين، وبيشتغلوا كزراير */}
+      <button
+        type="button"
+        dir="rtl"
+        aria-pressed={position > 85}
+        onClick={() => jump(100)}
+        className={`absolute bottom-6 left-6 z-20 py-2 text-base font-bold outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-sand md:bottom-10 md:left-10 md:text-xl ${
+          dominant === "before" ? "text-white" : "text-white/50 hover:text-white"
+        }`}
+      >
+        كاميرا عادية
+      </button>
+      <button
+        type="button"
+        dir="rtl"
+        aria-pressed={position < 15}
+        onClick={() => jump(0)}
+        className={`absolute bottom-6 right-6 z-20 py-2 text-base font-bold outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-sand md:bottom-10 md:right-10 md:text-xl ${
+          dominant === "after" ? "text-sand" : "text-white/50 hover:text-white"
+        }`}
+      >
+        رؤية رقميات الذكية
+      </button>
+
+      <span
+        aria-hidden="true"
+        dir="rtl"
+        className={`pointer-events-none absolute inset-x-0 bottom-8 text-center text-sm text-white/70 transition-opacity duration-700 md:bottom-12 ${
+          touched ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        اسحب يمين وشمال
+      </span>
     </section>
   );
 }

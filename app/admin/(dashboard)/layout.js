@@ -42,9 +42,9 @@ export default function AdminDashboardLayout({ children }) {
         }`}
       >
         <div className="px-6 py-7 flex items-center gap-3">
-          {/* حط ملف اللوجو في public/logo.png (أو غيّر الامتداد هنا لو svg/webp) */}
+          {/* حط ملف اللوجو في public/logo.webp (أو غيّر الامتداد هنا لو svg/webp) */}
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="شعار الموقع"
             width={36}
             height={36}
@@ -107,7 +107,7 @@ export default function AdminDashboardLayout({ children }) {
           <div className="flex items-center gap-2">
             <span className="font-black text-sm text-ink">لوحة التحكم</span>
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="شعار الموقع"
               width={26}
               height={26}

@@ -45,7 +45,7 @@ export default function WhyDifferent() {
         {/* الصورة: ملزوقة في الحواف الأربعة، بطول السكشن كله */}
         <div className="relative h-[380px] lg:h-auto">
           <Image
-            src="/why-different.png"
+            src="/why-different.webp"
             alt="أمن سيبراني وهوية رقمية سعودية"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"

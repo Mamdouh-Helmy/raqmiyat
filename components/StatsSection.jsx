@@ -72,7 +72,7 @@ export default function StatsSection() {
         {/* صورة الفريق: من الحافة للحافة وبطول اللوح كله */}
         <div className="relative min-h-[280px] md:min-h-[420px]">
           <Image
-            src="/team.png"
+            src="/team.webp"
             alt="فريق من الخبراء المحليين"
             fill
             sizes="(min-width: 768px) 50vw, 100vw"

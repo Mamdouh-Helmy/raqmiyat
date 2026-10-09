@@ -20,7 +20,7 @@ export default function SecurityBanner() {
         {/* الصورة: من الحافة للحافة وبطول اللوح كله */}
         <div className="relative min-h-[300px] lg:min-h-[480px]">
           <Image
-            src="/security.png"
+            src="/security.webp"
             alt="غرفة مراقبة بالكاميرات"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"

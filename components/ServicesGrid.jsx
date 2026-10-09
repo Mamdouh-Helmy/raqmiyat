@@ -15,7 +15,7 @@ export default function ServicesGrid() {
           {/* الصورة: من الحافة للحافة وبطول الكارت كله */}
           <div className="relative min-h-[260px] md:min-h-full">
             <Image
-              src="/services/software.png"
+              src="/services/software.webp"
               alt="الحلول البرمجية"
               fill
               sizes="(min-width: 1024px) 340px, 100vw"

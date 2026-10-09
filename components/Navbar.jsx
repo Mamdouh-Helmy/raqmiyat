@@ -34,6 +34,9 @@ const SERVICES = [
   },
 ];
 
+// الصفحات اللي بتبدأ بقسم غامق والنافبار شفاف فوقه عند الصفر
+const HERO_PATHS = ["/", "/works"];
+
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -43,14 +46,15 @@ export default function Navbar() {
   const { openContactModal } = useContactModal();
 
   const isHome = pathname === "/";
+  const isHeroPage = HERO_PATHS.includes(pathname);
 
-  // فوق الصورة الغامقة: الرئيسية + عند الصفر + القائمة مقفولة
-  const overHero = isHome && !scrolled && !isOpen;
+  // فوق القسم الغامق: صفحات الهيرو + عند الصفر + القائمة مقفولة
+  const overHero = isHeroPage && !scrolled && !isOpen;
 
-  // الخلفية تظهر بعد النزول، أو مع قائمة الموبايل، أو في الصفحات غير الرئيسية
-  const showBg = scrolled || isOpen || !isHome;
+  // الخلفية تظهر بعد النزول، أو مع قائمة الموبايل، أو في الصفحات من غير هيرو
+  const showBg = scrolled || isOpen || !isHeroPage;
 
-  // صورة اللوجو: مخفية عند الصفر على الرئيسية فقط
+  // صورة اللوجو: مخفية عند الصفر على صفحات الهيرو فقط
   const showLogo = !overHero;
 
   const isActive = (href) =>
@@ -60,6 +64,7 @@ export default function Navbar() {
 
   const active = {
     home: isHome && !contactInView,
+    works: isActive("/works"),
     blog: isActive("/blog"),
     contact: isHome && contactInView,
   };
@@ -186,7 +191,7 @@ export default function Navbar() {
                 }`}
               >
                 <Image
-                  src="/raqmiyat.png"
+                  src="/raqmiyat.webp"
                   alt=""
                   width={36}
                   height={36}
@@ -485,8 +490,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* مساحة بديلة للصفحات غير الرئيسية (الـ header fixed) */}
-      {!isHome && <div aria-hidden="true" className="h-[4.5rem]" />}
+      {/* مساحة بديلة للصفحات من غير هيرو (الـ header fixed) */}
+      {!isHeroPage && <div aria-hidden="true" className="h-[4.5rem]" />}
     </>
   );
 }

@@ -42,7 +42,7 @@ const items = [
     icon: "video",
     title: "توريد وتركيب الكاميرات",
     text: "اختيار وتركيب كاميرات عالية الدقة (4K) تناسب طبيعة موقعك الداخلي والخارجي.",
-    image: "/security/services/installation.png",
+    image: "/security/services/installation.webp",
     intro:
       "نبدأ بمعاينة الموقع بأنفسنا: نمشي المكان ونحدد النقاط العمياء، ثم نختار عدد الكاميرات وأنواعها على هذا الأساس، لا العكس.",
     stats: [
@@ -73,7 +73,7 @@ const items = [
     icon: "bell",
     title: "التنبيهات الذكية",
     text: "إشعارات فورية على هاتفك عند رصد حركة أو شخص غير معتاد في الموقع.",
-    image: "/security/services/smart-alerts.png",
+    image: "/security/services/smart-alerts.webp",
     intro:
       "بدل أن تراجع ساعات من التسجيل، يصلك تنبيه واحد فقط عندما يحدث شيء يستحق انتباهك.",
     stats: [
@@ -104,7 +104,7 @@ const items = [
     icon: "smartphone",
     title: "المتابعة عبر الجوال",
     text: "تطبيق مخصص يتيح لك مشاهدة كل الكاميرات مباشرة من أي مكان وفي أي وقت.",
-    image: "/security/services/mobile-app.png",
+    image: "/security/services/mobile-app.webp",
     intro:
       "كل كاميراتك في شاشة واحدة، سواء كنت في المكتب أو في سفر.",
     stats: [
@@ -135,7 +135,7 @@ const items = [
     icon: "cloud",
     title: "التخزين السحابي",
     text: "نسخ احتياطي تلقائي للتسجيلات على السحابة، بحفظ آمن لأي مدة تحتاجها.",
-    image: "/security/services/cloud-storage.png",
+    image: "/security/services/cloud-storage.webp",
     intro:
       "جهاز التسجيل في الموقع قد يتعطل أو يُسرق. النسخة السحابية تبقى محفوظة في مكان آخر.",
     stats: [
@@ -166,7 +166,7 @@ const items = [
     icon: "wrench",
     title: "الصيانة الدورية",
     text: "فحص وصيانة منتظمة لضمان عمل كل كاميرا بأعلى كفاءة طوال الوقت.",
-    image: "/security/services/maintenance.png",
+    image: "/security/services/maintenance.webp",
     intro:
       "النظام الذي لا يُفحص قد يكون متوقفاً منذ أسابيع دون أن تعلم. الزيارات الدورية تمنع ذلك.",
     stats: [
@@ -197,7 +197,7 @@ const items = [
     icon: "headphones",
     title: "دعم فني على مدار الساعة",
     text: "فريق جاهز للرد على أي عطل أو استفسار فور حدوثه، ليل نهار.",
-    image: "/security/services/support.png",
+    image: "/security/services/support.webp",
     intro:
       "الأعطال لا تنتظر ساعات الدوام. فريقنا موجود حين تحتاجه، ليلاً أو نهاراً.",
     stats: [
@@ -233,21 +233,21 @@ export default function SecurityPage() {
       <SecurityIntro
         title="عين ساهرة على منشأتك، ٢٤ ساعة"
         subtitle="أنظمة كاميرات مراقبة متطورة بتقنية الذكاء الاصطناعي، تركيب احترافي ومتابعة مستمرة تضمن أمان موقعك."
-        image="/security/intro.png"
+        image="/security/intro.webp"
       />
       <SiteMonitoring
         images={[
-          "/security/cam-entrance.png",
-          "/security/cam-parking.png",
-          "/security/cam-lobby.png",
-          "/security/cam-warehouse.png",
+          "/security/cam-entrance.webp",
+          "/security/cam-parking.webp",
+          "/security/cam-lobby.webp",
+          "/security/cam-warehouse.webp",
         ]}
         locations={["المدخل الرئيسي", "موقف السيارات", "الردهة", "المخازن"]}
       />
       <SurveillanceFeatures />
       <BeforeAfterCompare
-        beforeImage="/security/compare-before.png"
-        afterImage="/security/compare-after.png"
+        beforeImage="/security/compare-before.webp"
+        afterImage="/security/compare-after.webp"
       />
       <SecurityServices
         title="خدماتنا في أنظمة المراقبة"

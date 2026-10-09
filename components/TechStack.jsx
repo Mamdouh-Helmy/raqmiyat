@@ -60,9 +60,10 @@ const lattice =
 
 const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
-const outline = {
-  WebkitTextStroke: "1.2px rgba(255,255,255,0.55)",
-};
+const countLabel = (n) =>
+  `${toAr(n)} ${n === 1 ? "أداة" : n === 2 ? "أداتان" : n <= 10 ? "أدوات" : "أداة"}`;
+
+const outline = { WebkitTextStroke: "1.2px rgba(255,255,255,0.55)" };
 
 export default function TechStack() {
   return (
@@ -112,47 +113,72 @@ export default function TechStack() {
           {layers.map((layer, i) => (
             <li
               key={layer.name}
-              className="grid gap-6 border-t border-white/15 py-9 md:grid-cols-[11rem_1fr] md:gap-10 md:py-12"
+              className="group/layer relative grid gap-6 border-t border-white/15 py-9 md:grid-cols-[11rem_1fr] md:gap-10 md:py-12"
             >
+              {/* خط ذهبي بيترسم فوق الصف */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 -top-px h-px origin-right scale-x-0 bg-gradient-to-l from-sand via-sand/60 to-transparent transition-transform duration-1000 ease-out group-hover/layer:scale-x-100 motion-reduce:transition-none"
+              />
+
               {/* بطاقة الطبقة */}
               <div className="flex items-start gap-4 md:flex-col md:gap-3">
                 <span
                   aria-hidden="true"
-                  className="select-none font-heading text-5xl leading-none text-transparent md:text-6xl"
-                  style={{ WebkitTextStroke: "1px rgba(201,166,107,0.6)" }}
+                  className="select-none font-heading text-5xl leading-none text-transparent opacity-60 transition-opacity duration-500 group-hover/layer:opacity-100 md:text-6xl"
+                  style={{ WebkitTextStroke: "1px rgba(201,166,107,0.8)" }}
                 >
                   {toAr(String(i + 1).padStart(2, "0"))}
                 </span>
                 <div>
                   <h3 className="text-xl font-black text-sand">{layer.name}</h3>
                   <p className="mt-1 text-xs text-white/50">{layer.note}</p>
+                  <p className="mt-3 text-[11px] font-bold tracking-wider text-white/30">
+                    {countLabel(layer.tools.length)}
+                  </p>
                 </div>
               </div>
 
-              {/* الأدوات: حروف عملاقة */}
-              <ul className="flex flex-wrap gap-x-12 gap-y-9 md:gap-x-16 md:gap-y-12">
-                {layer.tools.map((tool) => (
-                  <li key={tool.name} className="group/tool relative max-w-full pb-4">
+              {/* الأدوات */}
+              <ul className="flex flex-wrap gap-x-12 gap-y-6 md:gap-x-16 md:gap-y-8 [&:hover>li:not(:hover)]:opacity-40">
+                {layer.tools.map((tool, j) => (
+                  <li
+                    key={tool.name}
+                    className="group/tool relative max-w-full pb-4 pt-5 transition-opacity duration-500 motion-reduce:transition-none"
+                  >
+                    {/* رقم الأداة */}
+                    <span
+                      aria-hidden="true"
+                      className="absolute end-0 top-0 text-[10px] font-bold tracking-widest text-white/25 transition-colors duration-500 group-hover/tool:text-sand"
+                    >
+                      {toAr(String(j + 1).padStart(2, "0"))}
+                    </span>
+
+                    {/* الاسم: مفرغ، وتعبئة ذهبية بتمسح من الشمال لليمين */}
                     <span
                       dir="ltr"
-                      className="block cursor-default text-4xl font-black leading-none tracking-tight text-transparent transition-colors duration-500 group-hover/tool:text-sand sm:text-5xl md:text-6xl lg:text-7xl"
+                      className="block cursor-default bg-gradient-to-r from-sand via-[#e8cf9d] to-sand bg-left bg-no-repeat bg-clip-text text-4xl font-black leading-none tracking-tight text-transparent transition-[background-size] duration-700 ease-out [background-size:0%_100%] group-hover/tool:[background-size:100%_100%] sm:text-5xl md:text-6xl lg:text-7xl [@media(hover:none)]:text-white/90 motion-reduce:transition-none"
                       style={outline}
                     >
                       {tool.name}
                     </span>
 
-                    <p className="mt-4 max-w-[17rem] text-sm leading-relaxed text-white/45 transition-all duration-500 group-hover/tool:translate-x-[-6px] group-hover/tool:text-white">
+                    <p className="mt-4 flex max-w-[17rem] items-start gap-2 text-sm leading-relaxed text-white/45 transition-all duration-500 group-hover/tool:translate-x-[-6px] group-hover/tool:text-white motion-reduce:transition-none">
+                      <span
+                        aria-hidden="true"
+                        className="mt-[0.55em] size-1 shrink-0 rotate-45 bg-sand/50 transition-colors duration-500 group-hover/tool:bg-sand"
+                      />
                       {tool.role}
                     </p>
 
                     {/* خط ذهبي بيتمدّد تحت الأداة */}
                     <span
                       aria-hidden="true"
-                      className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-sand transition-transform duration-700 ease-out group-hover/tool:scale-x-100"
+                      className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-sand transition-transform duration-700 ease-out group-hover/tool:scale-x-100 motion-reduce:transition-none"
                     />
                     <span
                       aria-hidden="true"
-                      className="absolute -bottom-[3px] end-0 size-1.5 rotate-45 scale-0 bg-sand transition-transform duration-500 group-hover/tool:scale-100"
+                      className="absolute -bottom-[3px] end-0 size-1.5 rotate-45 scale-0 bg-sand transition-transform duration-500 group-hover/tool:scale-100 motion-reduce:transition-none"
                     />
                   </li>
                 ))}

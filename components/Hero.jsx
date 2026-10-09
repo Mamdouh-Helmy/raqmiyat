@@ -11,7 +11,7 @@ export default function Hero() {
   return (
     <section className="relative isolate flex min-h-svh w-full items-end overflow-hidden bg-brand-dark text-white">
       <Image
-        src="/hero.png"
+        src="/hero.webp"
         alt="أفق الرياض"
         fill
         priority
