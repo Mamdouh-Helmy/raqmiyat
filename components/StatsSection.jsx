@@ -75,7 +75,8 @@ export default function StatsSection() {
             src="/team.webp"
             alt="فريق من الخبراء المحليين"
             fill
-            sizes="(min-width: 768px) 50vw, 100vw"
+            quality={60}
+            sizes="(min-width: 768px) 45vw, calc(100vw - 2.5rem)"
             className="object-cover"
           />
         </div>
