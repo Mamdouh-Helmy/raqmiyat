@@ -23,7 +23,8 @@ export default function SecurityBanner() {
             src="/security.webp"
             alt="غرفة مراقبة بالكاميرات"
             fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
+            quality={60}
+            sizes="(min-width: 1024px) 45vw, calc(100vw - 2.5rem)"
             className="object-cover"
           />
         </div>

@@ -95,9 +95,8 @@ export default function InnovationCarousel() {
                     className="grid h-6 place-items-center outline-none focus-visible:ring-2 focus-visible:ring-brand-dark"
                   >
                     <span
-                      className={`block h-1 rounded-full bg-brand-dark transition-all duration-500 ${
-                        i === active ? "w-8" : "w-4 opacity-30"
-                      }`}
+                      className={`block h-1 rounded-full bg-brand-dark transition-all duration-500 ${i === active ? "w-8" : "w-4 opacity-30"
+                        }`}
                     />
                   </button>
                 ))}
@@ -125,7 +124,8 @@ export default function InnovationCarousel() {
             src={slide.image}
             alt={slide.title}
             fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
+            quality={60}
+            sizes="(min-width: 1024px) 45vw, calc(100vw - 2.5rem)"
             className="object-cover"
           />
         </div>

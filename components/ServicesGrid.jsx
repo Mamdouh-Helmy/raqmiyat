@@ -19,7 +19,8 @@ export default function ServicesGrid() {
               src="/services/software.webp"
               alt="الحلول البرمجية"
               fill
-              sizes="(min-width: 1024px) 340px, 100vw"
+              quality={60}
+              sizes="(min-width: 1024px) 340px, (min-width: 768px) 40vw, calc(100vw - 2.5rem)"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
           </div>
