@@ -1,9 +1,12 @@
-//app/robots.js
-import { SITE_URL } from "@/lib/site";
+// app/robots.js
+import { headers } from "next/headers";
+import { ORIGINS, siteKeyFromHost } from "@/lib/site";
 
-export default function robots() {
+export default async function robots() {
+  const key = siteKeyFromHost((await headers()).get("host") || "");
+
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    sitemap: `${ORIGINS[key]}/sitemap.xml`,
   };
 }
