@@ -41,7 +41,7 @@ export default function Footer({ site = "main" }) {
     <footer className="pt-14 pb-8 bg-white">
       <div className="container-x grid grid-cols-1 md:grid-cols-4 gap-10 pb-6 text-sm">
         <div>
-          <h4 className="font-black text-ink mb-5">المقر الرئيسي</h4>
+          <h3 className="font-black text-ink mb-5">المقر الرئيسي</h3>
           <ul className="space-y-4 text-ink/60">
             <li className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-brand-soft flex items-center justify-center shrink-0">
@@ -69,7 +69,7 @@ export default function Footer({ site = "main" }) {
         </div>
 
         <div>
-          <h4 className="font-black text-ink mb-5">روابط سريعة</h4>
+          <h3 className="font-black text-ink mb-5">روابط سريعة</h3>
           <ul className="space-y-3 text-ink/60">
             {quickLinks.map(({ label, href, action }) => (
               <li key={label}>
@@ -92,7 +92,7 @@ export default function Footer({ site = "main" }) {
         </div>
 
         <div>
-          <h4 className="font-black text-ink mb-5">الخدمات</h4>
+          <h3 className="font-black text-ink mb-5">الخدمات</h3>
           <ul className="space-y-3 text-ink/60">
             {services.map(({ label, section, path }) => (
               <li key={label}>
@@ -137,7 +137,7 @@ export default function Footer({ site = "main" }) {
         </div>
       </div>
 
-      <div className="container-x flex flex-col md:flex-row items-center justify-between mt-14 pt-6 border-t border-ink/10 text-xs text-ink/50 gap-3">
+      <div className="container-x flex flex-col md:flex-row items-center justify-between mt-14 pt-6 border-t border-ink/10 text-xs text-ink/70 gap-3">
         <span>© 2026 شركة رقميات للحلول التقنية. جميع الحقوق محفوظة.</span>
         <div className="flex gap-6">
           <Link href={resolve("/")} className="hover:text-brand transition-colors">
