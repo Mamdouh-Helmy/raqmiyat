@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X, ArrowLeft, ArrowRight } from "lucide-react";
+import { useIsClient } from "@/lib/useIsClient";
 
 const AR_DIGITS = "٠١٢٣٤٥٦٧٨٩";
 const arNum = (n) =>
@@ -32,11 +33,7 @@ export default function ServiceDetailModal({
   onPrev,
   onNext,
 }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   useEffect(() => {
     if (!service) return;

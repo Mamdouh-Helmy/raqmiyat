@@ -1,10 +1,11 @@
 // components/SiteMonitoring.jsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 
 const INTERVAL = 6000;
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 const pad = (n) =>
   (n + 1).toLocaleString("ar-SA", { minimumIntegerDigits: 2, useGrouping: false });
@@ -30,29 +31,49 @@ const CORNERS = [
   "bottom-5 end-5 border-b-2 border-e-2",
 ];
 
+function subscribeReducedMotion(callback) {
+  const mql = window.matchMedia(REDUCED_MOTION_QUERY);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+// بيتابع إعداد "تقليل الحركة" في الجهاز (false على السيرفر)
+function useReducedMotion() {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => false
+  );
+}
+
 export default function SiteMonitoring({ images, locations }) {
   const [active, setActive] = useState(0);
-  const [auto, setAuto] = useState(true);
+  const [auto, setAuto] = useState(true); // false بعد ما الزائر يختار كاميرا بنفسه
   const [now, setNow] = useState(null);
+  const reducedMotion = useReducedMotion();
 
+  // التشغيل التلقائي: مش بيشتغل لو الزائر اختار بنفسه، أو الجهاز على تقليل الحركة
+  const autoplay = auto && !reducedMotion && locations.length > 1;
+
+  // الساعة: أول قراءة بعد الـ mount مباشرة، وبعدها كل ثانية
   useEffect(() => {
-    setNow(new Date());
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
+    const tick = () => setNow(new Date());
+    const first = setTimeout(tick, 0);
+    const timer = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(timer);
+    };
   }, []);
 
   useEffect(() => {
-    if (!auto || locations.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setAuto(false);
-      return;
-    }
+    if (!autoplay) return;
     const t = setInterval(
       () => setActive((a) => (a + 1) % locations.length),
       INTERVAL
     );
     return () => clearInterval(t);
-  }, [auto, locations.length]);
+  }, [autoplay, locations.length]);
 
   const select = (i) => {
     setAuto(false);
@@ -183,7 +204,7 @@ export default function SiteMonitoring({ images, locations }) {
                       </span>
                     </span>
 
-                    {auto && (
+                    {autoplay && (
                       <span
                         aria-hidden
                         key={`bar-${i}`}

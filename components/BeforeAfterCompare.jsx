@@ -1,7 +1,7 @@
 // components/BeforeAfterCompare.jsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -23,25 +23,28 @@ export default function BeforeAfterCompare({ beforeImage, afterImage }) {
   const interacted = useRef(false);
   const frameRef = useRef(null);
 
-  const apply = (v) => {
+  const apply = useCallback((v) => {
     posRef.current = v;
     setPosition(v);
-  };
+  }, []);
 
-  const tween = (to, duration = 900) =>
-    new Promise((resolve) => {
-      cancelAnimationFrame(rafRef.current);
-      const from = posRef.current;
-      const t0 = performance.now();
-      const step = (t) => {
-        const k = Math.min(1, (t - t0) / duration);
-        const eased = 1 - Math.pow(1 - k, 3);
-        apply(from + (to - from) * eased);
-        if (k < 1) rafRef.current = requestAnimationFrame(step);
-        else resolve();
-      };
-      rafRef.current = requestAnimationFrame(step);
-    });
+  const tween = useCallback(
+    (to, duration = 900) =>
+      new Promise((resolve) => {
+        cancelAnimationFrame(rafRef.current);
+        const from = posRef.current;
+        const t0 = performance.now();
+        const step = (t) => {
+          const k = Math.min(1, (t - t0) / duration);
+          const eased = 1 - Math.pow(1 - k, 3);
+          apply(from + (to - from) * eased);
+          if (k < 1) rafRef.current = requestAnimationFrame(step);
+          else resolve();
+        };
+        rafRef.current = requestAnimationFrame(step);
+      }),
+    [apply]
+  );
 
   const takeControl = () => {
     interacted.current = true;
@@ -74,7 +77,7 @@ export default function BeforeAfterCompare({ beforeImage, afterImage }) {
       io.disconnect();
       cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [tween]);
 
   const jump = (to) => {
     takeControl();

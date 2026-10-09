@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { validateContactForm, inputClass } from "@/lib/validate";
+import { useIsClient } from "@/lib/useIsClient";
 
 const emptyForm = { name: "", email: "", phone: "", message: "" };
 
@@ -26,18 +27,14 @@ function modalTitle(subject) {
 }
 
 export function ContactModalProvider({ children }) {
-  const [mounted, setMounted] = useState(false);
+  // لازم نعرف إننا بقينا على الكلينت عشان نقدر نعمل createPortal لـ document.body بأمان
+  const mounted = useIsClient();
   const [modal, setModal] = useState(null); // null | "استشارة مجانية" | "مناقشة مشروع" | "فحص أمني" | ...
   const [details, setDetails] = useState([]); // اختيارات الزائر من الـ planner: [{ label, value }]
   const [status, setStatus] = useState("idle");
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-
-  // لازم نعرف إننا بقينا على الكلينت عشان نقدر نعمل createPortal لـ document.body بأمان
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     function onKey(e) {

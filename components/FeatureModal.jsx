@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { X } from "@phosphor-icons/react";
+import { useIsClient } from "@/lib/useIsClient";
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
 
@@ -24,15 +25,11 @@ export default function FeatureModal({
   const { deliverables = [], tech = [], duration } = details;
 
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const triggerRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
   const titleId = useId();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const close = useCallback(() => setOpen(false), []);
 

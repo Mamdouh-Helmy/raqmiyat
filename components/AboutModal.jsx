@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { X, Camera, Code2, Globe, Smartphone, Building2, GraduationCap } from "lucide-react";
 
 const services = [
@@ -100,9 +101,13 @@ export default function AboutModal({ open, onClose }) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <a href="/#contact" onClick={onClose} className="btn-primary inline-flex items-center justify-center">
+            <Link
+              href="/#contact"
+              onClick={onClose}
+              className="btn-primary inline-flex items-center justify-center"
+            >
               تواصل معنا
-            </a>
+            </Link>
             <button onClick={onClose} className="btn-outline">
               إغلاق
             </button>
