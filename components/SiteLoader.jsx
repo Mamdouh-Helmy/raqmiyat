@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { isArrival } from "@/lib/arrival";
 
-const MIN_VISIBLE = 1400; // أقل مدة ظهور (ms)
-const MAX_WAIT = 15000; // أمان: يقفل بعد كده مهما حصل
-const EXIT_MS = 1100; // مدة حركة الستارة
+const MIN_VISIBLE = 700; // أقل مدة ظهور (ms)
+const FONT_WAIT = 1200; // أقصى انتظار للخطوط، بعده نكمل حتى لو لسه بتتحمل
+const MAX_WAIT = 3000; // أمان: يقفل بعد كده مهما حصل
+const EXIT_MS = 650; // مدة حركة الستارة
 
 const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
@@ -30,30 +31,11 @@ export default function SiteLoader() {
     root.style.overflow = "hidden";
 
     let fontsDone = !document.fonts;
-    let loadDone = document.readyState === "complete";
     let shown = 0;
     let rafId;
     let exitTimer;
 
     document.fonts?.ready.then(() => (fontsDone = true)).catch(() => (fontsDone = true));
-
-    const onLoad = () => (loadDone = true);
-    if (!loadDone) window.addEventListener("load", onLoad, { once: true });
-
-    // الصور غير الـ lazy بس، عشان اللي تحت الفولد ما يعلّقش اللودر
-    const imagesRatio = () => {
-      const imgs = Array.from(document.images).filter((img) => img.loading !== "lazy");
-      if (!imgs.length) return 1;
-      return imgs.filter((img) => img.complete).length / imgs.length;
-    };
-
-    const compute = () => {
-      let t = 10;
-      if (fontsDone) t += 25;
-      t += 30 * imagesRatio();
-      if (loadDone) t += 35;
-      return Math.min(t, 100);
-    };
 
     const finish = () => {
       setProgress(100);
@@ -62,14 +44,22 @@ export default function SiteLoader() {
       exitTimer = setTimeout(() => setPhase("done"), EXIT_MS + 100);
     };
 
+    // العداد مبني على الوقت، ومش بيستنى load ولا الصور.
+    // الخطوط بس هي اللي ممكن توقفه عند 85% لحد FONT_WAIT.
     const loop = (now) => {
-      const forced = now - start > MAX_WAIT;
-      const target = forced ? 100 : compute();
-      const step = Math.max(0.2, (target - shown) * 0.06);
+      const elapsed = now - start;
+      const forced = elapsed > MAX_WAIT;
+      const fontsReady = fontsDone || elapsed > FONT_WAIT;
+
+      const timeRatio = Math.min(1, elapsed / MIN_VISIBLE);
+      const base = 10 + 90 * timeRatio;
+      const target = forced ? 100 : fontsReady ? base : Math.min(base, 85);
+
+      const step = Math.max(0.8, (target - shown) * 0.2);
       shown = Math.max(shown, Math.min(target, shown + step));
       setProgress(Math.round(shown));
 
-      if (shown >= 99.5 && now - start >= MIN_VISIBLE) {
+      if (shown >= 99.5 && elapsed >= MIN_VISIBLE) {
         finish();
         return;
       }
@@ -80,7 +70,6 @@ export default function SiteLoader() {
     return () => {
       cancelAnimationFrame(rafId);
       clearTimeout(exitTimer);
-      window.removeEventListener("load", onLoad);
       root.style.overflow = "";
     };
   }, []);
@@ -132,7 +121,7 @@ export default function SiteLoader() {
 
         {/* الاسم: مفرغ، وتعبئة ذهبية بتمسح من اليمين مع التقدم */}
         <div
-          className={`absolute inset-0 grid place-items-center px-6 transition-all duration-700 ease-out motion-reduce:transition-none ${
+          className={`absolute inset-0 grid place-items-center px-6 transition-all duration-500 ease-out motion-reduce:transition-none ${
             leaving ? "-translate-y-6 opacity-0" : "translate-y-0 opacity-100"
           }`}
         >
@@ -155,7 +144,7 @@ export default function SiteLoader() {
 
         {/* الشريط السفلي */}
         <div
-          className={`absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-8 transition-opacity duration-500 md:px-14 md:pb-12 ${
+          className={`absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-8 transition-opacity duration-300 md:px-14 md:pb-12 ${
             leaving ? "opacity-0" : "opacity-100"
           }`}
         >
