@@ -1,33 +1,63 @@
+// مكان الملف: نفس مسار route الأدمن الواحد الحالي (PATCH تعديل + DELETE حذف) داخل [id]
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import Admin from "@/models/Admin";
-import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
+import { requireAdmin } from "@/lib/requireAdmin";
 
-async function requireSession(req) {
-  const token = req.cookies.get(SESSION_COOKIE)?.value;
-  return verifySessionToken(token);
-}
+const MAX_USERNAME = 64;
+const MAX_PASSWORD = 200;
+
+const unauthorized = () =>
+  NextResponse.json({ error: "غير مصرح." }, { status: 401 });
+
+const invalidId = () =>
+  NextResponse.json({ error: "معرّف غير صالح." }, { status: 400 });
+
+const duplicate = () =>
+  NextResponse.json({ error: "اسم المستخدم ده مستخدم بالفعل." }, { status: 409 });
 
 export async function PATCH(req, { params }) {
-  const session = await requireSession(req);
-  if (!session) {
-    return NextResponse.json({ error: "غير مصرح." }, { status: 401 });
-  }
-
   try {
-    const { username, password } = await req.json();
+    const session = await requireAdmin(req);
+    if (!session) return unauthorized();
+
+    const { id } = await params;
+    if (!mongoose.isValidObjectId(id)) return invalidId();
+
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "طلب غير صالح." }, { status: 400 });
+    }
+
+    const { username, password } = body || {};
     const update = {};
 
-    if (username && username.trim()) {
-      update.username = username.trim().toLowerCase();
+    if (username !== undefined && username !== null && username !== "") {
+      if (typeof username !== "string") {
+        return NextResponse.json({ error: "اسم المستخدم غير صالح." }, { status: 400 });
+      }
+      const trimmed = username.trim();
+      if (trimmed) {
+        if (trimmed.length > MAX_USERNAME) {
+          return NextResponse.json({ error: "اسم المستخدم طويل جداً." }, { status: 400 });
+        }
+        update.username = trimmed.toLowerCase();
+      }
     }
-    if (password) {
-      if (password.length < 8) {
+
+    if (password !== undefined && password !== null && password !== "") {
+      if (typeof password !== "string" || password.length < 8) {
         return NextResponse.json(
           { error: "كلمة المرور لازم تكون 8 أحرف على الأقل." },
           { status: 400 }
         );
+      }
+      if (password.length > MAX_PASSWORD) {
+        return NextResponse.json({ error: "كلمة المرور طويلة جداً." }, { status: 400 });
       }
       update.passwordHash = await bcrypt.hash(password, 10);
     }
@@ -41,16 +71,20 @@ export async function PATCH(req, { params }) {
     if (update.username) {
       const clash = await Admin.findOne({
         username: update.username,
-        _id: { $ne: params.id },
+        _id: { $ne: id },
       });
-      if (clash) {
-        return NextResponse.json({ error: "اسم المستخدم ده مستخدم بالفعل." }, { status: 409 });
-      }
+      if (clash) return duplicate();
     }
 
-    const admin = await Admin.findByIdAndUpdate(params.id, update, { new: true }).select(
-      "-passwordHash"
-    );
+    let admin;
+    try {
+      admin = await Admin.findByIdAndUpdate(id, update, { new: true }).select(
+        "-passwordHash"
+      );
+    } catch (err) {
+      if (err?.code === 11000) return duplicate();
+      throw err;
+    }
 
     if (!admin) {
       return NextResponse.json({ error: "الأدمن غير موجود." }, { status: 404 });
@@ -64,13 +98,14 @@ export async function PATCH(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-  const session = await requireSession(req);
-  if (!session) {
-    return NextResponse.json({ error: "غير مصرح." }, { status: 401 });
-  }
-
   try {
-    if (session.sub === params.id) {
+    const session = await requireAdmin(req);
+    if (!session) return unauthorized();
+
+    const { id } = await params;
+    if (!mongoose.isValidObjectId(id)) return invalidId();
+
+    if (session.sub === id) {
       return NextResponse.json(
         { error: "متقدرش تمسح حسابك الحالي وانت داخل بيه." },
         { status: 400 }
@@ -87,7 +122,7 @@ export async function DELETE(req, { params }) {
       );
     }
 
-    const admin = await Admin.findByIdAndDelete(params.id);
+    const admin = await Admin.findByIdAndDelete(id);
     if (!admin) {
       return NextResponse.json({ error: "الأدمن غير موجود." }, { status: 404 });
     }

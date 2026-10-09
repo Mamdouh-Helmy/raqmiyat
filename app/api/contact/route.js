@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Contact from "@/models/Contact";
 import { validateContactForm } from "@/lib/validate";
-import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { createLimiter, getClientIp } from "@/lib/rateLimit";
 import { sanitizeDetails, summarizeDetails } from "@/lib/leadDetails";
 
 const ALLOWED_SUBJECTS = [
@@ -14,18 +15,66 @@ const ALLOWED_SUBJECTS = [
   "عام",
 ];
 
+// 5 طلبات لكل IP كل 15 دقيقة
+const limiter = createLimiter({ max: 5, windowMs: 15 * 60 * 1000 });
+
+// أقصى أطوال للحقول النصية
+const LIMITS = { name: 100, email: 254, phone: 30, company: 100, message: 4000 };
+const MAX_FINAL_MESSAGE = 6000;
+
+// بيرجّع اسم أول حقل نوعه غلط أو طويل زيادة، وإلا null
+function findBadField(body) {
+  for (const [field, max] of Object.entries(LIMITS)) {
+    const value = body[field];
+    if (value === undefined || value === null || value === "") continue;
+    if (typeof value !== "string" || value.length > max) return field;
+  }
+  return null;
+}
+
 export async function POST(req) {
   try {
-    const body = await req.json();
-    console.log("contact body:", JSON.stringify(body));
-    const { name, email, phone, message, subject, company, details: rawDetails } =
-      body || {};
+    const ip = getClientIp(req);
+    if (limiter.isLimited(ip)) {
+      return NextResponse.json(
+        { error: "طلبات كتير في وقت قصير. حاول تاني بعد شوية." },
+        { status: 429 }
+      );
+    }
+    limiter.hit(ip);
+
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "طلب غير صالح." }, { status: 400 });
+    }
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "طلب غير صالح." }, { status: 400 });
+    }
+
+    // Honeypot: حقل مخفي (website) البشر ما بيملوهوش، والبوتات بتملاه.
+    // بنرد بنجاح وهمي من غير ما نحفظ حاجة.
+    if (typeof body.website === "string" && body.website.trim()) {
+      return NextResponse.json({ success: true }, { status: 201 });
+    }
+
+    const badField = findBadField(body);
+    if (badField) {
+      return NextResponse.json(
+        { error: "بيانات غير صحيحة.", fields: { [badField]: "قيمة غير صالحة أو طويلة." } },
+        { status: 400 }
+      );
+    }
+
+    const { name, email, phone, message, subject, company, details: rawDetails } = body;
 
     const details = sanitizeDetails(rawDetails);
 
     // لو الـ planner مبعتش ملاحظات حرّة، الرسالة بتتكوّن من التفاصيل نفسها
-    const finalMessage =
-      (typeof message === "string" && message.trim()) || summarizeDetails(details);
+    const finalMessage = (
+      (typeof message === "string" && message.trim()) || summarizeDetails(details)
+    ).slice(0, MAX_FINAL_MESSAGE);
 
     // Server-side validation is the source of truth — never trust the client.
     const errors = validateContactForm({ name, email, phone, message: finalMessage });
@@ -61,8 +110,7 @@ export async function POST(req) {
 // just finds the URL or a leaked static key.
 export async function GET(req) {
   try {
-    const token = req.cookies.get(SESSION_COOKIE)?.value;
-    const session = await verifySessionToken(token);
+    const session = await requireAdmin(req);
     if (!session) {
       return NextResponse.json({ error: "غير مصرح." }, { status: 401 });
     }

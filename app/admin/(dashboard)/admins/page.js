@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, X, ShieldCheck, UserRound } from "lucide-react";
 
 function Modal({ title, onClose, children }) {
@@ -25,6 +26,7 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function AdminsPage() {
+  const router = useRouter();
   const [admins, setAdmins] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | idle | error
 
@@ -42,10 +44,18 @@ export default function AdminsPage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  // الجلسة خلصت أو الحساب اتمسح: رجّعه لصفحة الدخول بدل رسالة خطأ عامة
+  function redirectIfUnauthorized(res) {
+    if (res.status !== 401) return false;
+    router.push("/admin/login");
+    return true;
+  }
+
   async function fetchAdmins() {
     setStatus("loading");
     try {
       const res = await fetch("/api/admin/admins");
+      if (redirectIfUnauthorized(res)) return;
       if (!res.ok) throw new Error();
       const data = await res.json();
       setAdmins(data.admins || []);
@@ -57,6 +67,7 @@ export default function AdminsPage() {
 
   useEffect(() => {
     fetchAdmins();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function openCreate() {
@@ -75,6 +86,7 @@ export default function AdminsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAdmin),
       });
+      if (redirectIfUnauthorized(res)) return;
       const data = await res.json();
       if (!res.ok) {
         setCreateError(data.error || "حدث خطأ.");
@@ -108,6 +120,7 @@ export default function AdminsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (redirectIfUnauthorized(res)) return;
       const data = await res.json();
       if (!res.ok) {
         setEditError(data.error || "حدث خطأ.");
@@ -127,6 +140,7 @@ export default function AdminsPage() {
     setDeleteError("");
     try {
       const res = await fetch(`/api/admin/admins/${deleteTarget._id}`, { method: "DELETE" });
+      if (redirectIfUnauthorized(res)) return;
       const data = await res.json();
       if (!res.ok) {
         setDeleteError(data.error || "حدث خطأ.");

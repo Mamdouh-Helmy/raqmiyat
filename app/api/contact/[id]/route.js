@@ -3,13 +3,12 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import Contact from "@/models/Contact";
-import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
+import { requireAdmin } from "@/lib/requireAdmin";
 
 // Admin only — نفس حماية الـ GET.
 export async function DELETE(req, { params }) {
   try {
-    const token = req.cookies.get(SESSION_COOKIE)?.value;
-    const session = await verifySessionToken(token);
+    const session = await requireAdmin(req);
     if (!session) {
       return NextResponse.json({ error: "غير مصرح." }, { status: 401 });
     }

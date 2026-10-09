@@ -1,33 +1,18 @@
+// مكان الملف: نفس مسار route تسجيل الدخول الحالي (POST /login)
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import Admin from "@/models/Admin";
 import { createSessionToken, SESSION_COOKIE } from "@/lib/auth";
+import { createLimiter, getClientIp } from "@/lib/rateLimit";
 
-// Simple in-memory rate limiting. Resets on server restart/redeploy —
-// fine for a low-traffic admin login; swap for Redis if you scale this out.
-const attempts = new Map();
-const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
+// حد لكل IP، وحد لكل اسم مستخدم (بيوقف التخمين الموزّع على IPs كتير)
+const ipLimiter = createLimiter({ max: 5, windowMs: WINDOW_MS });
+const userLimiter = createLimiter({ max: 10, windowMs: WINDOW_MS });
 
-function isRateLimited(key) {
-  const entry = attempts.get(key);
-  if (!entry) return false;
-  if (Date.now() - entry.first > WINDOW_MS) {
-    attempts.delete(key);
-    return false;
-  }
-  return entry.count >= MAX_ATTEMPTS;
-}
-
-function recordFailedAttempt(key) {
-  const entry = attempts.get(key);
-  if (!entry) {
-    attempts.set(key, { count: 1, first: Date.now() });
-  } else {
-    entry.count += 1;
-  }
-}
+const MAX_USERNAME = 64;
+const MAX_PASSWORD = 200;
 
 // A precomputed dummy hash, compared against when the username doesn't
 // exist, so a login attempt for a real vs. fake username takes roughly the
@@ -35,30 +20,50 @@ function recordFailedAttempt(key) {
 const DUMMY_HASH =
   "$2b$10$CwTycUXWue0Thq9StjUM0uJ8vAgFj2Bm7oXQKA9cQY6c6qHFNjaDe";
 
-export async function POST(req) {
-  const ip = req.headers.get("x-forwarded-for") || "local";
+const tooMany = () =>
+  NextResponse.json(
+    { error: "محاولات دخول كثيرة، حاول تاني بعد شوية." },
+    { status: 429 }
+  );
 
-  if (isRateLimited(ip)) {
+export async function POST(req) {
+  const ip = getClientIp(req);
+  if (ipLimiter.isLimited(ip)) return tooMany();
+
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "طلب غير صالح." }, { status: 400 });
+  }
+
+  const { username, password } = body || {};
+
+  if (
+    typeof username !== "string" ||
+    typeof password !== "string" ||
+    !username.trim() ||
+    !password
+  ) {
     return NextResponse.json(
-      { error: "محاولات دخول كثيرة، حاول تاني بعد شوية." },
-      { status: 429 }
+      { error: "أدخل اسم المستخدم وكلمة المرور." },
+      { status: 400 }
     );
   }
 
+  if (username.length > MAX_USERNAME || password.length > MAX_PASSWORD) {
+    return NextResponse.json(
+      { error: "اسم المستخدم أو كلمة المرور غير صحيحة." },
+      { status: 401 }
+    );
+  }
+
+  const normalized = username.trim().toLowerCase();
+  if (userLimiter.isLimited(normalized)) return tooMany();
+
   try {
-    const { username, password } = await req.json();
-
-    if (!username || !password) {
-      return NextResponse.json(
-        { error: "أدخل اسم المستخدم وكلمة المرور." },
-        { status: 400 }
-      );
-    }
-
     await connectDB();
-    const admin = await Admin.findOne({
-      username: username.trim().toLowerCase(),
-    });
+    const admin = await Admin.findOne({ username: normalized });
 
     const validPassword = await bcrypt.compare(
       password,
@@ -66,17 +71,18 @@ export async function POST(req) {
     );
 
     if (!admin || !validPassword) {
-      recordFailedAttempt(ip);
+      ipLimiter.hit(ip);
+      userLimiter.hit(normalized);
       return NextResponse.json(
         { error: "اسم المستخدم أو كلمة المرور غير صحيحة." },
         { status: 401 }
       );
     }
 
-    attempts.delete(ip);
+    ipLimiter.reset(ip);
+    userLimiter.reset(normalized);
 
-    admin.lastLoginAt = new Date();
-    await admin.save();
+    await Admin.updateOne({ _id: admin._id }, { lastLoginAt: new Date() });
 
     const token = await createSessionToken({
       sub: admin._id.toString(),
