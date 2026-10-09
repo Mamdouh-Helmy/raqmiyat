@@ -7,6 +7,11 @@ import SiteLoader from "@/components/SiteLoader";
 import { ARRIVAL_CSS, ARRIVAL_SCRIPT } from "@/lib/arrival";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
+// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 // خط متغيّر: كل الأوزان من 400 لـ 700 في ملف واحد (عربي + لاتيني)
 const elMessiri = localFont({
   src: "./fonts/El_Messiri,Rakkas/ElMessiri-VariableFont_wght.ttf",

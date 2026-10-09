@@ -16,6 +16,11 @@ import {
   toAr,
 } from "@/lib/posts";
 
+// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const allKeywords = [...new Set(posts.flatMap((p) => p.keywords))];
 const allKeywordsEn = [...new Set(posts.flatMap((p) => p.keywordsEn || []))];
 const latest = posts[0];

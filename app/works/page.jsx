@@ -5,6 +5,11 @@ import WorksLedger from "@/components/WorksLedger";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import { works } from "@/lib/works";
 
+// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const metadata = {
   title: "أعمالنا: متاجر وتطبيقات وأنظمة مراقبة وأعمال",
   description:

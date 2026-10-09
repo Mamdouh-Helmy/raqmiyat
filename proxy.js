@@ -1,4 +1,5 @@
-// middleware.js
+// proxy.js  (بديل middleware.js في Next 16)
+// ⚠️ احذف middleware.js لما تحط الملف ده، ما تسيبش الاتنين.
 import { NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
 import { routeSubdomains } from "@/lib/subdomains";
@@ -11,7 +12,7 @@ const isProtected = (pathname) =>
   pathname !== LOGIN_PATH &&
   !pathname.startsWith(`${LOGIN_PATH}/`);
 
-export async function middleware(req) {
+export async function proxy(req) {
   // 1) الـ subdomains الأول: rewrite/redirect حسب الدومين
   const routed = routeSubdomains(req);
   if (routed) return routed;
@@ -33,7 +34,7 @@ export async function middleware(req) {
 }
 
 // يستثني: _next والـ api وrobots/sitemap (بيقرأوا الـ host بنفسهم)
-// وملفات الأصول الثابتة بامتداداتها. أي حاجة تانية (زي /blog/feed.xml) بتعدّي على routeSubdomains
+// وملفات الأصول الثابتة بامتداداتها.
 // ⚠️ الـ api مستثناة هنا، فكل route للأدمن لازم يتحقق بنفسه (requireAdmin).
 export const config = {
   matcher: [

@@ -7,6 +7,11 @@ import CopyFeedUrl from "@/components/CopyFeedUrl";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import { posts, formatDate, toAr } from "@/lib/posts";
 
+// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const FEED_URL = `${SITE_URL}/blog/feed.xml`;
 
 export const metadata = {
