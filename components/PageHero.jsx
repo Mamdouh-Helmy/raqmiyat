@@ -25,7 +25,7 @@ export default function PageHero({ title, subtitle, screenshot }) {
           <h1 className="font-heading text-3xl font-extrabold leading-[1.3] md:text-5xl">
             {title}
           </h1>
-          <p className="mt-6 max-w-lg text-base leading-loose text-brand-dark/75 md:text-lg">
+          <p className="mt-6 max-w-lg text-base leading-loose text-brand-dark/90 md:text-lg">
             {subtitle}
           </p>
           <div className="mt-9">
@@ -47,7 +47,7 @@ export default function PageHero({ title, subtitle, screenshot }) {
               alt={title}
               fill
               priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 50vw, calc(100vw - 2.5rem)"
               className="object-cover"
             />
           </div>
