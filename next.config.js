@@ -16,6 +16,11 @@ const nextConfig = {
 
   experimental: {
     inlineCss: true,
+    optimizePackageImports: [
+      "@phosphor-icons/react",
+      "lucide-react",
+      "framer-motion",
+    ],
   },
 
   async headers() {
