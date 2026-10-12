@@ -11,7 +11,7 @@ const nextConfig = {
   poweredByHeader: false,
 
   images: {
-    qualities: [60],
+    qualities: [60, 75],
   },
 
   experimental: {
