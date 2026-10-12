@@ -1,4 +1,5 @@
 //app/software/page.js
+import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
 import TechStack from "@/components/TechStack";
@@ -6,9 +7,6 @@ import FeatureGrid from "@/components/FeatureGrid";
 import StatsBand from "@/components/StatsBand";
 import Principles from "@/components/Principles";
 import ProcessSteps from "@/components/ProcessSteps";
-import ProjectPlanner from "@/components/ProjectPlanner";
-import Testimonial from "@/components/Testimonial";
-import Faq from "@/components/Faq";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import {
@@ -20,6 +18,11 @@ import {
   Plug,
 } from "lucide-react";
 import { SOFTWARE_URL } from "@/lib/site";
+
+// أقسام تحت الشاشة: تتحمّل JS منفصل بدل ما تتحمّل مع أول صفحة
+const ProjectPlanner = dynamic(() => import("@/components/ProjectPlanner"));
+const Testimonial = dynamic(() => import("@/components/Testimonial"));
+const Faq = dynamic(() => import("@/components/Faq"));
 
 export const metadata = {
   title: "الحلول البرمجية",

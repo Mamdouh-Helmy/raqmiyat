@@ -47,7 +47,7 @@ export default function PageHero({ title, subtitle, screenshot }) {
               alt={title}
               fill
               priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 50vw, calc(100vw - 2.5rem)"
               className="object-cover"
             />
           </div>
