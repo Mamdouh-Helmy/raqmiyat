@@ -1,7 +1,7 @@
 //app/page.js
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import SecurityBanner from "@/components/SecurityBanner";
+import SoftwareBanner from "@/components/SoftwareBanner";
 import InnovationCarousel from "@/components/InnovationCarousel";
 import ServicesGrid from "@/components/ServicesGrid";
 import StatsSection from "@/components/StatsSection";
@@ -18,7 +18,7 @@ export default function Home() {
     <main className="bg-paper">
       <Navbar />
       <Hero />
-      <SecurityBanner />
+      <SoftwareBanner />
       <InnovationCarousel />
       <ServicesGrid />
       <StatsSection />

@@ -40,14 +40,15 @@ export default function Hero() {
 
       <div className="container-x w-full pb-12 pt-36 md:pb-20">
         <h1 className="max-w-2xl font-arabic text-4xl font-black leading-[1.35] md:text-6xl lg:text-7xl lg:leading-[1.3]">
-          برمجيات تشتغل،
+          نحوّل أفكارك إلى حلول تقنية
           <br />
-          وكاميرات ما تغفل.
+          تنمّي أعمالك.
         </h1>
 
         <p className="mt-6 max-w-lg text-base leading-[2] text-white/75 md:text-lg">
-          نبني الأنظمة والتطبيقات ونركّب أنظمة المراقبة، ونتولى التشغيل والدعم
-          بعد التسليم.
+          نطوّر المواقع والتطبيقات والأنظمة البرمجية المصممة على احتياجات شركتك،
+          ونوفّر حلول المراقبة الأمنية، مع دعم فني مستمر يساعدك على تشغيل أعمالك
+          بكفاءة وثقة.
         </p>
 
         <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -55,14 +56,15 @@ export default function Hero() {
             href="#contact"
             className="inline-flex items-center justify-center rounded-full bg-[#c9a66b] px-8 py-3.5 text-sm font-black text-brand-dark outline-none transition-colors duration-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-white"
           >
-            ابدأ مشروعك
+            ناقش مشروعك معنا
           </a>
+
           <button
             type="button"
             onClick={() => setAboutOpen(true)}
             className="inline-flex items-center justify-center rounded-full border border-white/40 px-8 py-3.5 text-sm font-bold text-white outline-none transition-colors duration-300 hover:bg-white hover:text-brand-dark focus-visible:ring-2 focus-visible:ring-white"
           >
-            تعرف علينا
+            تعرّف على رقميات
           </button>
         </div>
       </div>

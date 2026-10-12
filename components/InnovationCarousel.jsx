@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -5,49 +6,71 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useContactModal } from "@/components/ContactModalProvider";
 
-// action: "contact" يفتح بوب التواصل بالـ subject المحدد
 const slides = [
   {
-    title: "أنظمة مراقبة وحماية متكاملة",
-    text: "نصمم ونركّب كاميرات المراقبة وأنظمة التحكم في الدخول، مع متابعة مركزية وعن بُعد من الجوال على مدار الساعة.",
-    cta: "اطلب معاينة",
-    action: { type: "contact", subject: "فحص أمني" },
-    image: "/carousel/ai.webp",
-  },
-  {
-    title: "برمجيات وأنظمة تُبنى لأعمالك",
-    text: "مواقع وتطبيقات وأنظمة ERP وLMS مخصصة لاحتياج منشأتك، من التحليل حتى التشغيل والدعم.",
+    title: "طوّر أعمالك بحلول برمجية تناسبك",
+    text: "نصمّم ونطوّر المواقع والتطبيقات والأنظمة المخصصة لتسهيل عمليات شركتك، من فهم احتياجاتك وتحديد الحل المناسب إلى التطوير والتشغيل.",
     cta: "ناقش مشروعك",
-    action: { type: "contact", subject: "مناقشة مشروع" },
+    action: {
+      type: "contact",
+      subject: "طلب مشروع برمجي",
+    },
     image: "/carousel/team.webp",
+    imageAlt: "فريق يعمل على تطوير حلول برمجية",
   },
   {
-    title: "شريك تقني من الفكرة للتشغيل",
-    text: "فريق يرافقك في كل مرحلة بمعايير جودة وأمان عالية، وعقود دعم وصيانة تضمن استمرارية عملك.",
-    cta: "احجز استشارة مجانية",
-    action: { type: "contact", subject: "استشارة مجانية" },
+    title: "حلول أمنية تحمي منشأتك",
+    text: "أنظمة مراقبة وكاميرات وحلول للتحكم في الدخول، مصممة لتناسب طبيعة منشأتك، مع إمكانية المتابعة عن بُعد وخدمات التركيب والصيانة.",
+    cta: "اطلب استشارة أمنية",
+    action: {
+      type: "contact",
+      subject: "استشارة أنظمة أمنية",
+    },
+    image: "/carousel/ai.webp",
+    imageAlt: "حلول أنظمة المراقبة والأمان",
+  },
+  {
+    title: "دعم تقني يواكب نمو أعمالك",
+    text: "نساعدك في تطوير حلولك التقنية وصيانتها وتحسينها مع تغيّر احتياجات عملك، لتستفيد من أنظمتك وتواصل التركيز على أهداف شركتك.",
+    cta: "تواصل مع فريقنا",
+    action: {
+      type: "contact",
+      subject: "استفسار عن الدعم والصيانة",
+    },
     image: "/carousel/vision2030.webp",
+    imageAlt: "التقنية ودورها في تطوير الأعمال",
   },
 ];
 
-const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+const toAr = (n) =>
+  String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
 export default function InnovationCarousel() {
   const { openContactModal } = useContactModal();
+
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
     if (paused) return;
+
     timerRef.current = setInterval(() => {
-      setActive((i) => (i + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timerRef.current);
+      setActive((current) => (current + 1) % slides.length);
+    }, 7000);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [paused]);
 
   const slide = slides[active];
-  const go = (i) => setActive((i + slides.length) % slides.length);
+
+  const go = (index) => {
+    setActive((index + slides.length) % slides.length);
+  };
 
   function handleCta() {
     if (slide.action.type === "contact") {
@@ -64,6 +87,14 @@ export default function InnovationCarousel() {
         className="grid overflow-hidden rounded-xl2 bg-sand text-brand-dark lg:grid-cols-2"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
+        onFocusCapture={() => setPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setPaused(false);
+          }
+        }}
+        aria-roledescription="عرض شرائح"
+        aria-label="حلول وخدمات رقميات"
       >
         {/* النص */}
         <div className="flex flex-col justify-between gap-10 px-6 py-10 md:px-14 md:py-14">
@@ -71,62 +102,88 @@ export default function InnovationCarousel() {
             <p className="mb-5 text-sm font-bold text-brand-dark/60">
               {toAr(active + 1)} / {toAr(slides.length)}
             </p>
-            <h2 className="font-heading text-3xl font-extrabold leading-[1.3] md:text-5xl">
+
+            <h2
+              className="font-heading text-3xl font-extrabold leading-[1.3] md:text-5xl"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {slide.title}
             </h2>
-            <p className="mt-6 max-w-xl leading-loose text-brand-dark/75">{slide.text}</p>
+
+            <p className="mt-6 max-w-xl leading-loose text-brand-dark/75">
+              {slide.text}
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-6">
-            <button type="button" onClick={handleCta} className="btn-cta">
+            <button
+              type="button"
+              onClick={handleCta}
+              className="btn-cta"
+            >
               {slide.cta}
             </button>
 
             <div className="flex items-center gap-5">
-              {/* شرطات التنقل */}
+              {/* مؤشرات التنقل */}
               <div className="flex items-center gap-2">
-                {slides.map((s, i) => (
+                {slides.map((item, index) => (
                   <button
-                    key={s.title}
+                    key={item.title}
                     type="button"
-                    onClick={() => setActive(i)}
-                    aria-label={`الشريحة ${toAr(i + 1)}`}
-                    aria-current={i === active}
-                    className="grid h-6 place-items-center outline-none focus-visible:ring-2 focus-visible:ring-brand-dark"
+                    onClick={() => go(index)}
+                    aria-label={`الشريحة ${toAr(index + 1)}: ${item.title}`}
+                    aria-current={index === active ? "true" : undefined}
+                    className="grid h-6 place-items-center rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-brand-dark"
                   >
                     <span
-                      className={`block h-1 rounded-full bg-brand-dark transition-all duration-500 ${i === active ? "w-8" : "w-4 opacity-30"
+                      className={`block h-1 rounded-full bg-brand-dark transition-all duration-500 ${index === active
+                          ? "w-8"
+                          : "w-4 opacity-30"
                         }`}
                     />
                   </button>
                 ))}
               </div>
 
-              {/* في الـ RTL: اليمين = السابق، الشمال = التالي */}
+              {/* أزرار التنقل في اتجاه RTL */}
               <div className="flex gap-2">
-                <button type="button" onClick={() => go(active - 1)} aria-label="السابق" className={arrow}>
-                  <ChevronRight size={18} />
+                <button
+                  type="button"
+                  onClick={() => go(active - 1)}
+                  aria-label="الشريحة السابقة"
+                  className={arrow}
+                >
+                  <ChevronRight size={18} aria-hidden="true" />
                 </button>
-                <button type="button" onClick={() => go(active + 1)} aria-label="التالي" className={arrow}>
-                  <ChevronLeft size={18} />
+
+                <button
+                  type="button"
+                  onClick={() => go(active + 1)}
+                  aria-label="الشريحة التالية"
+                  className={arrow}
+                >
+                  <ChevronLeft size={18} aria-hidden="true" />
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* الصورة: من الحافة للحافة وبطول اللوح كله */}
+        {/* الصورة */}
         <div
           key={`img-${active}`}
           className="relative min-h-[280px] animate-fadeIn lg:min-h-[460px]"
         >
           <Image
             src={slide.image}
-            alt={slide.title}
+            alt={slide.imageAlt}
             fill
-            quality={60}
             sizes="(min-width: 1024px) 45vw, calc(100vw - 2.5rem)"
             className="object-cover"
+            quality={75}
+            loading="eager"
           />
         </div>
       </div>
