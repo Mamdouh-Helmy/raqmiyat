@@ -1,7 +1,7 @@
 // components/SiteMonitoring.jsx
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 
 const INTERVAL = 6000;
@@ -50,10 +50,25 @@ export default function SiteMonitoring({ images, locations }) {
   const [active, setActive] = useState(0);
   const [auto, setAuto] = useState(true); // false بعد ما الزائر يختار كاميرا بنفسه
   const [now, setNow] = useState(null);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
-  // التشغيل التلقائي: مش بيشتغل لو الزائر اختار بنفسه، أو الجهاز على تقليل الحركة
-  const autoplay = auto && !reducedMotion && locations.length > 1;
+  // التشغيل التلقائي: مش بيشتغل لو الزائر اختار بنفسه، أو الجهاز على تقليل الحركة،
+  // ولا يبدأ إلا لما السيكشن يظهر على الشاشة فعلاً
+  const autoplay = auto && inView && !reducedMotion && locations.length > 1;
+
+  // متابعة ظهور السيكشن
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // الساعة: أول قراءة بعد الـ mount مباشرة، وبعدها كل ثانية
   useEffect(() => {
@@ -81,7 +96,7 @@ export default function SiteMonitoring({ images, locations }) {
   };
 
   return (
-    <section className="section bg-brand-dark" style={LATTICE}>
+    <section ref={sectionRef} className="section bg-brand-dark" style={LATTICE}>
       <style>{`
         @keyframes smScan { from { transform: translateY(-100%); } to { transform: translateY(650%); } }
         @keyframes smBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -141,7 +156,6 @@ export default function SiteMonitoring({ images, locations }) {
                   src={images[i]}
                   alt={isActive ? loc : ""}
                   fill
-                  priority={i === 0}
                   sizes={isActive ? "(min-width: 1024px) 800px, 100vw" : "200px"}
                   className={`object-cover transition-all duration-700 ${
                     isActive
